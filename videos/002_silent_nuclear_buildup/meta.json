@@ -24,14 +24,5 @@
  "madeForKids": false,
  "syntheticMedia": false,
  "language": "hi",
- "ig_segments": [
-  [
-   0,
-   8.02
-  ],
-  [
-   16.55,
-   33.15
-  ]
- ]
+ "ig_video": "ig.mp4"
 }

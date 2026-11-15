@@ -50,11 +50,11 @@ def with_cover(video, thumb):
                                          "-of", "csv=p=0", video]).decode().strip())
     out = os.path.join(tempfile.mkdtemp(), "ig.mp4")
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", video,
-                    "-loop", "1", "-framerate", "60", "-t", "0.2", "-i", thumb,
-                    "-f", "lavfi", "-t", "0.2", "-i", "anullsrc=r=48000:cl=stereo",
-                    "-filter_complex", "[1:v]scale=1080:1920,setsar=1,fps=60,format=yuv420p[c];"
-                    "[0:v]scale=1080:1920,setsar=1,fps=60,format=yuv420p[v0];"
-                    "[0:a]aresample=48000,aformat=channel_layouts=stereo[a0];"
+                    "-loop", "1", "-framerate", "30", "-t", "0.2", "-i", thumb,
+                    "-f", "lavfi", "-t", "0.2", "-i", "anullsrc=r=44100:cl=stereo",
+                    "-filter_complex", "[1:v]scale=1080:1920,setsar=1,fps=30,format=yuv420p[c];"
+                    "[0:v]scale=1080:1920,setsar=1,fps=30,format=yuv420p[v0];"
+                    "[0:a]aresample=44100,aformat=channel_layouts=stereo[a0];"
                     "[v0][a0][c][2:a]concat=n=2:v=1:a=1[v][a]",
                     "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
                     "-maxrate", "3500k", "-bufsize", "7000k", "-pix_fmt", "yuv420p",
@@ -194,8 +194,14 @@ def instagram_cut(video, segments, thumb=None):
     return out, (int(total * 1000) + 100 if thumb else 0)
 
 def prepare(video, m):
-    thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg")
+    folder = os.path.dirname(video)
+    thumb = os.path.join(folder, "thumbnail.jpg")
     thumb = thumb if os.path.exists(thumb) else None
+    igv = os.path.join(folder, m["ig_video"]) if m.get("ig_video") else None
+    if igv and os.path.exists(igv):
+        if _dur(igv) > IG_MAX_S:
+            sys.exit(f"{m['ig_video']} is longer than {IG_MAX_S}s")
+        return (with_cover(igv, thumb) if thumb else (igv, 0)), True
     if _dur(video) <= IG_MAX_S:
         return (with_cover(video, thumb) if thumb else (video, m.get("ig_thumb_offset_ms", 0))), False
     segs = m.get("ig_segments") or [[0, IG_MAX_S - 0.5]]
