@@ -1,0 +1,18 @@
+{
+ "description": "Rohit speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. The recording is very high quality, with the voice sounding clear and very close up, with no background noise.",
+ "seed": 7,
+ "items": [
+  {
+   "name": "00",
+   "text": "आवाज़ से बीस गुना तेज़, अठारह हज़ार किलोमीटर तक मार। किसके पास हैं ये मिसाइलें?"
+  },
+  {
+   "name": "01",
+   "text": "भारत, अग्नि-पाँच, पाँच हज़ार से ज़्यादा। फ़्रांस, साढ़े नौ हज़ार। अमेरिका, बारह हज़ार, और सबसे भरोसेमंद। चीन, पंद्रह हज़ार। और नंबर एक, रूस, अठारह हज़ार किलोमीटर।"
+  },
+  {
+   "name": "02",
+   "text": "भारत भी इस ख़ास क्लब में है। पूरी वीडियो यूट्यूब पर देखें, और फ़ॉलो करें।"
+  }
+ ]
+}
