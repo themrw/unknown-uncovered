@@ -7,13 +7,14 @@ English on-screen text, curious facts and world data explained simply.
 ## Layout
 - `tools/uu_youtube.py`: YouTube uploader (stdlib only). Used by the GitHub Action.
 - `tools/uu_instagram.py`: Instagram Reels uploader (Instagram API with Instagram Login, resumable upload, stdlib only). Used by the GitHub Action when the `INSTAGRAM_ACCESS_TOKEN` secret exists.
+- `tools/uu_facebook.py`: Facebook Page Reels uploader (Graph API `video_reels`, resumable, sets the thumbnail). Used when the `FACEBOOK_PAGE_ID` and `FACEBOOK_PAGE_TOKEN` secrets exist. The caption is the same as Instagram's, or `fb_caption`.
 - `tools/tts_template.py`: Kokoro Hindi TTS (voice `hm_omega`, speed 1.1, lang `hi`) → `vo_NN.wav` + `durs.json`.
 - `tools/render_template.py`: 1080×1920 60 fps PIL renderer (radar, ticker, flags, typed text, glitch transitions). A template: copy it and write new scene functions for each topic.
 - `tools/thumbnail_template.py`: 1080×1920 thumbnail made with PIL. It uses the renderer's background, radar and flags, Mukta ExtraBold for Hindi (text shaped by raqm) and Anton for numbers. Copy it and redesign it for each topic.
 - `tools/scenes_example_nuclear.py`: example scene set (reel 002) that shows how to restyle the renderer for a new topic.
 - `tools/music_template.py`: synthesized military-style score + voice mix with ducking (imports the renderer as `render3`).
 - `videos/NNN_slug/`: one folder per reel: `video.mp4`, `meta.json`, and `uploaded.json` once it's on YouTube.
-- `.github/workflows/upload.yml`: on push of a `videos/*/meta.json`, uploads every folder with no `uploaded.json` to YouTube and every folder with no `instagram.json` to Instagram Reels, then commits the results.
+- `.github/workflows/upload.yml`: on push of a `videos/*/meta.json`, uploads every folder with no `uploaded.json` to YouTube and every folder with no `instagram.json` to Instagram Reels, and every folder with no `facebook.json` to the Facebook Page as a Reel, then commits the results.
 - `site/`: homepage + privacy policy for the Google OAuth consent screen.
 
 ## Making a reel
@@ -29,6 +30,7 @@ English on-screen text, curious facts and world data explained simply.
 8. Publish: commit `videos/NNN_slug/video.mp4` + `meta.json` (next free number) and push to master. The Action uploads it. Watch it with `gh api repos/themrw/unknown-uncovered/actions/runs?per_page=1`, then report the URLs from `uploaded.json` and `instagram.json` after `git pull`. The Action sets the YouTube thumbnail (`thumbnail.json` when done). If YouTube rate-limits it, the run retries every 6 hours on a schedule. On Instagram, the thumbnail is appended as a 0.2 s end card and used as the Reel cover.
 
 ## Limits
+- Facebook Page token: made from a long-lived user token, so it doesn't expire unless the password changes or access is removed. If it fails, the user makes a new one (Graph API Explorer → extend → `me/accounts`) and updates `FACEBOOK_PAGE_TOKEN`.
 - Instagram token: long-lived and lasts 60 days. Refresh it before then with `tools/uu_instagram.py refresh <token>` (needs graph.instagram.com reachable), or have the user generate a new one in the Meta app dashboard. The user pastes it into the `INSTAGRAM_ACCESS_TOKEN` secret. Instagram allows 50 API posts per 24 hours.
 - Until Google's YouTube API audit passes, API uploads are forced to **Private**. The user flips them to Public in Studio.
 - While the OAuth app is in Testing, the refresh token expires after about 7 days (the Action fails with `invalid_grant`). Run `tools/uu_youtube.py auth-url` with the client secret and have the user sign in and paste back the localhost URL. Run `exchange`, then the user pastes the new token JSON into the `YOUTUBE_TOKEN_JSON` secret.
