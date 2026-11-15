@@ -6,17 +6,19 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import uu_instagram as U
 
 page_id, token, video = sys.argv[1], sys.argv[2], sys.argv[3]
-durs = [int(x) for x in sys.argv[4].split(",")]
+durs = sys.argv[4].split(",")
 ig = U.page_ig(page_id, token); ig_id = ig["user_id"]
 print("account:", ig.get("username"))
 lim = U.call("GET", f"{U.FB_API}/{ig_id}/content_publishing_limit", {"fields": "config,quota_usage", "access_token": token})
 print("publishing limit:", json.dumps(lim))
-for d in durs:
+for spec in durs:
+    d, _, br = spec.partition("@")
     out = os.path.join(tempfile.mkdtemp(), f"cut{d}.mp4")
-    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", video, "-t", str(d), "-c:v", "libx264", "-preset", "veryfast",
-                    "-crf", "23", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", out], check=True)
+    vq = ["-b:v", br, "-maxrate", br, "-bufsize", br] if br else ["-crf", "23"]
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", video, "-t", d, "-c:v", "libx264", "-preset", "veryfast"] + vq +
+                   ["-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", out], check=True)
     size = os.path.getsize(out)
-    res = {"duration_s": d, "size_mb": round(size / 1e6, 1)}
+    res = {"spec": spec, "size_mb": round(size / 1e6, 1)}
     try:
         c = U.call("POST", f"{U.FB_API}/{ig_id}/media", {"media_type": "REELS", "upload_type": "resumable",
                    "share_to_feed": "true", "access_token": token}, data=b"")
