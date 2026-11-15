@@ -73,5 +73,7 @@ if __name__ == "__main__":
             print(json.dumps(whoami(a[1], a[2])))
         elif a[0] == "upload":
             upload(a[1], a[2], a[3], a[4])
+        elif a[0] == "delete":   # delete <page_token> <video_id>: remove a Page video/reel (only when the user asked)
+            print(json.dumps(call("DELETE", f"{API}/{a[2]}", {"access_token": a[1]})))
     except urllib.error.HTTPError as e:
         sys.exit(f"HTTP {e.code}: {e.read().decode(errors='replace')[:800]}")
