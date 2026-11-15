@@ -57,7 +57,7 @@ jobs:
           for d in $dirs; do
             [ -f "$d/meta.json" ] || continue
             [ -f "$d/uploaded.json" ] && { echo "skip $d (already uploaded)"; continue; }
-            v=$(find "$d" -maxdepth 1 -name '*.mp4' | head -1)
+            v="$d/video.mp4"; [ -f "$v" ] || v=$(find "$d" -maxdepth 1 -name '*.mp4' ! -name 'ig.mp4' | sort | head -1)   # main video, never the short IG edit
             [ -n "$v" ] || { echo "::warning::$d has no .mp4"; continue; }
             echo "Uploading $v"
             python3 tools/uu_youtube.py upload "$RUNNER_TEMP/cs.json" "$RUNNER_TEMP/tok.json" "$v" "$d/meta.json" > "$RUNNER_TEMP/out.json"
@@ -100,7 +100,7 @@ jobs:
           for d in $dirs; do
             [ -f "$d/meta.json" ] || continue
             [ -f "$d/facebook.json" ] && { echo "skip $d (already on Facebook)"; continue; }
-            v=$(find "$d" -maxdepth 1 -name '*.mp4' | head -1)
+            v="$d/video.mp4"; [ -f "$v" ] || v=$(find "$d" -maxdepth 1 -name '*.mp4' ! -name 'ig.mp4' | sort | head -1)   # main video, never the short IG edit
             [ -n "$v" ] || continue
             echo "Posting $v to Facebook"
             python3 tools/uu_facebook.py upload "$FACEBOOK_PAGE_ID" "$FACEBOOK_PAGE_TOKEN" "$v" "$d/meta.json" > "$RUNNER_TEMP/fb.json"
@@ -129,7 +129,7 @@ jobs:
           for d in $dirs; do
             [ -f "$d/meta.json" ] || continue
             [ -f "$d/instagram.json" ] && { echo "skip $d (already on Instagram)"; continue; }
-            v=$(find "$d" -maxdepth 1 -name '*.mp4' | head -1)
+            v="$d/video.mp4"; [ -f "$v" ] || v=$(find "$d" -maxdepth 1 -name '*.mp4' ! -name 'ig.mp4' | sort | head -1)   # main video, never the short IG edit
             [ -n "$v" ] || continue
             echo "Posting $v to Instagram"
             if [ "$mode" = ig ]; then
