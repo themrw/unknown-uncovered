@@ -1,4 +1,5 @@
 name: Upload to YouTube
+# Platforms: YouTube Shorts, Instagram Reels (via Facebook Page), Facebook Page Reels
 
 # Runs whenever a video folder's meta.json is pushed, or by hand from the Actions tab.
 # Uploads every folder under videos/ that has meta.json + an .mp4 but no uploaded.json yet.
