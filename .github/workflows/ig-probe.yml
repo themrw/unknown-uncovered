@@ -1,0 +1,17 @@
+name: Instagram upload probe (never publishes)
+on:
+  push:
+    branches: [master, main]
+    paths: ["probe/request.txt"]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe
+        env:
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          FACEBOOK_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_TOKEN }}
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null; }
+          python3 tools/ig_probe.py "$FACEBOOK_PAGE_ID" "$FACEBOOK_PAGE_TOKEN" videos/002_silent_nuclear_buildup/video.mp4 "$(cat probe/request.txt)"
