@@ -166,7 +166,7 @@ jobs:
         run: |
           git config user.name "uu-uploader"
           git config user.email "uu-uploader@users.noreply.github.com"
-          git add -A videos/*/uploaded.json videos/*/instagram.json videos/*/thumbnail.json videos/*/facebook.json videos/*/facebook_replace.json 2>/dev/null || true
+          git add -A -- videos ':(exclude)videos/*/*.mp4'   # result files only (one unmatched glob used to drop them all)
           if git diff --cached --quiet; then echo "Nothing to record"; exit 0; fi
           git commit -m "Record upload results [skip ci]"
           git push
