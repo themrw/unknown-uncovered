@@ -6,7 +6,7 @@ English on-screen text, curious facts and world data explained simply.
 
 ## Layout
 - `tools/uu_youtube.py`: YouTube uploader (stdlib only). Used by the GitHub Action.
-- `tools/uu_instagram.py`: Instagram Reels uploader (Instagram API with Instagram Login, resumable upload, stdlib only). Used by the GitHub Action when the `INSTAGRAM_ACCESS_TOKEN` secret exists.
+- `tools/uu_instagram.py`: Instagram Reels uploader (Instagram API with Instagram Login, resumable upload, stdlib only). Used by the GitHub Action with `INSTAGRAM_ACCESS_TOKEN`, or, if that's absent, through the Facebook Page's linked Instagram account using `FACEBOOK_PAGE_ID` + `FACEBOOK_PAGE_TOKEN` (graph.facebook.com). The Page route is the one in use: one never-expiring token covers Facebook and Instagram.
 - `tools/uu_facebook.py`: Facebook Page Reels uploader (Graph API `video_reels`, resumable, sets the thumbnail). Used when the `FACEBOOK_PAGE_ID` and `FACEBOOK_PAGE_TOKEN` secrets exist. The caption is the same as Instagram's, or `fb_caption`.
 - `tools/tts_template.py`: Kokoro Hindi TTS (voice `hm_omega`, speed 1.1, lang `hi`) → `vo_NN.wav` + `durs.json`.
 - `tools/render_template.py`: 1080×1920 60 fps PIL renderer (radar, ticker, flags, typed text, glitch transitions). A template: copy it and write new scene functions for each topic.

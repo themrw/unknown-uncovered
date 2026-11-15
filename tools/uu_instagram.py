@@ -5,6 +5,10 @@ Commands:
   whoami   <token>                        show the connected Instagram account
   upload   <token> <video.mp4> <meta.json> publish a Reel, print JSON with id + permalink
   refresh  <token>                        print a refreshed 60-day token (JSON)
+  whoami-page  <page_id> <page_token>     show the Instagram account linked to a Facebook Page
+  upload-page  <page_id> <page_token> <video.mp4> <meta.json>
+                                          publish a Reel through the Page's linked Instagram account
+                                          (Instagram API with Facebook Login, graph.facebook.com)
 
 Caption: meta["ig_caption"] if present, else built from meta title + description
 (#Shorts removed, YouTube wording swapped, at most 30 hashtags, 2200 chars).
@@ -57,16 +61,26 @@ def with_cover(video, thumb):
                     "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", out], check=True)
     return out, int(dur * 1000) + 100
 
-def upload(token, video, meta_path):
+FB_API = "https://graph.facebook.com/v22.0"
+
+def page_ig(page_id, token):
+    d = call("GET", f"{FB_API}/{page_id}", {"fields": "name,instagram_business_account{id,username}", "access_token": token})
+    ig = d.get("instagram_business_account")
+    if not ig:
+        sys.exit("No Instagram account is linked to this Facebook Page (Page settings > Linked accounts > Instagram).")
+    return {"user_id": ig["id"], "username": ig.get("username"), "page": d.get("name")}
+
+def upload(token, video, meta_path, api=None, ig=None):
+    api = api or API
     m = json.load(open(meta_path))
     offset = m.get("ig_thumb_offset_ms", 14000)
     thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg")
     if os.path.exists(thumb) and shutil.which("ffmpeg"):
         video, offset = with_cover(video, thumb)
-    ig = me(token)
+    ig = ig or me(token)
     ig_id = ig.get("user_id") or ig["id"]
     size = os.path.getsize(video)
-    c = call("POST", f"{API}/{ig_id}/media", {
+    c = call("POST", f"{api}/{ig_id}/media", {
         "media_type": "REELS", "upload_type": "resumable", "share_to_feed": "true",
         "caption": build_caption(m), "thumb_offset": str(offset),
         "access_token": token}, data=b"")
@@ -78,7 +92,7 @@ def upload(token, video, meta_path):
     if not r.get("success"):
         sys.exit("Upload failed: " + json.dumps(r))
     for _ in range(60):
-        s = call("GET", f"{API}/{cid}", {"fields": "status_code,status", "access_token": token})
+        s = call("GET", f"{api}/{cid}", {"fields": "status_code,status", "access_token": token})
         if s.get("status_code") == "FINISHED":
             break
         if s.get("status_code") in ("ERROR", "EXPIRED"):
@@ -86,9 +100,9 @@ def upload(token, video, meta_path):
         time.sleep(10)
     else:
         sys.exit("Timed out waiting for Instagram to process the video")
-    p = call("POST", f"{API}/{ig_id}/media_publish", {"creation_id": cid, "access_token": token}, data=b"")
+    p = call("POST", f"{api}/{ig_id}/media_publish", {"creation_id": cid, "access_token": token}, data=b"")
     mid = p["id"]
-    info = call("GET", f"{API}/{mid}", {"fields": "permalink", "access_token": token})
+    info = call("GET", f"{api}/{mid}", {"fields": "permalink", "access_token": token})
     print(json.dumps({"id": mid, "url": info.get("permalink"), "account": ig.get("username")}, ensure_ascii=False))
 
 def refresh(token):
@@ -102,6 +116,10 @@ if __name__ == "__main__":
             print(json.dumps(me(a[1])))
         elif a[0] == "upload":
             upload(a[1], a[2], a[3])
+        elif a[0] == "whoami-page":
+            print(json.dumps(page_ig(a[1], a[2])))
+        elif a[0] == "upload-page":
+            upload(a[2], a[3], a[4], api=FB_API, ig=page_ig(a[1], a[2]))
         elif a[0] == "refresh":
             refresh(a[1])
     except urllib.error.HTTPError as e:
