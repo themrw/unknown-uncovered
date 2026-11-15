@@ -1,10 +1,11 @@
 name: Generate voice (Indic Parler-TTS)
 
-# Push voice/requests/<name>.json to master -> writes voice/out/<name>/*.wav and commits them back.
+# Push voice/requests/<name>.json to master -> writes voice/out/<name>/*.wav (+ done.json) and commits them back.
+# The work is split across 4 parallel runners (CPU only, about 1 min per sentence on each).
 on:
   push:
     branches: [master]
-    paths: ["voice/requests/**.json", ".github/workflows/voice.yml"]
+    paths: ["voice/requests/**.json"]
 
 permissions:
   contents: write
@@ -16,9 +17,15 @@ concurrency:
 jobs:
   tts:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -34,19 +41,45 @@ jobs:
           pip install --quiet git+https://github.com/huggingface/parler-tts.git soundfile
           # newer sentencepiece needs protobuf>=5.26 (audiotools pins an old one it doesn't need at inference)
           pip install --quiet -U "protobuf>=5.26"
-          python -c "import torch, torchaudio, google.protobuf as p; print('torch', torch.__version__, 'torchaudio', torchaudio.__version__, 'protobuf', p.__version__)"
       - name: Check Hugging Face access
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           if [ -z "$HF_TOKEN" ]; then echo "::error::HF_TOKEN secret is missing"; exit 1; fi
           python -c "from huggingface_hub import HfApi; print('signed in as', HfApi().whoami()['name'])"
-      - name: Synthesize pending requests
+      - name: Synthesize this shard
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python tools/v2/uu_voice_parler.py
-      - name: Commit voice files
+        run: python tools/v2/uu_voice_parler.py --shard ${{ matrix.shard }} --of 4
+      - uses: actions/upload-artifact@v4
         if: always()
+        with:
+          name: voice-${{ matrix.shard }}
+          path: voice/out
+          if-no-files-found: ignore
+          retention-days: 3
+
+  commit:
+    needs: tts
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: voice-*
+          path: voice/out
+          merge-multiple: true
+      - name: Write done markers
+        run: |
+          pip install --quiet soundfile numpy
+          python tools/v2/uu_voice_parler.py --finish
+      - name: Commit voice files
         run: |
           git config user.name "uu-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
