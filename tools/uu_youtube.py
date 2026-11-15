@@ -92,8 +92,24 @@ def cmd_upload(cs, tok_path, video, meta_path):
                       "privacyStatus": res.get("status", {}).get("privacyStatus"),
                       "uploadStatus": res.get("status", {}).get("uploadStatus")}, ensure_ascii=False))
 
+def wait_processed(at, video_id, timeout=900):
+    """A thumbnail set before YouTube finishes processing can be replaced by the auto frame, so wait first."""
+    import time
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        r = urllib.request.Request("https://www.googleapis.com/youtube/v3/videos?part=processingDetails&id=" + video_id,
+                                   headers={"Authorization": "Bearer " + at})
+        items = json.load(urllib.request.urlopen(r)).get("items", [])
+        st = items[0].get("processingDetails", {}).get("processingStatus") if items else None
+        if st in ("succeeded", "failed", "terminated"):
+            print("processing:", st, file=sys.stderr); return
+        time.sleep(20)
+    print("processing: still running, setting thumbnail anyway", file=sys.stderr)
+
 def cmd_thumbnail(cs, tok_path, video_id, image):
     at = access_token(cs, tok_path)
+    wait_processed(at, video_id)
+    import time; time.sleep(30)   # let YouTube settle its own auto-thumbnail first
     ctype = "image/png" if image.lower().endswith(".png") else "image/jpeg"
     with open(image, "rb") as f:
         req = urllib.request.Request(
