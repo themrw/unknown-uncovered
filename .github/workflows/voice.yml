@@ -29,8 +29,10 @@ jobs:
           key: hf-indic-parler-tts-v1
       - name: Install
         run: |
-          pip install --quiet --index-url https://download.pytorch.org/whl/cpu torch
           pip install --quiet git+https://github.com/huggingface/parler-tts.git soundfile
+          # CPU-only runner: replace any CUDA builds with matching CPU torch + torchaudio
+          pip install --quiet --force-reinstall --no-deps --index-url https://download.pytorch.org/whl/cpu torch torchaudio
+          python -c "import torch, torchaudio; print('torch', torch.__version__, 'torchaudio', torchaudio.__version__)"
       - name: Check Hugging Face access
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
