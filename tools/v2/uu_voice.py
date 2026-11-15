@@ -6,7 +6,7 @@ Two engines, chosen by spec["tts"]:
       1) uu_voice.py spec.json request <job>   -> writes <repo>/voice/requests/<job>.json; commit + push it
       2) wait for the "Generate voice" Action, git pull
       3) uu_voice.py spec.json                 -> reads <repo>/voice/out/<spec["voice_job"]>/NN.wav, polishes -> vo/
-     Speaker/style caption: spec["voice_desc"] (default: Rohit, documentary narrator). Optional spec["speed"] via atempo.
+     Speaker/style caption: spec["voice_desc"] (default: Aman, energetic documentary narrator). Optional spec["speed"] via atempo.
   "kokoro" (offline fallback, robotic): kokoro-onnx with spec["voice"] (hm_psi) and spec["speed"]; models in $UU_TTS.
 Repo path: $UU_REPO (default /home/claude/unknown-uncovered).
 """
@@ -17,7 +17,7 @@ spec_path = sys.argv[1]; spec = json.load(open(spec_path))
 work = os.path.dirname(os.path.abspath(spec_path)); vo = os.path.join(work, "vo"); os.makedirs(vo, exist_ok=True)
 REPO = os.environ.get("UU_REPO", "/home/claude/unknown-uncovered")
 engine = spec.get("tts", "parler")
-DESC = ("Rohit speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. "
+DESC = ("Aman speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. "
         "The recording is very high quality, with the voice sounding clear and very close up, with no background noise.")
 # gentle broadcast polish: no echo, no harsh presence boost (those made Kokoro sound like a phone line)
 POLISH = {"parler": "highpass=f=60,lowpass=f=15000,equalizer=f=220:t=q:w=1:g=1.5,acompressor=threshold=-22dB:ratio=2.5:attack=8:release=150:makeup=2",
