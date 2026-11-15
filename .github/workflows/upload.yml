@@ -6,6 +6,8 @@ on:
   push:
     branches: [master, main]
     paths: ["videos/**/meta.json", ".github/workflows/upload.yml"]
+  schedule:
+    - cron: "17 */6 * * *"   # every 6 hours: retry pending thumbnails / posts
   workflow_dispatch:
     inputs:
       folder:
@@ -65,6 +67,24 @@ jobs:
             uploaded=$((uploaded+1))
           done
 
+      - name: Set pending YouTube thumbnails
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          for d in $(find videos -mindepth 1 -maxdepth 1 -type d | sort); do
+            [ -f "$d/uploaded.json" ] && [ -f "$d/thumbnail.jpg" ] || continue
+            [ -f "$d/thumbnail.json" ] && continue
+            vid=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1])).get('id',''))" "$d/uploaded.json")
+            [ -n "$vid" ] || continue
+            echo "Setting thumbnail for $d ($vid)"
+            if python3 tools/uu_youtube.py thumbnail "$RUNNER_TEMP/cs.json" "$RUNNER_TEMP/tok.json" "$vid" "$d/thumbnail.jpg" > "$RUNNER_TEMP/th.json"; then
+              mv "$RUNNER_TEMP/th.json" "$d/thumbnail.json"
+              echo "- Thumbnail set for **$d**" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning::Thumbnail for $d not set yet (will retry on the next run)"
+            fi
+          done
+
       - name: Post pending reels to Instagram
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
@@ -73,6 +93,7 @@ jobs:
           set -euo pipefail
           if [ -z "${INSTAGRAM_ACCESS_TOKEN:-}" ]; then echo "No INSTAGRAM_ACCESS_TOKEN secret, skipping Instagram"; exit 0; fi
           echo "Instagram account:"; python3 tools/uu_instagram.py whoami "$INSTAGRAM_ACCESS_TOKEN"
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null; }
           if [ -n "${ONLY_FOLDER:-}" ]; then dirs="${ONLY_FOLDER%/}"; else dirs=$(find videos -mindepth 1 -maxdepth 1 -type d | sort); fi
           for d in $dirs; do
             [ -f "$d/meta.json" ] || continue
@@ -92,7 +113,7 @@ jobs:
         run: |
           git config user.name "uu-uploader"
           git config user.email "uu-uploader@users.noreply.github.com"
-          git add videos/*/uploaded.json videos/*/instagram.json 2>/dev/null || true
+          git add videos/*/uploaded.json videos/*/instagram.json videos/*/thumbnail.json 2>/dev/null || true
           if git diff --cached --quiet; then echo "Nothing to record"; exit 0; fi
           git commit -m "Record upload results [skip ci]"
           git push

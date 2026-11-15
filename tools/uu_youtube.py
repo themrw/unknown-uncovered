@@ -6,6 +6,7 @@ Commands:
   exchange  <client_secret.json> <code> <token.json>  turn the code into a saved token
   upload    <client_secret.json> <token.json> <video.mp4> <meta.json>
   whoami    <client_secret.json> <token.json>         show which channel the token belongs to
+  thumbnail <client_secret.json> <token.json> <video_id> <image.jpg>  set a custom thumbnail (JPG/PNG, under 2 MB)
 
 meta.json: {"title": "...", "description": "...", "tags": [...], "categoryId": "25",
             "privacyStatus": "public", "madeForKids": false, "language": "hi"}
@@ -91,12 +92,24 @@ def cmd_upload(cs, tok_path, video, meta_path):
                       "privacyStatus": res.get("status", {}).get("privacyStatus"),
                       "uploadStatus": res.get("status", {}).get("uploadStatus")}, ensure_ascii=False))
 
+def cmd_thumbnail(cs, tok_path, video_id, image):
+    at = access_token(cs, tok_path)
+    ctype = "image/png" if image.lower().endswith(".png") else "image/jpeg"
+    with open(image, "rb") as f:
+        req = urllib.request.Request(
+            "https://www.googleapis.com/upload/youtube/v3/thumbnails/set?uploadType=media&videoId=" + video_id,
+            data=f.read(), method="POST", headers={"Authorization": "Bearer " + at, "Content-Type": ctype})
+    with urllib.request.urlopen(req) as r:
+        d = json.load(r)
+    print(json.dumps({"videoId": video_id, "thumbnail": d.get("items", [{}])[0].get("maxres", d.get("items", [{}])[0].get("default", {})).get("url")}))
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     try:
         {"auth-url": lambda: cmd_auth_url(a[1]),
          "exchange": lambda: cmd_exchange(a[1], a[2], a[3]),
          "whoami": lambda: cmd_whoami(a[1], a[2]),
-         "upload": lambda: cmd_upload(a[1], a[2], a[3], a[4])}[a[0]]()
+         "upload": lambda: cmd_upload(a[1], a[2], a[3], a[4]),
+         "thumbnail": lambda: cmd_thumbnail(a[1], a[2], a[3], a[4])}[a[0]]()
     except urllib.error.HTTPError as e:
         sys.exit(f"HTTP {e.code}: {e.read().decode(errors='replace')[:800]}")

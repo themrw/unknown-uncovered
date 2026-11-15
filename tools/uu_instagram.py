@@ -8,9 +8,11 @@ Commands:
 
 Caption: meta["ig_caption"] if present, else built from meta title + description
 (#Shorts removed, YouTube wording swapped, at most 30 hashtags, 2200 chars).
-Cover frame: meta["ig_thumb_offset_ms"] (default 14000).
+Cover: if thumbnail.jpg sits next to the video and ffmpeg is available, a 0.2 s still of it is
+appended to the end of the Instagram copy and used as the Reel cover; otherwise the frame at
+meta["ig_thumb_offset_ms"] (default 14000) is used.
 """
-import json, os, re, sys, time, urllib.parse, urllib.request, urllib.error
+import json, os, re, shutil, subprocess, sys, tempfile, time, urllib.parse, urllib.request, urllib.error
 
 API = "https://graph.instagram.com/v22.0"
 
@@ -38,14 +40,35 @@ def build_caption(m):
             cap = cap.replace(t, "", 1)
     return cap[:2200]
 
+def with_cover(video, thumb):
+    """Return (path, cover_offset_ms) for a copy of video with the thumbnail appended as a short end card."""
+    dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                                         "-of", "csv=p=0", video]).decode().strip())
+    out = os.path.join(tempfile.mkdtemp(), "ig.mp4")
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", video,
+                    "-loop", "1", "-framerate", "60", "-t", "0.2", "-i", thumb,
+                    "-f", "lavfi", "-t", "0.2", "-i", "anullsrc=r=48000:cl=stereo",
+                    "-filter_complex", "[1:v]scale=1080:1920,setsar=1,fps=60,format=yuv420p[c];"
+                    "[0:v]scale=1080:1920,setsar=1,fps=60,format=yuv420p[v0];"
+                    "[0:a]aresample=48000,aformat=channel_layouts=stereo[a0];"
+                    "[v0][a0][c][2:a]concat=n=2:v=1:a=1[v][a]",
+                    "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+                    "-maxrate", "3500k", "-bufsize", "7000k", "-pix_fmt", "yuv420p",
+                    "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", out], check=True)
+    return out, int(dur * 1000) + 100
+
 def upload(token, video, meta_path):
     m = json.load(open(meta_path))
+    offset = m.get("ig_thumb_offset_ms", 14000)
+    thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg")
+    if os.path.exists(thumb) and shutil.which("ffmpeg"):
+        video, offset = with_cover(video, thumb)
     ig = me(token)
     ig_id = ig.get("user_id") or ig["id"]
     size = os.path.getsize(video)
     c = call("POST", f"{API}/{ig_id}/media", {
         "media_type": "REELS", "upload_type": "resumable", "share_to_feed": "true",
-        "caption": build_caption(m), "thumb_offset": str(m.get("ig_thumb_offset_ms", 14000)),
+        "caption": build_caption(m), "thumb_offset": str(offset),
         "access_token": token}, data=b"")
     cid, uri = c["id"], c["uri"]
     with open(video, "rb") as f:

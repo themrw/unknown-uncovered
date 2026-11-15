@@ -9,6 +9,8 @@ English on-screen text, curious facts and world data explained simply.
 - `tools/uu_instagram.py`: Instagram Reels uploader (Instagram API with Instagram Login, resumable upload, stdlib only). Used by the GitHub Action when the `INSTAGRAM_ACCESS_TOKEN` secret exists.
 - `tools/tts_template.py`: Kokoro Hindi TTS (voice `hm_omega`, speed 1.1, lang `hi`) → `vo_NN.wav` + `durs.json`.
 - `tools/render_template.py`: 1080×1920 60 fps PIL renderer (radar, ticker, flags, typed text, glitch transitions). A template: copy it and write new scene functions for each topic.
+- `tools/thumbnail_template.py`: 1080×1920 thumbnail made with PIL. It uses the renderer's background, radar and flags, Mukta ExtraBold for Hindi (text shaped by raqm) and Anton for numbers. Copy it and redesign it for each topic.
+- `tools/scenes_example_nuclear.py`: example scene set (reel 002) that shows how to restyle the renderer for a new topic.
 - `tools/music_template.py`: synthesized military-style score + voice mix with ducking (imports the renderer as `render3`).
 - `videos/NNN_slug/`: one folder per reel: `video.mp4`, `meta.json`, and `uploaded.json` once it's on YouTube.
 - `.github/workflows/upload.yml`: on push of a `videos/*/meta.json`, uploads every folder with no `uploaded.json` to YouTube and every folder with no `instagram.json` to Instagram Reels, then commits the results.
@@ -20,10 +22,11 @@ English on-screen text, curious facts and world data explained simply.
 3. Setup in the workspace: `pip install --break-system-packages kokoro-onnx soundfile scipy`, then download `kokoro-v1.0.onnx` and `voices-v1.0.bin` from
    `https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/` into `/home/claude/tts/`.
 4. Copy the templates to `/home/claude/tts/tts.py`, `/home/claude/reel2/render3.py` and `/home/claude/reel2/music3.py` (these paths are hard-coded), adapt the lines, scenes and data, and render 2–3 stills to check before the full render.
-5. Mux, check loudness (≈ −14 LUFS), then compress: `-crf 23 -maxrate 2400k -bufsize 4800k` (keep it under ~30 MB).
-6. Write `meta.json`: title ≤100 chars (Hindi hook + English keywords + #Shorts); description with the hook, key numbers, an engagement question, a subscribe line, sources and 8–12 hashtags; 12–18 tags under 450 characters in total; `categoryId` 25 or 27; `privacyStatus` public; `madeForKids` false; `language` hi. No `<` or `>`.
+5. **Thumbnail (always required).** Make `videos/NNN_slug/thumbnail.jpg`: 1080×1920 JPG, quality 88, under 2 MB. Use a big Hindi hook (Mukta ExtraBold, stroked, drop shadow), one striking number (Anton), a symbol or flags, and a curiosity sticker such as "भारत कहाँ?". Keep the key content inside the central 1080×1440 so Instagram's grid crop doesn't cut it. Fonts: download `Mukta-ExtraBold.ttf` and `Anton-Regular.ttf` from `https://raw.githubusercontent.com/google/fonts/main/ofl/<family>/` into `/home/claude/fonts/`. Look at the image before publishing.
+6. Mux, check loudness (≈ −14 LUFS), then compress: `-crf 23 -maxrate 2400k -bufsize 4800k` (keep it under ~30 MB).
+7. Write `meta.json`: title ≤100 chars (Hindi hook + English keywords + #Shorts); description with the hook, key numbers, an engagement question, a subscribe line, sources and 8–12 hashtags; 12–18 tags under 450 characters in total; `categoryId` 25 or 27; `privacyStatus` public; `madeForKids` false; `language` hi. No `<` or `>`.
    Optional for Instagram: `ig_thumb_offset_ms` (the cover frame, e.g. the first country card) and `ig_caption` (otherwise built from the title and description, with #Shorts removed and at most 30 hashtags).
-7. Publish: commit `videos/NNN_slug/video.mp4` + `meta.json` (next free number) and push to master. The Action uploads it. Watch it with `gh api repos/themrw/unknown-uncovered/actions/runs?per_page=1`, then report the URL from `uploaded.json` after `git pull`.
+8. Publish: commit `videos/NNN_slug/video.mp4` + `meta.json` (next free number) and push to master. The Action uploads it. Watch it with `gh api repos/themrw/unknown-uncovered/actions/runs?per_page=1`, then report the URLs from `uploaded.json` and `instagram.json` after `git pull`. The Action sets the YouTube thumbnail (`thumbnail.json` when done). If YouTube rate-limits it, the run retries every 6 hours on a schedule. On Instagram, the thumbnail is appended as a 0.2 s end card and used as the Reel cover.
 
 ## Limits
 - Instagram token: long-lived and lasts 60 days. Refresh it before then with `tools/uu_instagram.py refresh <token>` (needs graph.instagram.com reachable), or have the user generate a new one in the Meta app dashboard. The user pastes it into the `INSTAGRAM_ACCESS_TOKEN` secret. Instagram allows 50 API posts per 24 hours.
