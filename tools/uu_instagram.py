@@ -103,6 +103,41 @@ def _publish(token, video, m, caption, offset, api, ig_id):
         raise RuntimeError("publish: HTTP %s %s" % (e.code, e.read().decode(errors="replace")[:400]))
     return p["id"]
 
+def _publish_url(token, video_url, caption, offset, api, ig_id, cover_url=None):
+    params = {"media_type": "REELS", "video_url": video_url, "share_to_feed": "true",
+              "caption": caption, "access_token": token}
+    if cover_url:
+        params["cover_url"] = cover_url
+    else:
+        params["thumb_offset"] = str(offset)
+    try:
+        c = call("POST", f"{api}/{ig_id}/media", params, data=b"")
+    except urllib.error.HTTPError as e:
+        raise RuntimeError("create container (url): HTTP %s %s" % (e.code, e.read().decode(errors="replace")[:400]))
+    cid = c["id"]
+    s = {}
+    for _ in range(90):
+        s = call("GET", f"{api}/{cid}", {"fields": "status_code,status", "access_token": token})
+        if s.get("status_code") == "FINISHED":
+            break
+        if s.get("status_code") in ("ERROR", "EXPIRED"):
+            raise RuntimeError("processing (url): " + json.dumps(s))
+        time.sleep(10)
+    else:
+        raise RuntimeError("processing (url) timed out: " + json.dumps(s))
+    try:
+        p = call("POST", f"{api}/{ig_id}/media_publish", {"creation_id": cid, "access_token": token}, data=b"")
+    except urllib.error.HTTPError as e:
+        raise RuntimeError("publish (url): HTTP %s %s" % (e.code, e.read().decode(errors="replace")[:400]))
+    return p["id"]
+
+def facebook_source(token, fb_video_id):
+    """Public CDN URLs of a video already posted to the Facebook Page, plus its preferred thumbnail."""
+    d = call("GET", f"{FB_API}/{fb_video_id}", {"fields": "source,thumbnails{uri,is_preferred}", "access_token": token})
+    thumbs = d.get("thumbnails", {}).get("data", [])
+    pref = next((t["uri"] for t in thumbs if t.get("is_preferred")), None)
+    return d.get("source"), pref
+
 def upload(token, video, meta_path, api=None, ig=None):
     api = api or API
     m = json.load(open(meta_path))
@@ -117,8 +152,22 @@ def upload(token, video, meta_path, api=None, ig=None):
         except Exception as e:
             print(f"cover end card not made: {e}", file=sys.stderr)
     attempts.append(("plain video", video, m.get("ig_thumb_offset_ms", 14000)))
+    fbj = os.path.join(os.path.dirname(video), "facebook.json")
+    fb_id = None
+    if api == FB_API and os.path.exists(fbj):
+        fb_id = json.load(open(fbj)).get("id")
     mid, errors = None, []
-    for label, path, offset in attempts:
+    if fb_id:
+        try:
+            print("Instagram attempt: video from the Facebook reel", file=sys.stderr)
+            src, cover = facebook_source(token, fb_id)
+            if not src:
+                raise RuntimeError("Facebook gave no video source URL")
+            mid = _publish_url(token, src, caption, m.get("ig_thumb_offset_ms", 14000), api, ig_id, cover)
+        except Exception as e:
+            errors.append(f"facebook source: {e}")
+            print(f"Instagram attempt failed (facebook source): {e}", file=sys.stderr)
+    for label, path, offset in ([] if mid else attempts):
         try:
             print(f"Instagram attempt: {label}", file=sys.stderr)
             mid = _publish(token, path, m, caption, offset, api, ig_id)

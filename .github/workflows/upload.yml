@@ -86,6 +86,30 @@ jobs:
             fi
           done
 
+      - name: Post pending reels to Facebook Page
+        if: always()
+        env:
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          FACEBOOK_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_TOKEN }}
+          ONLY_FOLDER: ${{ github.event.inputs.folder }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FACEBOOK_PAGE_ID:-}" ] || [ -z "${FACEBOOK_PAGE_TOKEN:-}" ]; then echo "No Facebook secrets, skipping Facebook"; exit 0; fi
+          echo "Facebook Page:"; python3 tools/uu_facebook.py whoami "$FACEBOOK_PAGE_ID" "$FACEBOOK_PAGE_TOKEN"
+          if [ -n "${ONLY_FOLDER:-}" ]; then dirs="${ONLY_FOLDER%/}"; else dirs=$(find videos -mindepth 1 -maxdepth 1 -type d | sort); fi
+          for d in $dirs; do
+            [ -f "$d/meta.json" ] || continue
+            [ -f "$d/facebook.json" ] && { echo "skip $d (already on Facebook)"; continue; }
+            v=$(find "$d" -maxdepth 1 -name '*.mp4' | head -1)
+            [ -n "$v" ] || continue
+            echo "Posting $v to Facebook"
+            python3 tools/uu_facebook.py upload "$FACEBOOK_PAGE_ID" "$FACEBOOK_PAGE_TOKEN" "$v" "$d/meta.json" > "$RUNNER_TEMP/fb.json"
+            mv "$RUNNER_TEMP/fb.json" "$d/facebook.json"
+            cat "$d/facebook.json"
+            url=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['url'])" "$d/facebook.json")
+            echo "- Facebook **$d** → $url" >> "$GITHUB_STEP_SUMMARY"
+          done
+
       - name: Post pending reels to Instagram
         if: always()
         env:
@@ -117,30 +141,6 @@ jobs:
             cat "$d/instagram.json"
             url=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['url'])" "$d/instagram.json")
             echo "- Instagram **$d** → $url" >> "$GITHUB_STEP_SUMMARY"
-          done
-
-      - name: Post pending reels to Facebook Page
-        if: always()
-        env:
-          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
-          FACEBOOK_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_TOKEN }}
-          ONLY_FOLDER: ${{ github.event.inputs.folder }}
-        run: |
-          set -euo pipefail
-          if [ -z "${FACEBOOK_PAGE_ID:-}" ] || [ -z "${FACEBOOK_PAGE_TOKEN:-}" ]; then echo "No Facebook secrets, skipping Facebook"; exit 0; fi
-          echo "Facebook Page:"; python3 tools/uu_facebook.py whoami "$FACEBOOK_PAGE_ID" "$FACEBOOK_PAGE_TOKEN"
-          if [ -n "${ONLY_FOLDER:-}" ]; then dirs="${ONLY_FOLDER%/}"; else dirs=$(find videos -mindepth 1 -maxdepth 1 -type d | sort); fi
-          for d in $dirs; do
-            [ -f "$d/meta.json" ] || continue
-            [ -f "$d/facebook.json" ] && { echo "skip $d (already on Facebook)"; continue; }
-            v=$(find "$d" -maxdepth 1 -name '*.mp4' | head -1)
-            [ -n "$v" ] || continue
-            echo "Posting $v to Facebook"
-            python3 tools/uu_facebook.py upload "$FACEBOOK_PAGE_ID" "$FACEBOOK_PAGE_TOKEN" "$v" "$d/meta.json" > "$RUNNER_TEMP/fb.json"
-            mv "$RUNNER_TEMP/fb.json" "$d/facebook.json"
-            cat "$d/facebook.json"
-            url=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['url'])" "$d/facebook.json")
-            echo "- Facebook **$d** → $url" >> "$GITHUB_STEP_SUMMARY"
           done
 
       - name: Record results
