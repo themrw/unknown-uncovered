@@ -1,0 +1,276 @@
+{
+ "theme": "nuclear",
+ "voice": "hm_psi",
+ "speed": 1.0,
+ "header": "THE SILENT NUCLEAR BUILD-UP",
+ "source": "Source: SIPRI Yearbooks 2021 & 2026",
+ "ticker": "  12,187 NUCLEAR WARHEADS WORLDWIDE   ///   MILITARY STOCKPILES GROWING AGAIN   ///   9 NUCLEAR-ARMED STATES   ///   SOURCE: SIPRI YEARBOOK 2026   ///",
+ "scenes": [
+  {
+   "type": "hook",
+   "min": 5.5,
+   "file": [
+    "> FILE 002 // NUCLEAR STOCKPILES",
+    "> STATUS: UNDER WATCH",
+    "> SOURCE: SIPRI"
+   ],
+   "title": [
+    [
+     "A SILENT",
+     "WHITE"
+    ],
+    [
+     "RACE IS",
+     "WHITE"
+    ],
+    [
+     "UNDERWAY",
+     "accent"
+    ]
+   ],
+   "title_at": 1.6,
+   "blips": [
+    [
+     35,
+     105
+    ],
+    [
+     22,
+     79
+    ],
+    [
+     40,
+     127
+    ],
+    [
+     30,
+     70
+    ],
+    [
+     54,
+     -2
+    ]
+   ],
+   "vo": "दुनिया में एक ख़ामोश दौड़ चल रही है, और ज़्यादातर लोगों को इसकी ख़बर तक नहीं।"
+  },
+  {
+   "type": "tease",
+   "min": 5.0,
+   "kicker": "> 2021 → 2026",
+   "big": "5",
+   "big_label": "COUNTRIES. MORE WARHEADS.",
+   "hook": "One of them will surprise you.",
+   "cards": 5,
+   "vo": "पिछले पाँच सालों में, पाँच देशों ने चुपचाप अपने परमाणु हथियार बढ़ाए हैं, और इनमें से एक नाम आपको ज़रूर चौंका देगा।"
+  },
+  {
+   "type": "stat",
+   "view": [
+    20,
+    30
+   ],
+   "kicker": "> NUCLEAR WARHEADS WORLDWIDE, JAN 2026",
+   "value": 12187,
+   "label": "WARHEADS",
+   "items": [
+    [
+     "9,745",
+     "in military stockpiles, ready for use"
+    ],
+    [
+     "+130",
+     "added to stockpiles in just one year"
+    ],
+    [
+     "9",
+     "countries have nuclear weapons"
+    ]
+   ],
+   "vo": "आज दुनिया में करीब बारह हज़ार परमाणु हथियार हैं, और इस्तेमाल के लिए तैयार भंडार, फिर से बढ़ने लगा है। तो आइए, उल्टी गिनती शुरू करते हैं।"
+  },
+  {
+   "type": "rank",
+   "rank": 5,
+   "code": "GB",
+   "name": "UNITED KINGDOM",
+   "sub": "Raised its warhead cap in 2021",
+   "tag": "GONE QUIET",
+   "from_label": "Warhead cap: 180  →",
+   "from": 180,
+   "to": 260,
+   "to_label": "260",
+   "unit": "CAP",
+   "delta": "+80",
+   "fact": [
+    "Then stopped publishing",
+    "how many it actually has"
+   ],
+   "vo": "पाँचवें नंबर पर है ब्रिटेन, जिसने अपनी सीमा एक सौ अस्सी से बढ़ाकर दो सौ साठ कर दी, और फिर अपनी असली गिनती बताना ही बंद कर दिया।"
+  },
+  {
+   "type": "rank",
+   "rank": 4,
+   "code": "PK",
+   "name": "PAKISTAN",
+   "sub": "Warheads, 2021 → 2026",
+   "tag": "SLOW & STEADY",
+   "from_label": "2021: 165  →  2026:",
+   "from": 165,
+   "to": 170,
+   "to_label": "~170",
+   "prefix": "~",
+   "unit": "WARHEADS",
+   "delta": "+5",
+   "fact": [
+    "Building new delivery systems",
+    "and more fissile material"
+   ],
+   "vo": "चौथे नंबर पर पाकिस्तान, एक सौ पैंसठ से बढ़कर करीब एक सौ सत्तर, और आने वाले दशक में ये संख्या और बढ़ सकती है।"
+  },
+  {
+   "type": "rank",
+   "rank": 3,
+   "code": "KP",
+   "name": "NORTH KOREA",
+   "sub": "Warheads, 2021 → 2026",
+   "tag": "ACCELERATING",
+   "from_label": "2021: 40–50  →  2026:",
+   "from": 45,
+   "to": 60,
+   "to_label": "~60",
+   "prefix": "~",
+   "unit": "WARHEADS",
+   "delta": "+15",
+   "fact": [
+    "Has material for",
+    "at least 30 more"
+   ],
+   "vo": "तीसरे नंबर पर उत्तर कोरिया, चालीस-पचास से बढ़कर करीब साठ, और कम से कम तीस और बनाने का सामान तैयार है।"
+  },
+  {
+   "type": "rank",
+   "rank": 2,
+   "code": "IN",
+   "name": "INDIA",
+   "sub": "Warheads, 2021 → 2026",
+   "tag": "STEADY RISE",
+   "from_label": "2021: 156  →  2026:",
+   "from": 156,
+   "to": 190,
+   "to_label": "~190",
+   "prefix": "~",
+   "unit": "WARHEADS",
+   "delta": "+34",
+   "fact": [
+    "For the first time, 12 counted",
+    "as deployed on missiles"
+   ],
+   "vo": "दूसरे नंबर पर है भारत, एक सौ छप्पन से बढ़कर करीब एक सौ नब्बे, और पहली बार बारह हथियार मिसाइलों पर तैनात माने गए हैं।"
+  },
+  {
+   "type": "rank",
+   "rank": 1,
+   "code": "CN",
+   "name": "CHINA",
+   "sub": "Warheads, 2021 → 2026",
+   "tag": "FASTEST ON EARTH",
+   "reveal_at": 1.8,
+   "from_label": "2021: 350  →  2026:",
+   "from": 350,
+   "to": 620,
+   "to_label": "~620",
+   "prefix": "~",
+   "unit": "WARHEADS",
+   "delta": "+270",
+   "fact": [
+    "Nearly doubled in five years",
+    "faster than any other country"
+   ],
+   "vo": "और पहले नंबर पर, चीन। सिर्फ़ पाँच साल में, तीन सौ पचास से सीधे करीब छह सौ बीस, यानी लगभग दोगुना।"
+  },
+  {
+   "type": "bars",
+   "title": "THE 5-YEAR JUMP",
+   "kicker": "> warheads added, 2021 → 2026",
+   "rows": [
+    [
+     "CN",
+     "China",
+     270,
+     "+270"
+    ],
+    [
+     "IN",
+     "India",
+     34,
+     "+34"
+    ],
+    [
+     "KP",
+     "North Korea",
+     15,
+     "+15"
+    ],
+    [
+     "PK",
+     "Pakistan",
+     5,
+     "+5"
+    ]
+   ],
+   "note": "The other three combined: about +55",
+   "vo": "यानी अकेले चीन की बढ़ोतरी, बाकी तीनों को मिलाकर भी कई गुना ज़्यादा है।"
+  },
+  {
+   "type": "outro",
+   "min": 9.5,
+   "highlight": [
+    "CN",
+    "IN",
+    "KP",
+    "PK"
+   ],
+   "lines": [
+    [
+     "USA + Russia still hold 83%",
+     "WHITE"
+    ],
+    [
+     "but the fastest race",
+     "WHITE"
+    ],
+    [
+     "is now in Asia.",
+     "accent"
+    ]
+   ],
+   "vo": "अमेरिका और रूस के पास आज भी तैयार भंडार का तिरासी प्रतिशत है, लेकिन सबसे तेज़ दौड़ अब एशिया में है। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "thumb": {
+  "hook": [
+   "चुपचाप बढ़ रहे",
+   "परमाणु हथियार!"
+  ],
+  "number": "+270",
+  "number_label": "WARHEADS IN JUST 5 YEARS",
+  "sticker": "भारत कहाँ?",
+  "highlight": [
+   "CN",
+   "IN",
+   "PK",
+   "KP"
+  ],
+  "view": [
+   28,
+   85
+  ],
+  "mystery": [
+   "GB",
+   "PK",
+   "KP",
+   "IN",
+   "CN"
+  ]
+ }
+}

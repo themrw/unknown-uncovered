@@ -1,0 +1,122 @@
+{
+ "theme": "nuclear",
+ "voice": "hm_psi",
+ "speed": 1.1,
+ "header": "THE SILENT NUCLEAR BUILD-UP",
+ "source": "Source: SIPRI Yearbooks 2021 & 2026",
+ "ticker": "  12,187 NUCLEAR WARHEADS WORLDWIDE   ///   MILITARY STOCKPILES GROWING AGAIN   ///   9 NUCLEAR-ARMED STATES   ///   SOURCE: SIPRI YEARBOOK 2026   ///",
+ "scenes": [
+  {
+   "type": "hook",
+   "min": 4.0,
+   "file": [
+    "> FILE 002 // NUCLEAR STOCKPILES",
+    "> STATUS: UNDER WATCH",
+    "> SOURCE: SIPRI"
+   ],
+   "title": [
+    [
+     "A SILENT",
+     "WHITE"
+    ],
+    [
+     "RACE IS",
+     "WHITE"
+    ],
+    [
+     "UNDERWAY",
+     "accent"
+    ]
+   ],
+   "title_at": 0.7,
+   "blips": [
+    [
+     35,
+     105
+    ],
+    [
+     22,
+     79
+    ],
+    [
+     40,
+     127
+    ],
+    [
+     30,
+     70
+    ],
+    [
+     54,
+     -2
+    ]
+   ],
+   "vo": "पाँच देश चुपचाप अपने परमाणु हथियार बढ़ा रहे हैं। और आख़िरी नाम आपको चौंका देगा।"
+  },
+  {
+   "type": "roll",
+   "title": "THE COUNTDOWN",
+   "start_rank": 5,
+   "first_at": 0.8,
+   "hold": 1.6,
+   "items": [
+    [
+     "GB",
+     "UK",
+     "260 cap",
+     "+80"
+    ],
+    [
+     "PK",
+     "PAKISTAN",
+     "~170",
+     "+5"
+    ],
+    [
+     "KP",
+     "N. KOREA",
+     "~60",
+     "+15"
+    ],
+    [
+     "IN",
+     "INDIA",
+     "~190",
+     "+34"
+    ],
+    [
+     "CN",
+     "CHINA",
+     "~620",
+     "+270"
+    ]
+   ],
+   "vo": "ब्रिटेन ने सीमा बढ़ाकर दो सौ साठ की। पाकिस्तान, लगभग एक सौ सत्तर। उत्तर कोरिया, लगभग साठ। भारत, लगभग एक सौ नब्बे। और नंबर एक, चीन, तीन सौ पचास से सीधे छह सौ बीस।"
+  },
+  {
+   "type": "outro",
+   "min": 5.0,
+   "highlight": [
+    "CN",
+    "IN",
+    "KP",
+    "PK"
+   ],
+   "lines": [
+    [
+     "The fastest race",
+     "WHITE"
+    ],
+    [
+     "is now in Asia.",
+     "accent"
+    ]
+   ],
+   "vo": "सबसे तेज़ दौड़ अब एशिया में है। पूरी वीडियो, यूट्यूब पर देखें, और फ़ॉलो करें।",
+   "card": "youtube",
+   "card_at": 1.0
+  }
+ ],
+ "lead": 0.2,
+ "tail": 0.3
+}
