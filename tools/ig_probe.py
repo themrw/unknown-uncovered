@@ -12,6 +12,20 @@ print("account:", ig.get("username"))
 lim = U.call("GET", f"{U.FB_API}/{ig_id}/content_publishing_limit", {"fields": "config,quota_usage", "access_token": token})
 print("publishing limit:", json.dumps(lim))
 for spec in durs:
+    if spec.startswith("fburl:"):   # create the container from the Facebook reel's public CDN URL instead of uploading bytes
+        res = {"spec": spec}
+        try:
+            src, _ = U.facebook_source(token, spec[6:])
+            c = U.call("POST", f"{U.FB_API}/{ig_id}/media", {"media_type": "REELS", "video_url": src, "share_to_feed": "true",
+                       "access_token": token}, data=b"")
+            for _ in range(40):
+                st = U.call("GET", f"{U.FB_API}/{c['id']}", {"fields": "status_code,status", "access_token": token})
+                if st.get("status_code") in ("FINISHED", "ERROR", "EXPIRED"): break
+                time.sleep(10)
+            res["status"] = st
+        except urllib.error.HTTPError as e:
+            res["error"] = f"HTTP {e.code} {e.read().decode(errors='replace')[:200]}"
+        print("RESULT", json.dumps(res)); continue
     d, _, br = spec.partition("@")
     out = os.path.join(tempfile.mkdtemp(), f"cut{d}.mp4")
     vq = ["-b:v", br, "-maxrate", br, "-bufsize", br] if br else ["-crf", "23"]
