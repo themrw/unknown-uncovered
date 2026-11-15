@@ -1,0 +1,26 @@
+{
+ "description": "Rohit speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. The recording is very high quality, with the voice sounding clear and very close up, with no background noise.",
+ "seed": 7,
+ "items": [
+  {
+   "name": "rohit",
+   "text": "आवाज़ से बीस गुना तेज़ रफ़्तार, और अठारह हज़ार किलोमीटर तक की मार। आख़िर किन देशों के पास हैं, दुनिया की सबसे ताक़तवर मिसाइलें?",
+   "description": "Rohit speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. The recording is very high quality, with the voice sounding clear and very close up, with no background noise."
+  },
+  {
+   "name": "aman",
+   "text": "आवाज़ से बीस गुना तेज़ रफ़्तार, और अठारह हज़ार किलोमीटर तक की मार। आख़िर किन देशों के पास हैं, दुनिया की सबसे ताक़तवर मिसाइलें?",
+   "description": "Aman speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. The recording is very high quality, with the voice sounding clear and very close up, with no background noise."
+  },
+  {
+   "name": "divya",
+   "text": "आवाज़ से बीस गुना तेज़ रफ़्तार, और अठारह हज़ार किलोमीटर तक की मार। आख़िर किन देशों के पास हैं, दुनिया की सबसे ताक़तवर मिसाइलें?",
+   "description": "Divya speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. The recording is very high quality, with the voice sounding clear and very close up, with no background noise."
+  },
+  {
+   "name": "rani",
+   "text": "आवाज़ से बीस गुना तेज़ रफ़्तार, और अठारह हज़ार किलोमीटर तक की मार। आख़िर किन देशों के पास हैं, दुनिया की सबसे ताक़तवर मिसाइलें?",
+   "description": "Rani speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. The recording is very high quality, with the voice sounding clear and very close up, with no background noise."
+  }
+ ]
+}

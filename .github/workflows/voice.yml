@@ -1,0 +1,52 @@
+name: Generate voice (Indic Parler-TTS)
+
+# Push voice/requests/<name>.json to master -> writes voice/out/<name>/*.wav and commits them back.
+on:
+  push:
+    branches: [master]
+    paths: ["voice/requests/**.json", ".github/workflows/voice.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: voice
+  cancel-in-progress: false
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-indic-parler-tts-v1
+      - name: Install
+        run: |
+          pip install --quiet --index-url https://download.pytorch.org/whl/cpu torch
+          pip install --quiet git+https://github.com/huggingface/parler-tts.git soundfile
+      - name: Check Hugging Face access
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then echo "::error::HF_TOKEN secret is missing"; exit 1; fi
+          python -c "from huggingface_hub import HfApi; print('signed in as', HfApi().whoami()['name'])"
+      - name: Synthesize pending requests
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python tools/v2/uu_voice_parler.py
+      - name: Commit voice files
+        if: always()
+        run: |
+          git config user.name "uu-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add voice/out || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Voice output [skip ci]"
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done

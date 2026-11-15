@@ -28,6 +28,8 @@ THEMES = {
                   land=(34, 30, 20), land_edge=(110, 95, 55), ocean=(12, 11, 8), part=(255, 215, 120), motif="chart"),
     "space": dict(bg=(4, 4, 12), glow=(30, 20, 80), accent=(140, 200, 255), accent2=(255, 140, 220), alert=(255, 90, 120),
                   land=(22, 26, 48), land_edge=(80, 100, 170), ocean=(6, 8, 22), part=(220, 230, 255), motif="stars"),
+    "missile": dict(bg=(4, 7, 16), glow=(18, 36, 86), accent=(255, 152, 40), accent2=(110, 205, 255), alert=(255, 58, 72),
+                    land=(20, 30, 48), land_edge=(70, 112, 165), ocean=(6, 12, 26), part=(150, 210, 255), motif="radar"),
     "history": dict(bg=(14, 10, 6), glow=(70, 45, 15), accent=(235, 190, 110), accent2=(200, 150, 90), alert=(200, 70, 50),
                     land=(48, 38, 26), land_edge=(120, 95, 60), ocean=(20, 15, 10), part=(240, 210, 160), motif="parchment"),
 }
@@ -334,6 +336,24 @@ def sc_stat(img, sc, t, D, tg, k):
         text_a(img, (122 + dx, y + 12), kk, F("anton", 62), WHITE, a)
         text_a(img, (122 + dx, y + 80), s, F("inter", 32, "Medium"), MUTED, a)
 
+
+def draw_reach(img, gx, gy, lat0d, lon0d, origin, km, p, col):
+    """Expanding range ring around `origin`: how far the missile can reach (no target implied)."""
+    if p <= 0: return
+    c = GLOBE.S / 2
+    la1, lo1 = math.radians(origin[0]), math.radians(origin[1])
+    lay = Image.new("RGBA", img.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for frac, w, al in ((1.0, 6, 255), (0.82, 3, 110), (0.6, 2, 60)):
+        dl = min(math.pi * 0.995, p * frac * km / 6371.0)
+        b = np.linspace(0, 2 * np.pi, 240)
+        la = np.arcsin(np.sin(la1) * np.cos(dl) + np.cos(la1) * np.sin(dl) * np.cos(b))
+        lo = lo1 + np.arctan2(np.sin(b) * np.sin(dl) * np.cos(la1), np.cos(dl) - np.sin(la1) * np.sin(la))
+        pts, vis = GLOBE.project(lo, la, math.radians(lat0d), math.radians(lon0d))
+        for i in range(1, len(b)):
+            if vis[i] > 0 and vis[i - 1] > 0:
+                d.line([(gx + pts[i - 1][0], gy + pts[i - 1][1]), (gx + pts[i][0], gy + pts[i][1])], fill=col + (al,), width=w)
+    img.alpha_composite(lay.filter(ImageFilter.GaussianBlur(7))); img.alpha_composite(lay)
+
 def sc_rank(img, sc, t, D, tg, k):
     """Countdown card: globe swings to the country (still hidden), suspense beat, then flag + name reveal."""
     lat, lon = scene_view(sc)
@@ -354,6 +374,9 @@ def sc_rank(img, sc, t, D, tg, k):
         for j in range(2):
             ph = (tg * 0.9 + j * 0.5) % 1; rr = 14 + ph * 70
             ImageDraw.Draw(img).ellipse([cx - rr, cy - rr, cx + rr, cy + rr], outline=(T["alert"] if hide else T["accent"]) + (int(200 * (1 - ph)),), width=3)
+    if sc.get("reach_km") and not hide:
+        draw_reach(img, gx, gy, clat, clon, CENTROID.get(sc["code"], (lat, lon)), sc["reach_km"],
+                   prog(t, reveal + 0.2, sc.get("reach_dur", 2.5)), T["accent"])
     chrome(img, tg)
     text_a(img, (70, 300), f"#{sc['rank']}", F("anton", 150), T["alert"], clamp(t / 0.25), shadow=8)
     text_a(img, (76, 470), typed(sc.get("tag", ""), prog(t, 0.3, 0.6)), F("mono", 26), T["accent2"], 1)
@@ -378,7 +401,7 @@ def sc_rank(img, sc, t, D, tg, k):
     na = clamp((t - reveal - 0.3) / 0.3)
     text_a(img, (90, 1325), sc.get("from_label", ""), F("inter", 34, "SemiBold"), MUTED, na)
     v0, v1 = sc["from"], sc["to"]; g2 = prog(t, reveal + 0.3, max(1.0, D * 0.3))
-    cur = sc["to_label"] if g2 >= 0.999 else (sc.get("prefix", "") + str(int(round(v0 + (v1 - v0) * g2))))
+    cur = sc["to_label"] if g2 >= 0.999 else (sc.get("prefix", "") + f"{int(round(v0 + (v1 - v0) * g2)):,}")
     big_number(img, cur, 86, 1360, 170, T["accent"], na)
     tw = ImageDraw.Draw(img).textlength(cur, font=F("anton", 170))
     text_a(img, (100 + tw + 20, 1470), sc.get("unit", ""), F("disp", 44, "Black"), T["alert"], na)
