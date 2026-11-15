@@ -23,5 +23,6 @@
  "privacyStatus": "public",
  "madeForKids": false,
  "syntheticMedia": false,
- "language": "hi"
+ "language": "hi",
+ "ig_thumb_offset_ms": 17000
 }
