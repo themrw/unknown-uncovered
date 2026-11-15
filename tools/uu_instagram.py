@@ -70,6 +70,30 @@ def page_ig(page_id, token):
         sys.exit("No Instagram account is linked to this Facebook Page (Page settings > Linked accounts > Instagram).")
     return {"user_id": ig["id"], "username": ig.get("username"), "page": d.get("name")}
 
+def safe_encode(video, thumb=None):
+    """Conservative Reels encode: 1080x1920, 30 fps, H.264 main 4.1, AAC 128k 44.1 kHz stereo, optional cover end card."""
+    out = os.path.join(tempfile.mkdtemp(), "ig_safe.mp4")
+    dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                                         "-of", "csv=p=0", video]).decode().strip())
+    if thumb:
+        cmd = ["ffmpeg", "-loglevel", "error", "-y", "-i", video, "-loop", "1", "-framerate", "30", "-t", "0.3", "-i", thumb,
+               "-f", "lavfi", "-t", "0.3", "-i", "anullsrc=r=44100:cl=stereo",
+               "-filter_complex", "[1:v]scale=1080:1920,setsar=1,fps=30,format=yuv420p[c];"
+               "[0:v]scale=1080:1920,setsar=1,fps=30,format=yuv420p[v0];"
+               "[0:a]aresample=44100,aformat=channel_layouts=stereo[a0];"
+               "[v0][a0][c][2:a]concat=n=2:v=1:a=1[v][a]", "-map", "[v]", "-map", "[a]"]
+        offset = int(dur * 1000) + 150
+    else:
+        cmd = ["ffmpeg", "-loglevel", "error", "-y", "-i", video, "-vf", "scale=1080:1920,setsar=1,fps=30,format=yuv420p",
+               "-ar", "44100", "-ac", "2"]
+        offset = None
+    cmd += ["-c:v", "libx264", "-profile:v", "main", "-level", "4.1", "-preset", "medium", "-b:v", "5M",
+            "-maxrate", "6M", "-bufsize", "12M", "-g", "60", "-keyint_min", "60", "-sc_threshold", "0",
+            "-pix_fmt", "yuv420p", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
+            "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", out]
+    subprocess.run(cmd, check=True)
+    return out, offset
+
 def _publish(token, video, m, caption, offset, api, ig_id):
     size = os.path.getsize(video)
     try:
@@ -146,6 +170,12 @@ def upload(token, video, meta_path, api=None, ig=None):
     caption = build_caption(m)
     attempts = []
     thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg")
+    if shutil.which("ffmpeg"):
+        try:
+            p, off = safe_encode(video, thumb if os.path.exists(thumb) else None)
+            attempts.append(("safe 30fps encode", p, off or m.get("ig_thumb_offset_ms", 14000)))
+        except Exception as e:
+            print(f"safe encode failed: {e}", file=sys.stderr)
     if os.path.exists(thumb) and shutil.which("ffmpeg"):
         try:
             attempts.append(("with cover end card",) + with_cover(video, thumb))
