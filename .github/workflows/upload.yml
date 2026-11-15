@@ -1,0 +1,71 @@
+name: Upload to YouTube
+
+# Runs whenever a video folder's meta.json is pushed, or by hand from the Actions tab.
+# Uploads every folder under videos/ that has meta.json + an .mp4 but no uploaded.json yet.
+on:
+  push:
+    branches: [master, main]
+    paths: ["videos/**/meta.json"]
+  workflow_dispatch:
+    inputs:
+      folder:
+        description: "Only this folder (e.g. videos/002_richest_countries). Leave empty for all pending."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: youtube-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write credentials
+        env:
+          CLIENT_SECRET_JSON: ${{ secrets.CLIENT_SECRET_JSON }}
+          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+        run: |
+          if [ -z "$CLIENT_SECRET_JSON" ] || [ -z "$YOUTUBE_TOKEN_JSON" ]; then
+            echo "::error::Add CLIENT_SECRET_JSON and YOUTUBE_TOKEN_JSON in Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$CLIENT_SECRET_JSON" > "$RUNNER_TEMP/cs.json"
+          printf '%s' "$YOUTUBE_TOKEN_JSON" > "$RUNNER_TEMP/tok.json"
+
+      - name: Upload pending videos
+        env:
+          ONLY_FOLDER: ${{ github.event.inputs.folder }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ONLY_FOLDER:-}" ]; then dirs="${ONLY_FOLDER%/}"; else dirs=$(find videos -mindepth 1 -maxdepth 1 -type d | sort); fi
+          uploaded=0
+          for d in $dirs; do
+            [ -f "$d/meta.json" ] || continue
+            [ -f "$d/uploaded.json" ] && { echo "skip $d (already uploaded)"; continue; }
+            v=$(find "$d" -maxdepth 1 -name '*.mp4' | head -1)
+            [ -n "$v" ] || { echo "::warning::$d has no .mp4"; continue; }
+            echo "Uploading $v"
+            python3 tools/uu_youtube.py upload "$RUNNER_TEMP/cs.json" "$RUNNER_TEMP/tok.json" "$v" "$d/meta.json" > "$RUNNER_TEMP/out.json"
+            mv "$RUNNER_TEMP/out.json" "$d/uploaded.json"
+            cat "$d/uploaded.json"
+            url=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['url'])" "$d/uploaded.json")
+            echo "- **$d** → $url" >> "$GITHUB_STEP_SUMMARY"
+            uploaded=$((uploaded+1))
+          done
+          echo "UPLOADED=$uploaded" >> "$GITHUB_ENV"
+
+      - name: Record results
+        if: env.UPLOADED != '0'
+        run: |
+          git config user.name "uu-uploader"
+          git config user.email "uu-uploader@users.noreply.github.com"
+          git add videos/*/uploaded.json
+          git commit -m "Record YouTube upload results [skip ci]"
+          git push
