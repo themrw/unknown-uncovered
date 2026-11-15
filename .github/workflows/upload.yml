@@ -5,7 +5,7 @@ name: Upload to YouTube
 on:
   push:
     branches: [master, main]
-    paths: ["videos/**/meta.json"]
+    paths: ["videos/**/meta.json", ".github/workflows/upload.yml"]
   workflow_dispatch:
     inputs:
       folder:
@@ -38,6 +38,11 @@ jobs:
           umask 077
           printf '%s' "$CLIENT_SECRET_JSON" > "$RUNNER_TEMP/cs.json"
           printf '%s' "$YOUTUBE_TOKEN_JSON" > "$RUNNER_TEMP/tok.json"
+
+      - name: Check YouTube sign-in
+        run: |
+          echo "Signed in as:"
+          python3 tools/uu_youtube.py whoami "$RUNNER_TEMP/cs.json" "$RUNNER_TEMP/tok.json"
 
       - name: Upload pending videos
         env:
