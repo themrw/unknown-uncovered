@@ -1,0 +1,285 @@
+{
+ "theme": "missile",
+ "speed": 1.05,
+ "header": "WORLD'S MISSILE POWERS",
+ "source": "Sources: CSIS Missile Threat, US Navy, DRDO, French MoD",
+ "ticker": "  ONLY 6 NATIONS CAN FIRE MANY WARHEADS FROM ONE MISSILE   ///   RANKED BY FLAGSHIP MISSILE REACH   ///   SOURCES: CSIS · US NAVY · DRDO   ///",
+ "scenes": [
+  {
+   "type": "hook",
+   "min": 5.5,
+   "file": [
+    "> FILE 003 // MISSILE POWERS",
+    "> CLASS: STRATEGIC",
+    "> SOURCE: CSIS / US NAVY / DRDO"
+   ],
+   "title": [
+    [
+     "MACH 20.",
+     "WHITE"
+    ],
+    [
+     "18,000 KM.",
+     "WHITE"
+    ],
+    [
+     "WHO?",
+     "accent"
+    ]
+   ],
+   "title_at": 1.6,
+   "blips": [
+    [
+     55,
+     40
+    ],
+    [
+     35,
+     105
+    ],
+    [
+     39,
+     -98
+    ],
+    [
+     47,
+     2
+    ],
+    [
+     22,
+     79
+    ]
+   ],
+   "vo": "आवाज़ से बीस गुना तेज़, और अठारह हज़ार किलोमीटर तक मार। किन देशों के पास हैं, दुनिया की सबसे ताक़तवर मिसाइलें?"
+  },
+  {
+   "type": "tease",
+   "min": 5.0,
+   "kicker": "> ONE MISSILE, MANY WARHEADS",
+   "big": "6",
+   "big_label": "COUNTRIES CAN DO IT.",
+   "hook": "One of them borrows its missile.",
+   "cards": 6,
+   "vo": "सिर्फ़ छह देश एक ही मिसाइल से कई परमाणु हथियार, अलग-अलग निशानों पर भेज सकते हैं। पर इनमें से एक, अपनी मिसाइल ख़ुद नहीं बनाता।"
+  },
+  {
+   "type": "stat",
+   "view": [
+    20,
+    60
+   ],
+   "kicker": "> HOW WE RANK THEM: REACH",
+   "value": 20000,
+   "label": "KM: HALF THE EARTH",
+   "items": [
+    [
+     "20,000 km",
+     "the farthest any point on Earth can be"
+    ],
+    [
+     "5,500 km+",
+     "what makes a missile intercontinental"
+    ],
+    [
+     "5",
+     "nations that build their own"
+    ]
+   ],
+   "vo": "धरती पर कोई भी दो जगहें, ज़्यादा से ज़्यादा बीस हज़ार किलोमीटर दूर होती हैं। देखते हैं, कौन कितना पास पहुँचता है।"
+  },
+  {
+   "type": "rank",
+   "rank": 5,
+   "code": "IN",
+   "name": "INDIA",
+   "sub": "Agni-V · Mission Divyastra, 2024",
+   "tag": "MADE IN INDIA",
+   "from_label": "Agni-V reach:",
+   "from": 0,
+   "to": 5000,
+   "to_label": "5,000+",
+   "unit": "KM",
+   "delta": "MIRV",
+   "reach_km": 5000,
+   "fact": [
+    "Plus BrahMos, built with Russia:",
+    "about Mach 2.8"
+   ],
+   "vo": "पाँचवें नंबर पर भारत। अग्नि-पाँच, पाँच हज़ार किलोमीटर से ज़्यादा, और एक साथ कई हथियार। साथ में ब्रह्मोस, भारत और रूस की, आवाज़ से क़रीब तीन गुना तेज़।"
+  },
+  {
+   "type": "rank",
+   "rank": 4,
+   "code": "FR",
+   "name": "FRANCE",
+   "sub": "M51.3 · in service since Oct 2025",
+   "tag": "HIDDEN UNDER THE SEA",
+   "from_label": "M51.3 reach:",
+   "from": 0,
+   "to": 9500,
+   "to_label": "9,500+",
+   "unit": "KM",
+   "delta": "SLBM",
+   "reach_km": 9500,
+   "fact": [
+    "Fired from submarines,",
+    "re-enters at about Mach 20"
+   ],
+   "vo": "चौथे नंबर पर फ़्रांस। एम-इक्यावन, समुद्र के नीचे पनडुब्बी से, साढ़े नौ हज़ार किलोमीटर से भी ज़्यादा।"
+  },
+  {
+   "type": "rank",
+   "rank": 3,
+   "code": "US",
+   "name": "USA",
+   "sub": "Trident II D5 · in service since 1990",
+   "tag": "MOST RELIABLE",
+   "from_label": "Trident II reach:",
+   "from": 0,
+   "to": 12000,
+   "to_label": "12,000",
+   "unit": "KM",
+   "delta": "+UK",
+   "reach_km": 12000,
+   "fact": [
+    "197 successful test flights,",
+    "and Britain uses it too"
+   ],
+   "vo": "तीसरे नंबर पर अमेरिका। ट्राइडेंट-टू, करीब बारह हज़ार किलोमीटर, और एक सौ सत्तानवे सफल परीक्षण। और हाँ, ब्रिटेन भी यही अमेरिकी मिसाइल चलाता है।"
+  },
+  {
+   "type": "rank",
+   "rank": 2,
+   "code": "CN",
+   "name": "CHINA",
+   "sub": "DF-41 · road-mobile ICBM",
+   "tag": "UP TO 10 WARHEADS",
+   "from_label": "DF-41 reach:",
+   "from": 0,
+   "to": 15000,
+   "to_label": "15,000",
+   "unit": "KM",
+   "delta": "x10",
+   "reach_km": 15000,
+   "fact": [
+    "Estimated 12,000–15,000 km,",
+    "moves by road, hard to track"
+   ],
+   "vo": "दूसरे नंबर पर चीन। डीएफ-इकतालीस, पंद्रह हज़ार किलोमीटर तक, दस हथियार तक, और ये सड़क पर चलती है।"
+  },
+  {
+   "type": "rank",
+   "rank": 1,
+   "code": "RU",
+   "name": "RUSSIA",
+   "sub": "RS-28 Sarmat · 'Satan II'",
+   "tag": "LONGEST REACH",
+   "reveal_at": 1.8,
+   "from_label": "Sarmat reach:",
+   "from": 0,
+   "to": 18000,
+   "to_label": "18,000",
+   "unit": "KM",
+   "delta": "MACH 20",
+   "reach_km": 18000,
+   "fact": [
+    "Plus Avangard glide vehicle:",
+    "about Mach 20"
+   ],
+   "vo": "और पहले नंबर पर, रूस। सरमत, अठारह हज़ार किलोमीटर तक, और अवनगार्ड, आवाज़ से करीब बीस गुना तेज़।"
+  },
+  {
+   "type": "bars",
+   "title": "MAX REACH",
+   "kicker": "> flagship missile range, km",
+   "rows": [
+    [
+     "RU",
+     "Russia · RS-28 Sarmat",
+     18000,
+     "18,000"
+    ],
+    [
+     "CN",
+     "China · DF-41",
+     15000,
+     "15,000"
+    ],
+    [
+     "US",
+     "USA · Trident II",
+     12000,
+     "12,000"
+    ],
+    [
+     "FR",
+     "France · M51.3",
+     9500,
+     "9,500+"
+    ],
+    [
+     "IN",
+     "India · Agni-V",
+     5000,
+     "5,000+"
+    ]
+   ],
+   "note": "Estimates: CSIS, US Navy, DRDO, French MoD",
+   "vo": "यानी पहुँच में रूस और चीन आगे, पर भरोसे के रिकॉर्ड में अमेरिका का कोई मुकाबला नहीं।"
+  },
+  {
+   "type": "outro",
+   "min": 8.5,
+   "highlight": [
+    "RU",
+    "CN",
+    "US",
+    "FR",
+    "IN"
+   ],
+   "lines": [
+    [
+     "Longest reach: Russia",
+     "WHITE"
+    ],
+    [
+     "Most reliable: USA",
+     "WHITE"
+    ],
+    [
+     "India: in the MIRV club",
+     "accent"
+    ]
+   ],
+   "vo": "और भारत? वो इस छोटे से ख़ास क्लब में है। भारत का अगला कदम क्या होगा? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "thumb": {
+  "hook": [
+   "सबसे ताक़तवर",
+   "मिसाइलें किसकी?"
+  ],
+  "number": "18,000",
+  "number_label": "KM: LONGEST MISSILE REACH",
+  "sticker": "भारत कहाँ?",
+  "highlight": [
+   "RU",
+   "CN",
+   "IN",
+   "FR"
+  ],
+  "view": [
+   42,
+   60
+  ],
+  "mystery": [
+   "IN",
+   "FR",
+   "US",
+   "CN",
+   "RU"
+  ]
+ },
+ "tts": "parler",
+ "voice_job": "003_main_aman"
+}

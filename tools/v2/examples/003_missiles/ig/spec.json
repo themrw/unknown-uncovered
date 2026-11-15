@@ -1,0 +1,124 @@
+{
+ "theme": "missile",
+ "speed": 1.1,
+ "header": "WORLD'S MISSILE POWERS",
+ "source": "Sources: CSIS Missile Threat, US Navy, DRDO, French MoD",
+ "ticker": "  ONLY 6 NATIONS CAN FIRE MANY WARHEADS FROM ONE MISSILE   ///   RANKED BY FLAGSHIP MISSILE REACH   ///   SOURCES: CSIS · US NAVY · DRDO   ///",
+ "scenes": [
+  {
+   "type": "hook",
+   "min": 4.0,
+   "file": [
+    "> FILE 003 // MISSILE POWERS",
+    "> CLASS: STRATEGIC",
+    "> SOURCE: CSIS / US NAVY / DRDO"
+   ],
+   "title": [
+    [
+     "MACH 20.",
+     "WHITE"
+    ],
+    [
+     "18,000 KM.",
+     "WHITE"
+    ],
+    [
+     "WHO?",
+     "accent"
+    ]
+   ],
+   "title_at": 0.7,
+   "blips": [
+    [
+     55,
+     40
+    ],
+    [
+     35,
+     105
+    ],
+    [
+     39,
+     -98
+    ],
+    [
+     47,
+     2
+    ],
+    [
+     22,
+     79
+    ]
+   ],
+   "vo": "आवाज़ से बीस गुना तेज़, अठारह हज़ार किलोमीटर तक मार। किसके पास हैं ये मिसाइलें?"
+  },
+  {
+   "type": "roll",
+   "title": "MAX MISSILE REACH (KM)",
+   "start_rank": 5,
+   "first_at": 0.8,
+   "hold": 1.6,
+   "items": [
+    [
+     "IN",
+     "INDIA",
+     "5,000+",
+     "MIRV"
+    ],
+    [
+     "FR",
+     "FRANCE",
+     "9,500+",
+     "SLBM"
+    ],
+    [
+     "US",
+     "USA",
+     "12,000",
+     "+UK"
+    ],
+    [
+     "CN",
+     "CHINA",
+     "15,000",
+     "x10"
+    ],
+    [
+     "RU",
+     "RUSSIA",
+     "18,000",
+     "MACH 20"
+    ]
+   ],
+   "vo": "भारत, अग्नि-पाँच, पाँच हज़ार से ज़्यादा। फ़्रांस, साढ़े नौ हज़ार। अमेरिका, बारह हज़ार, और सबसे भरोसेमंद। चीन, पंद्रह हज़ार। और नंबर एक, रूस, अठारह हज़ार किलोमीटर।"
+  },
+  {
+   "type": "outro",
+   "min": 5.0,
+   "highlight": [
+    "RU",
+    "CN",
+    "US",
+    "FR",
+    "IN"
+   ],
+   "lines": [
+    [
+     "India is in the",
+     "WHITE"
+    ],
+    [
+     "MIRV club.",
+     "accent"
+    ]
+   ],
+   "vo": "भारत भी इस ख़ास क्लब में है। पूरी वीडियो यूट्यूब पर देखें, और फ़ॉलो करें।",
+   "card": "youtube",
+   "card_at": 1.0
+  }
+ ],
+ "lead": 0.2,
+ "tail": 0.3,
+ "tts": "parler",
+ "voice_job": "003_ig_aman"
+}
