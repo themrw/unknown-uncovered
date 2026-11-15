@@ -24,5 +24,14 @@
  "madeForKids": false,
  "syntheticMedia": false,
  "language": "hi",
- "ig_thumb_offset_ms": 17000
+ "ig_segments": [
+  [
+   0,
+   8.02
+  ],
+  [
+   16.55,
+   33.15
+  ]
+ ]
 }

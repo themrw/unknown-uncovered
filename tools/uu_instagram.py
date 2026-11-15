@@ -162,53 +162,71 @@ def facebook_source(token, fb_video_id):
     pref = next((t["uri"] for t in thumbs if t.get("is_preferred")), None)
     return d.get("source"), pref
 
+IG_MAX_S = 28.0   # Instagram's API currently rejects longer Reels from this account (probed Nov 2026)
+YT_LINE = "\n\n\u25b6\ufe0f Full video on YouTube: @Unknown_Uncovered_2026"
+
+def _dur(path):
+    return float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                                          "-of", "csv=p=0", path]).decode().strip())
+
+def instagram_cut(video, segments, thumb=None):
+    """Join whole scenes [[start, end], ...] into one <= IG_MAX_S clip (30 fps, safe encode), short audio fades
+    at each join, plus a 0.3 s thumbnail end card used as the cover. Returns (path, cover_offset_ms)."""
+    out = os.path.join(tempfile.mkdtemp(), "ig_cut.mp4")
+    inputs, parts, n = ["-i", video], [], 0
+    for i, (st, en) in enumerate(segments):
+        d = en - st
+        parts.append(f"[0:v]trim={st}:{en},setpts=PTS-STARTPTS,scale=1080:1920,setsar=1,fps=30,format=yuv420p[v{i}];"
+                     f"[0:a]atrim={st}:{en},asetpts=PTS-STARTPTS,aresample=44100,aformat=channel_layouts=stereo,"
+                     f"afade=t=in:d=0.08,afade=t=out:st={max(0, d - 0.12)}:d=0.12[a{i}];")
+        n += 1
+    labels = "".join(f"[v{i}][a{i}]" for i in range(n))
+    total = sum(en - st for st, en in segments)
+    if thumb:
+        inputs += ["-loop", "1", "-framerate", "30", "-t", "0.3", "-i", thumb, "-f", "lavfi", "-t", "0.3", "-i", "anullsrc=r=44100:cl=stereo"]
+        parts.append("[1:v]scale=1080:1920,setsar=1,fps=30,format=yuv420p[vc];")
+        labels += "[vc][2:a]"; n += 1
+    fc = "".join(parts) + f"{labels}concat=n={n}:v=1:a=1[v][a]"
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y"] + inputs + ["-filter_complex", fc, "-map", "[v]", "-map", "[a]",
+                    "-c:v", "libx264", "-profile:v", "main", "-level", "4.1", "-preset", "medium", "-b:v", "5M",
+                    "-maxrate", "6M", "-bufsize", "12M", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k",
+                    "-movflags", "+faststart", out], check=True)
+    return out, (int(total * 1000) + 100 if thumb else 0)
+
+def prepare(video, m):
+    thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg")
+    thumb = thumb if os.path.exists(thumb) else None
+    if _dur(video) <= IG_MAX_S:
+        return (with_cover(video, thumb) if thumb else (video, m.get("ig_thumb_offset_ms", 0))), False
+    segs = m.get("ig_segments") or [[0, IG_MAX_S - 0.5]]
+    if sum(e - s for s, e in segs) > IG_MAX_S:
+        sys.exit(f"ig_segments add up to more than {IG_MAX_S}s")
+    return instagram_cut(video, segs, thumb), True
+
 def upload(token, video, meta_path, api=None, ig=None):
     api = api or API
     m = json.load(open(meta_path))
     ig = ig or me(token)
     ig_id = ig.get("user_id") or ig["id"]
+    (path, offset), was_cut = prepare(video, m)
     caption = build_caption(m)
-    attempts = []
-    thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg")
-    if shutil.which("ffmpeg"):
+    if was_cut and "Full video" not in caption:
+        caption = (caption[:2200 - len(YT_LINE)] + YT_LINE)
+    print(f"Instagram file: {round(_dur(path), 1)} s, cut={was_cut}", file=sys.stderr)
+    errors = []
+    for attempt in range(1, 5):
         try:
-            p, off = safe_encode(video, thumb if os.path.exists(thumb) else None)
-            attempts.append(("safe 30fps encode", p, off or m.get("ig_thumb_offset_ms", 14000)))
-        except Exception as e:
-            print(f"safe encode failed: {e}", file=sys.stderr)
-    if os.path.exists(thumb) and shutil.which("ffmpeg"):
-        try:
-            attempts.append(("with cover end card",) + with_cover(video, thumb))
-        except Exception as e:
-            print(f"cover end card not made: {e}", file=sys.stderr)
-    attempts.append(("plain video", video, m.get("ig_thumb_offset_ms", 14000)))
-    fbj = os.path.join(os.path.dirname(video), "facebook.json")
-    fb_id = None
-    if api == FB_API and os.path.exists(fbj):
-        fb_id = json.load(open(fbj)).get("id")
-    mid, errors = None, []
-    if fb_id:
-        try:
-            print("Instagram attempt: video from the Facebook reel", file=sys.stderr)
-            src, cover = facebook_source(token, fb_id)
-            if not src:
-                raise RuntimeError("Facebook gave no video source URL")
-            mid = _publish_url(token, src, caption, m.get("ig_thumb_offset_ms", 14000), api, ig_id, cover)
-        except Exception as e:
-            errors.append(f"facebook source: {e}")
-            print(f"Instagram attempt failed (facebook source): {e}", file=sys.stderr)
-    for label, path, offset in ([] if mid else attempts):
-        try:
-            print(f"Instagram attempt: {label}", file=sys.stderr)
             mid = _publish(token, path, m, caption, offset, api, ig_id)
             break
         except Exception as e:
-            errors.append(f"{label}: {e}")
-            print(f"Instagram attempt failed ({label}): {e}", file=sys.stderr)
-    if not mid:
+            errors.append(f"attempt {attempt}: {e}")
+            print(f"Instagram attempt {attempt} failed: {e}", file=sys.stderr)
+            time.sleep(20 * attempt)
+    else:
         sys.exit("Instagram upload failed: " + " | ".join(errors))
     info = call("GET", f"{api}/{mid}", {"fields": "permalink", "access_token": token})
-    print(json.dumps({"id": mid, "url": info.get("permalink"), "account": ig.get("username")}, ensure_ascii=False))
+    print(json.dumps({"id": mid, "url": info.get("permalink"), "account": ig.get("username"),
+                      "instagram_cut_seconds": round(_dur(path), 1) if was_cut else None}, ensure_ascii=False))
 
 def refresh(token):
     print(json.dumps(call("GET", "https://graph.instagram.com/refresh_access_token",
