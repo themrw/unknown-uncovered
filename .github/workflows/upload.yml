@@ -64,13 +64,35 @@ jobs:
             echo "- **$d** → $url" >> "$GITHUB_STEP_SUMMARY"
             uploaded=$((uploaded+1))
           done
-          echo "UPLOADED=$uploaded" >> "$GITHUB_ENV"
+
+      - name: Post pending reels to Instagram
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          ONLY_FOLDER: ${{ github.event.inputs.folder }}
+        run: |
+          set -euo pipefail
+          if [ -z "${INSTAGRAM_ACCESS_TOKEN:-}" ]; then echo "No INSTAGRAM_ACCESS_TOKEN secret, skipping Instagram"; exit 0; fi
+          echo "Instagram account:"; python3 tools/uu_instagram.py whoami "$INSTAGRAM_ACCESS_TOKEN"
+          if [ -n "${ONLY_FOLDER:-}" ]; then dirs="${ONLY_FOLDER%/}"; else dirs=$(find videos -mindepth 1 -maxdepth 1 -type d | sort); fi
+          for d in $dirs; do
+            [ -f "$d/meta.json" ] || continue
+            [ -f "$d/instagram.json" ] && { echo "skip $d (already on Instagram)"; continue; }
+            v=$(find "$d" -maxdepth 1 -name '*.mp4' | head -1)
+            [ -n "$v" ] || continue
+            echo "Posting $v to Instagram"
+            python3 tools/uu_instagram.py upload "$INSTAGRAM_ACCESS_TOKEN" "$v" "$d/meta.json" > "$RUNNER_TEMP/ig.json"
+            mv "$RUNNER_TEMP/ig.json" "$d/instagram.json"
+            cat "$d/instagram.json"
+            url=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['url'])" "$d/instagram.json")
+            echo "- Instagram **$d** → $url" >> "$GITHUB_STEP_SUMMARY"
+          done
 
       - name: Record results
-        if: env.UPLOADED != '0'
+        if: always()
         run: |
           git config user.name "uu-uploader"
           git config user.email "uu-uploader@users.noreply.github.com"
-          git add videos/*/uploaded.json
-          git commit -m "Record YouTube upload results [skip ci]"
+          git add videos/*/uploaded.json videos/*/instagram.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "Nothing to record"; exit 0; fi
+          git commit -m "Record upload results [skip ci]"
           git push

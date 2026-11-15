@@ -6,11 +6,12 @@ English on-screen text, curious facts and world data explained simply.
 
 ## Layout
 - `tools/uu_youtube.py`: YouTube uploader (stdlib only). Used by the GitHub Action.
+- `tools/uu_instagram.py`: Instagram Reels uploader (Instagram API with Instagram Login, resumable upload, stdlib only). Used by the GitHub Action when the `INSTAGRAM_ACCESS_TOKEN` secret exists.
 - `tools/tts_template.py`: Kokoro Hindi TTS (voice `hm_omega`, speed 1.1, lang `hi`) → `vo_NN.wav` + `durs.json`.
 - `tools/render_template.py`: 1080×1920 60 fps PIL renderer (radar, ticker, flags, typed text, glitch transitions). A template: copy it and write new scene functions for each topic.
 - `tools/music_template.py`: synthesized military-style score + voice mix with ducking (imports the renderer as `render3`).
 - `videos/NNN_slug/`: one folder per reel: `video.mp4`, `meta.json`, and `uploaded.json` once it's on YouTube.
-- `.github/workflows/upload.yml`: on push of a `videos/*/meta.json`, uploads every folder with no `uploaded.json` and commits the result.
+- `.github/workflows/upload.yml`: on push of a `videos/*/meta.json`, uploads every folder with no `uploaded.json` to YouTube and every folder with no `instagram.json` to Instagram Reels, then commits the results.
 - `site/`: homepage + privacy policy for the Google OAuth consent screen.
 
 ## Making a reel
@@ -21,9 +22,11 @@ English on-screen text, curious facts and world data explained simply.
 4. Copy the templates to `/home/claude/tts/tts.py`, `/home/claude/reel2/render3.py` and `/home/claude/reel2/music3.py` (these paths are hard-coded), adapt the lines, scenes and data, and render 2–3 stills to check before the full render.
 5. Mux, check loudness (≈ −14 LUFS), then compress: `-crf 23 -maxrate 2400k -bufsize 4800k` (keep it under ~30 MB).
 6. Write `meta.json`: title ≤100 chars (Hindi hook + English keywords + #Shorts); description with the hook, key numbers, an engagement question, a subscribe line, sources and 8–12 hashtags; 12–18 tags under 450 characters in total; `categoryId` 25 or 27; `privacyStatus` public; `madeForKids` false; `language` hi. No `<` or `>`.
+   Optional for Instagram: `ig_thumb_offset_ms` (the cover frame, e.g. the first country card) and `ig_caption` (otherwise built from the title and description, with #Shorts removed and at most 30 hashtags).
 7. Publish: commit `videos/NNN_slug/video.mp4` + `meta.json` (next free number) and push to master. The Action uploads it. Watch it with `gh api repos/themrw/unknown-uncovered/actions/runs?per_page=1`, then report the URL from `uploaded.json` after `git pull`.
 
 ## Limits
+- Instagram token: long-lived and lasts 60 days. Refresh it before then with `tools/uu_instagram.py refresh <token>` (needs graph.instagram.com reachable), or have the user generate a new one in the Meta app dashboard. The user pastes it into the `INSTAGRAM_ACCESS_TOKEN` secret. Instagram allows 50 API posts per 24 hours.
 - Until Google's YouTube API audit passes, API uploads are forced to **Private**. The user flips them to Public in Studio.
 - While the OAuth app is in Testing, the refresh token expires after about 7 days (the Action fails with `invalid_grant`). Run `tools/uu_youtube.py auth-url` with the client secret and have the user sign in and paste back the localhost URL. Run `exchange`, then the user pastes the new token JSON into the `YOUTUBE_TOKEN_JSON` secret.
 - Never print or commit secrets. They live only in the repo's Actions secrets.
