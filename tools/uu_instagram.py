@@ -70,38 +70,64 @@ def page_ig(page_id, token):
         sys.exit("No Instagram account is linked to this Facebook Page (Page settings > Linked accounts > Instagram).")
     return {"user_id": ig["id"], "username": ig.get("username"), "page": d.get("name")}
 
-def upload(token, video, meta_path, api=None, ig=None):
-    api = api or API
-    m = json.load(open(meta_path))
-    offset = m.get("ig_thumb_offset_ms", 14000)
-    thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg")
-    if os.path.exists(thumb) and shutil.which("ffmpeg"):
-        video, offset = with_cover(video, thumb)
-    ig = ig or me(token)
-    ig_id = ig.get("user_id") or ig["id"]
+def _publish(token, video, m, caption, offset, api, ig_id):
     size = os.path.getsize(video)
-    c = call("POST", f"{api}/{ig_id}/media", {
-        "media_type": "REELS", "upload_type": "resumable", "share_to_feed": "true",
-        "caption": build_caption(m), "thumb_offset": str(offset),
-        "access_token": token}, data=b"")
+    try:
+        c = call("POST", f"{api}/{ig_id}/media", {
+            "media_type": "REELS", "upload_type": "resumable", "share_to_feed": "true",
+            "caption": caption, "thumb_offset": str(offset), "access_token": token}, data=b"")
+    except urllib.error.HTTPError as e:
+        raise RuntimeError("create container: HTTP %s %s" % (e.code, e.read().decode(errors="replace")[:400]))
     cid, uri = c["id"], c["uri"]
-    with open(video, "rb") as f:
-        r = call("POST", uri, data=f.read(), headers={
-            "Authorization": f"OAuth {token}", "offset": "0", "file_size": str(size),
-            "Content-Type": "application/octet-stream"})
+    try:
+        with open(video, "rb") as f:
+            r = call("POST", uri, data=f.read(), headers={
+                "Authorization": f"OAuth {token}", "offset": "0", "file_size": str(size)})
+    except urllib.error.HTTPError as e:
+        raise RuntimeError("upload bytes: HTTP %s %s" % (e.code, e.read().decode(errors="replace")[:400]))
     if not r.get("success"):
-        sys.exit("Upload failed: " + json.dumps(r))
+        raise RuntimeError("upload bytes: " + json.dumps(r))
+    s = {}
     for _ in range(60):
         s = call("GET", f"{api}/{cid}", {"fields": "status_code,status", "access_token": token})
         if s.get("status_code") == "FINISHED":
             break
         if s.get("status_code") in ("ERROR", "EXPIRED"):
-            sys.exit("Instagram processing failed: " + json.dumps(s))
+            raise RuntimeError("processing: " + json.dumps(s))
         time.sleep(10)
     else:
-        sys.exit("Timed out waiting for Instagram to process the video")
-    p = call("POST", f"{api}/{ig_id}/media_publish", {"creation_id": cid, "access_token": token}, data=b"")
-    mid = p["id"]
+        raise RuntimeError("processing timed out: " + json.dumps(s))
+    try:
+        p = call("POST", f"{api}/{ig_id}/media_publish", {"creation_id": cid, "access_token": token}, data=b"")
+    except urllib.error.HTTPError as e:
+        raise RuntimeError("publish: HTTP %s %s" % (e.code, e.read().decode(errors="replace")[:400]))
+    return p["id"]
+
+def upload(token, video, meta_path, api=None, ig=None):
+    api = api or API
+    m = json.load(open(meta_path))
+    ig = ig or me(token)
+    ig_id = ig.get("user_id") or ig["id"]
+    caption = build_caption(m)
+    attempts = []
+    thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg")
+    if os.path.exists(thumb) and shutil.which("ffmpeg"):
+        try:
+            attempts.append(("with cover end card",) + with_cover(video, thumb))
+        except Exception as e:
+            print(f"cover end card not made: {e}", file=sys.stderr)
+    attempts.append(("plain video", video, m.get("ig_thumb_offset_ms", 14000)))
+    mid, errors = None, []
+    for label, path, offset in attempts:
+        try:
+            print(f"Instagram attempt: {label}", file=sys.stderr)
+            mid = _publish(token, path, m, caption, offset, api, ig_id)
+            break
+        except Exception as e:
+            errors.append(f"{label}: {e}")
+            print(f"Instagram attempt failed ({label}): {e}", file=sys.stderr)
+    if not mid:
+        sys.exit("Instagram upload failed: " + " | ".join(errors))
     info = call("GET", f"{api}/{mid}", {"fields": "permalink", "access_token": token})
     print(json.dumps({"id": mid, "url": info.get("permalink"), "account": ig.get("username")}, ensure_ascii=False))
 
