@@ -32,9 +32,30 @@ def set_thumbnail(video_id, token, image):
     return call("POST", f"{API}/{video_id}/thumbnails", {"access_token": token}, data=body,
                 headers={"Content-Type": f"multipart/form-data; boundary={b}"})
 
+def recent(page_id, token, n=15):
+    """The Page's latest reels: [{id, description, created_time}]."""
+    try:
+        return call("GET", f"{API}/{page_id}/video_reels", {"fields": "id,description,created_time", "limit": n,
+                                                         "access_token": token}).get("data", [])
+    except Exception as e:
+        print(f"could not list reels: {e}", file=sys.stderr); return []
+
+def already_posted(page_id, token, caption):
+    key = caption.strip()[:80]
+    for r in recent(page_id, token):
+        if (r.get("description") or "").strip()[:80] == key:
+            return r["id"]
+    return None
+
 def upload(page_id, token, video, meta_path):
     m = json.load(open(meta_path))
     caption = m.get("fb_caption") or build_caption(m)
+    dup = already_posted(page_id, token, caption)          # a previous run may have published it before failing
+    if dup:
+        print(f"already on the Page as {dup}; recording it instead of posting again", file=sys.stderr)
+        print(json.dumps({"id": dup, "url": f"https://www.facebook.com/reel/{dup}", "status": "published",
+                          "thumbnail": None, "note": "found existing reel"}, ensure_ascii=False))
+        return
     size = os.path.getsize(video)
     s = call("POST", f"{API}/{page_id}/video_reels", {"upload_phase": "start", "access_token": token}, data=b"")
     vid, url = s["video_id"], s["upload_url"]
@@ -48,8 +69,18 @@ def upload(page_id, token, video, meta_path):
         "upload_phase": "finish", "video_id": vid, "video_state": "PUBLISHED",
         "description": caption, "access_token": token}, data=b"")
     status = {}
+    misses = 0
     for _ in range(60):
-        status = call("GET", f"{API}/{vid}", {"fields": "status", "access_token": token}).get("status", {})
+        try:
+            status = call("GET", f"{API}/{vid}", {"fields": "status", "access_token": token}).get("status", {})
+        except urllib.error.HTTPError as e:   # right after "finish" the video can briefly be unreadable
+            misses += 1
+            print(f"status not readable yet ({e.code}), retry {misses}", file=sys.stderr)
+            if misses >= 12:
+                if any(r.get("id") == vid for r in recent(page_id, token)):
+                    status = {"video_status": "published"}; break
+                sys.exit(f"Facebook reel {vid} not found after finish: " + e.read().decode(errors="replace")[:300])
+            time.sleep(15); continue
         vs = status.get("video_status")
         if vs in ("ready", "published") or status.get("publishing_phase", {}).get("status") == "complete":
             break
