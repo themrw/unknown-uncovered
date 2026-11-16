@@ -64,6 +64,23 @@ if theme == "nuclear":
             rate = base + (14 * (loc / rev) if rev and loc < rev else 0) + (3 if sc["type"] == "rank" else 0)
             add(clicks, c * rng.uniform(0.4, 1.0), tt); tt += rng.exponential(1 / rate)
     music += clicks * 0.22
+def chime(L=2.2, f0=1568.0):
+    """Bright metallic clink (gold): inharmonic partials with fast decay."""
+    t = np.arange(int(L * SR)) / SR; y = np.zeros_like(t)
+    for m, a, d in ((1, 1.0, 3.0), (2.76, 0.5, 4.5), (5.4, 0.25, 6), (8.9, 0.12, 8)):
+        y += a * np.sin(2 * np.pi * f0 * m * t) * np.exp(-d * t)
+    return y / np.max(np.abs(y))
+if theme == "gold":
+    reveals = [ST[i] + spec["scenes"][i].get("reveal_at", 1.4) for i in ranks]
+    for i, sc in enumerate(spec["scenes"]):
+        if sc["type"] == "roll":
+            ni = len(sc["items"]); a = sc.get("first_at", 0.5); b = max(a + 0.1, D[i] - sc.get("hold", 1.2))
+            reveals += [ST[i] + a + j * (b - a) / max(1, ni - 1) for j in range(ni)]
+        if sc.get("twist"):   # the big surprise: a cascade of coins
+            for j in range(9):
+                add(music, chime(1.6, 1318.5 * 2 ** (j % 5 / 12)), ST[i] + 0.35 + j * 0.07, 0.10)
+    for tt in reveals:
+        add(music, chime(), tt, 0.16)
 # risers + impacts at reveals; whooshes at cuts
 for i in ranks:
     rev = spec["scenes"][i].get("reveal_at", 1.4)

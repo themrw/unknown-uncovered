@@ -30,6 +30,8 @@ THEMES = {
                   land=(22, 26, 48), land_edge=(80, 100, 170), ocean=(6, 8, 22), part=(220, 230, 255), motif="stars"),
     "missile": dict(bg=(4, 7, 16), glow=(18, 36, 86), accent=(255, 152, 40), accent2=(110, 205, 255), alert=(255, 58, 72),
                     land=(20, 30, 48), land_edge=(70, 112, 165), ocean=(6, 12, 26), part=(150, 210, 255), motif="radar"),
+    "gold": dict(bg=(13, 9, 3), glow=(92, 62, 12), accent=(255, 198, 64), accent2=(255, 228, 160), alert=(255, 92, 58),
+                 land=(42, 31, 12), land_edge=(160, 118, 42), ocean=(15, 11, 4), part=(255, 214, 120), motif="ingot"),
     "history": dict(bg=(14, 10, 6), glow=(70, 45, 15), accent=(235, 190, 110), accent2=(200, 150, 90), alert=(200, 70, 50),
                     land=(48, 38, 26), land_edge=(120, 95, 60), ocean=(20, 15, 10), part=(240, 210, 160), motif="parchment"),
 }
@@ -227,6 +229,12 @@ def motif_img(R):
         for k in range(1, 5):
             r = R * k / 4; d.ellipse([c - r, c - r, c + r, c + r], outline=col, width=3)
         d.line([c - R, c, c + R, c], fill=col, width=2); d.line([c, c - R, c, c + R], fill=col, width=2)
+    elif T["motif"] == "ingot":   # stacked gold bars, outline
+        w, h = R * 0.9, R * 0.34
+        for (cx, cy) in ((c - w * 0.52, c + h * 0.6), (c + w * 0.52, c + h * 0.6), (c, c - h * 0.55)):
+            d.polygon([(cx - w * 0.5, cy + h * 0.5), (cx + w * 0.5, cy + h * 0.5), (cx + w * 0.36, cy - h * 0.5), (cx - w * 0.36, cy - h * 0.5)],
+                      outline=col, width=max(3, R // 18))
+            d.line([(cx - w * 0.36, cy - h * 0.5), (cx - w * 0.28, cy - h * 0.2), (cx + w * 0.28, cy - h * 0.2), (cx + w * 0.36, cy - h * 0.5)], fill=col, width=2)
     else:
         d.ellipse([c - R, c - R, c + R, c + R], outline=col, width=4)
     _motif[R] = im; return im
@@ -320,8 +328,9 @@ def sc_tease(img, sc, t, D, tg, k):
     text_a(img, (80, 1380), typed(sc.get("hook", ""), prog(t, 1.8, 1.2)), F("disp", 52, "Bold"), T["accent"], 1, shadow=5)
 
 def sc_stat(img, sc, t, D, tg, k):
-    lat, lon = scene_view(sc); lon += tg * 3
-    g = GLOBE.render(lat, lon, dim_others=0.2)
+    lat, lon = scene_view(sc); lon += (t if sc.get("highlight") else tg) * 3
+    g = GLOBE.render(lat, lon, highlight=sc.get("highlight"), hl_alpha=prog(t, 0.6, 0.8) if sc.get("highlight") else 1,
+                     dim_others=0.35 if sc.get("highlight") else 0.2, pulse=0.5 + 0.5 * math.sin(tg * 5) if sc.get("highlight") else 0)
     paste_a(img, g, (W / 2 - g.width / 2, 1170 - g.width / 2), 0.85 * prog(t, 0, 0.6))
     m = motif_img(170); paste_a(img, m.rotate(-tg * 12, resample=Image.BILINEAR), (W - 300, 330), 0.10)
     chrome(img, tg)
