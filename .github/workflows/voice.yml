@@ -1,7 +1,7 @@
 name: Generate voice (Indic Parler-TTS)
 
 # Push voice/requests/<name>.json to master -> writes voice/out/<name>/*.wav (+ done.json) and commits them back.
-# The work is split across 4 parallel runners (CPU only, about 1 min per sentence on each).
+# The work is split across 8 parallel runners (CPU only, about 1 min per sentence on each).
 on:
   push:
     branches: [master]
@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,7 +50,7 @@ jobs:
       - name: Synthesize this shard
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python tools/v2/uu_voice_parler.py --shard ${{ matrix.shard }} --of 4
+        run: python tools/v2/uu_voice_parler.py --shard ${{ matrix.shard }} --of 8
       - uses: actions/upload-artifact@v4
         if: always()
         with:
