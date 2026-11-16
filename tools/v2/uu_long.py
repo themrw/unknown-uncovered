@@ -77,7 +77,9 @@ def gradient(img, side="left", strength=0.85, span=0.62):
 def credit(img, path, a=1.0):
     c = CREDITS.get(os.path.basename(path))
     if not c: return
-    who = c.get("artist") or c.get("credit") or "Wikimedia Commons"
+    who = (c.get("artist") or c.get("credit") or "Wikimedia Commons").strip()
+    h = len(who) // 2
+    if len(who) % 2 == 0 and who[:h] == who[h:]: who = who[:h]          # Commons sometimes repeats the author
     s = f"Image: {who[:70]} · {c.get('license', '')} · via Wikimedia Commons"
     text_a(img, (W - 40, H - 66), s, F("inter", 17, "Medium"), (215, 215, 210), 0.85 * a, "rs", shadow=3)
 
