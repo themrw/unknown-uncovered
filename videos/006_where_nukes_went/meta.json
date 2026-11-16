@@ -20,5 +20,6 @@
  "madeForKids": false,
  "syntheticMedia": false,
  "language": "hi",
- "ig_video": "ig.mp4"
+ "ig_video": "ig.mp4",
+ "fb_retry": 1
 }
