@@ -1,0 +1,457 @@
+{
+ "format": "long",
+ "theme": "nuclear",
+ "tts": "parler",
+ "speed": 1.0,
+ "lead": 0.35,
+ "tail": 0.55,
+ "header": "HOW 70,300 NUCLEAR WEAPONS BECAME 12,187",
+ "source": "Data: US DOE/NNSA, FAS, Arms Control Association, NTI, Brookings",
+ "ticker": "  1986: ~70,300 NUCLEAR WEAPONS   ///   2026: ~12,187   ///   INF 1987 · START I 1991 · MEGATONS TO MEGAWATTS 1993–2013 · NEW START 2010–2026   ///   SOURCES: US DOE/NNSA · FAS · ACA · NTI   ///",
+ "credits_from": [
+  "media/005_nuclear_long/credits.json",
+  "media/007_story/credits.json",
+  "media/008_docu/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "counter",
+   "from": 70300,
+   "to": 12187,
+   "y0": 1986,
+   "y1": 2026,
+   "label": "NUCLEAR WEAPONS ON EARTH",
+   "chip": "−58,000",
+   "vo": "उन्नीस सौ छियासी। दुनिया में क़रीब सत्तर हज़ार तीन सौ परमाणु हथियार थे। आज, क़रीब बारह हज़ार एक सौ सत्तासी। यानी क़रीब अट्ठावन हज़ार हथियार, दुनिया से ग़ायब हो गए। ये कोई जादू नहीं था। ये इंसानी इतिहास की सबसे बड़ी, और सबसे कम जानी गई सफ़ाई थी। आज की इस वीडियो में, इसकी पूरी कहानी।"
+  },
+  {
+   "type": "disclaimer",
+   "min": 12,
+   "lines": [
+    "Educational content only. No endorsement of any country, leader, weapon or policy.",
+    "Figures come from official releases and independent research",
+    "(US DOE/NNSA, FAS, Arms Control Association, NTI). Historical estimates.",
+    "Images: public domain or Creative Commons, credited on screen.",
+    "Narration: AI voice."
+   ],
+   "vo": "शुरू करने से पहले, ये वीडियो सिर्फ़ जानकारी के लिए है, और इसके आंकड़े आधिकारिक रिपोर्टों और स्वतंत्र शोध पर आधारित हैं।"
+  },
+  {
+   "type": "chapter",
+   "n": 1,
+   "title": "The Madness of the Arms Race",
+   "img": "media/008_docu/ivymike_0.jpg",
+   "vo": "पहला अध्याय। हथियारों की पागल दौड़।",
+   "min": 4.5
+  },
+  {
+   "type": "image",
+   "img": "media/005_nuclear_long/nevada_0.jpg",
+   "kicker": "1967 · AMERICA'S PEAK",
+   "lines": [
+    "31,255 US nuclear weapons",
+    "the highest it ever reached"
+   ],
+   "vo": "कहानी शुरू होती है शीत युद्ध से। अमेरिका और सोवियत संघ में होड़ ऐसी थी, कि उन्नीस सौ सड़सठ में, अमेरिका के पास इकतीस हज़ार दो सौ पचपन परमाणु हथियार थे। ये उसका अब तक का सबसे ऊँचा आंकड़ा था।"
+  },
+  {
+   "type": "image",
+   "img": "media/008_docu/ss20_0.jpg",
+   "kicker": "1986 · SOVIET PEAK",
+   "lines": [
+    "40,159 Soviet nuclear weapons",
+    "the world total peaks at ~70,300"
+   ],
+   "vo": "और उन्नीस सौ छियासी में, सोवियत संघ का भंडार अपने चरम पर पहुँचा, चालीस हज़ार एक सौ उनसठ हथियार। उसी साल दुनिया का कुल आंकड़ा भी सबसे ऊपर था, क़रीब सत्तर हज़ार तीन सौ। और इनमें से ज़्यादातर, इन्हीं दो देशों के पास थे।"
+  },
+  {
+   "type": "image",
+   "img": "media/008_docu/silo1960_0.jpg",
+   "kicker": "26 SEPTEMBER 1983 · FALSE ALARM",
+   "lines": [
+    "A Soviet satellite reported 5 US missiles",
+    "It was sunlight on clouds",
+    "One officer called it a false alarm"
+   ],
+   "vo": "और फिर आया उन्नीस सौ तिरासी, शीत युद्ध का सबसे ख़तरनाक साल। छब्बीस सितंबर की रात, सोवियत संघ के चेतावनी सिस्टम ने बताया, कि अमेरिका से पाँच मिसाइलें उनकी तरफ़ आ रही हैं। ड्यूटी पर थे लेफ़्टिनेंट कर्नल स्तानिस्लाव पेत्रोव। उन्होंने सोचा, कोई भी जंग सिर्फ़ पाँच मिसाइलों से शुरू नहीं करता। उन्होंने इसे झूठा अलार्म माना, और वो सही निकले। सैटेलाइट ने बादलों पर पड़ती धूप की चमक को, मिसाइल समझ लिया था।"
+  },
+  {
+   "type": "image",
+   "img": "media/008_docu/ss20_1.jpg",
+   "kicker": "NOVEMBER 1983 · ABLE ARCHER 83",
+   "lines": [
+    "A NATO war-game looked real to Moscow",
+    "Soviet nuclear units put on high alert"
+   ],
+   "vo": "सिर्फ़ छह हफ़्ते बाद, नाटो ने एबल आर्चर नाम का एक युद्ध-अभ्यास किया, जिसमें परमाणु हमले की तैयारी की नक़ल की गई। सोवियत अधिकारियों को डर था कि ये असली हमले की आड़ हो सकती है, और उनकी कुछ परमाणु यूनिटें हाई अलर्ट पर रखी गईं। कई इतिहासकार मानते हैं, कि क्यूबा मिसाइल संकट के बाद, दुनिया परमाणु युद्ध के इतने क़रीब कभी नहीं पहुँची।"
+  },
+  {
+   "type": "stat",
+   "kicker": "> 20 NOVEMBER 1983 · ON AMERICAN TV",
+   "value": 100,
+   "value_label": "100 MILLION",
+   "label": "PEOPLE WATCHED ONE FILM ABOUT NUCLEAR WAR",
+   "items": [
+    [
+     "The Day After",
+     "TV film: a US town after a nuclear strike"
+    ],
+    [
+     "Oct 1983",
+     "US president saw it early: 'greatly depressed'"
+    ],
+    [
+     "After 1983",
+     "Washington's tone towards Moscow softened"
+    ]
+   ],
+   "vo": "उसी महीने, अमेरिका में क़रीब दस करोड़ लोगों ने, द डे आफ़्टर नाम की एक टीवी फ़िल्म देखी, जिसमें परमाणु हमले के बाद का एक अमेरिकी शहर दिखाया गया था। राष्ट्रपति रीगन ने इसे पहले ही देख लिया था, और अपनी डायरी में लिखा, कि इसने उन्हें बहुत उदास कर दिया। इसके बाद, मॉस्को की तरफ़ अमेरिका का रुख़ धीरे-धीरे नरम होने लगा। यानी, डर ही बदलाव की पहली वजह बना।"
+  },
+  {
+   "type": "chapter",
+   "n": 2,
+   "title": "The Summit That Almost Ended It",
+   "img": "media/008_docu/hofdi_0.jpg",
+   "vo": "दूसरा अध्याय। वो मुलाक़ात, जो सब ख़त्म कर सकती थी।",
+   "min": 4.5
+  },
+  {
+   "type": "image",
+   "img": "media/008_docu/hofdi_0.jpg",
+   "kicker": "OCTOBER 1986 · REYKJAVIK, ICELAND",
+   "lines": [
+    "Leaders discussed eliminating",
+    "ALL nuclear weapons"
+   ],
+   "vo": "अक्टूबर उन्नीस सौ छियासी। आइसलैंड के रेक्याविक में, इसी घर में, अमेरिका और सोवियत संघ के नेता मिले। बातचीत यहाँ तक पहुँच गई, कि दस साल में सारे परमाणु हथियार ख़त्म कर दिए जाएँ। लेकिन अमेरिका की अंतरिक्ष मिसाइल-रक्षा योजना पर बात अटक गई, और समझौता नहीं हो पाया।"
+  },
+  {
+   "type": "image",
+   "img": "media/007_story/inf_1.jpg",
+   "kicker": "1987 · INF TREATY",
+   "lines": [
+    "2,692 missiles destroyed by 1991",
+    "846 American + 1,846 Soviet",
+    "inspectors watched on site"
+   ],
+   "vo": "पर एक साल के अंदर, उन्नीस सौ सत्तासी में, INF संधि हुई। मिसाइलों की एक पूरी श्रेणी पर रोक लगी। उन्नीस सौ इक्यानवे तक, दो हज़ार छह सौ बानवे मिसाइलें नष्ट हुईं, आठ सौ छियालीस अमेरिकी, और अठारह सौ छियालीस सोवियत। और पहली बार, दोनों देशों के निरीक्षक, एक-दूसरे के ठिकानों पर जाकर ख़ुद ये होते हुए देखते थे।"
+  },
+  {
+   "type": "chapter",
+   "n": 3,
+   "title": "An Empire Falls",
+   "img": "media/008_docu/berlin_2.jpg",
+   "vo": "तीसरा अध्याय। एक साम्राज्य का पतन।",
+   "min": 4.5
+  },
+  {
+   "type": "image",
+   "img": "media/008_docu/berlin_2.jpg",
+   "kicker": "9 NOVEMBER 1989",
+   "lines": [
+    "The Berlin Wall falls"
+   ],
+   "vo": "नवंबर उन्नीस सौ नवासी में, बर्लिन की दीवार गिर गई, और दुनिया तेज़ी से बदलने लगी।"
+  },
+  {
+   "type": "stat",
+   "kicker": "> SEPTEMBER–OCTOBER 1991",
+   "value": 17000,
+   "label": "SMALL 'TACTICAL' NUKES WITHDRAWN (EST.)",
+   "items": [
+    [
+     "Sept 1991",
+     "US announces cuts, no treaty needed"
+    ],
+    [
+     "Oct 1991",
+     "Soviet Union answers with its own"
+    ],
+    [
+     "~17,000",
+     "withdrawn: the deepest cuts ever (NTI)"
+    ]
+   ],
+   "vo": "सितंबर उन्नीस सौ इक्यानवे में, अमेरिका ने बिना किसी संधि के, अपने ज़मीनी कम दूरी वाले परमाणु हथियार हटाने का एलान किया। कुछ ही दिनों में सोवियत संघ ने भी ऐसा ही किया। अनुमान है कि इससे, क़रीब सत्रह हज़ार छोटे परमाणु हथियार सेवा से हटे। अब तक की सबसे बड़ी कटौती।"
+  },
+  {
+   "type": "image",
+   "img": "media/008_docu/silo1960_1.jpg",
+   "kicker": "JULY 1991 · START I",
+   "lines": [
+    "Max 6,000 warheads each",
+    "1,600 missiles & bombers each"
+   ],
+   "vo": "उसी साल, START एक संधि पर दस्तख़त हुए, जिसने दोनों देशों को छह हज़ार हथियारों, और सोलह सौ मिसाइलों और बमवर्षकों तक सीमित कर दिया। हज़ारों मिसाइलें और बमवर्षक, सचमुच काटकर कबाड़ बना दिए गए।"
+  },
+  {
+   "type": "image",
+   "img": "media/007_story/nunnlugar_0.jpg",
+   "kicker": "DECEMBER 1991 · THE USSR BREAKS UP",
+   "lines": [
+    "Ukraine ~1,900 · Kazakhstan · Belarus",
+    "all sent their nukes to Russia"
+   ],
+   "vo": "और दिसंबर उन्नीस सौ इक्यानवे में, सोवियत संघ ही टूट गया। अचानक चार देशों के पास परमाणु हथियार थे। अकेले यूक्रेन के पास क़रीब उन्नीस सौ, दुनिया का तीसरा सबसे बड़ा भंडार। लेकिन यूक्रेन, कज़ाख़स्तान और बेलारूस ने, सारे हथियार रूस को लौटा दिए।"
+  },
+  {
+   "type": "country",
+   "code": "UA",
+   "name": "Ukraine",
+   "y0": "1991",
+   "y1": "1996",
+   "from": 1900,
+   "to": 0,
+   "from_label": "~1,900",
+   "chip": "WORLD #3",
+   "facts": [
+    "5 Dec 1994: Budapest Memorandum signed",
+    "US, UK, Russia give security assurances",
+    "1 June 1996: last warheads reach Russia"
+   ],
+   "vo": "यूक्रेन के लिए ये फ़ैसला आसान नहीं था, और इस पर वहाँ लंबी बहस चली। आख़िर, पाँच दिसंबर उन्नीस सौ चौरानवे को, बुडापेस्ट मेमोरेंडम पर दस्तख़त हुए, जिसमें अमेरिका, ब्रिटेन और रूस ने, यूक्रेन की सीमाओं और संप्रभुता का सम्मान करने का आश्वासन दिया। और एक जून उन्नीस सौ छियानवे को, आख़िरी हथियार ट्रेन से रूस पहुँच गए। आज ये मेमोरेंडम, दुनिया के सबसे ज़्यादा चर्चित समझौतों में से एक है।"
+  },
+  {
+   "type": "stat",
+   "kicker": "> NUNN–LUGAR PROGRAMME (US-FUNDED)",
+   "value": 7616,
+   "label": "SOVIET-ERA WARHEADS DEACTIVATED",
+   "items": [
+    [
+     "1991",
+     "US law to help dismantle Soviet arms"
+    ],
+    [
+     "7,616",
+     "warheads deactivated by 2013"
+    ],
+    [
+     "600 kg",
+     "weapons-grade uranium flown out of Kazakhstan, 1994"
+    ]
+   ],
+   "vo": "इस काम में अमेरिका ने भी पैसा और मदद दी। नन-लूगर नाम के कार्यक्रम से, सात हज़ार छह सौ से ज़्यादा सोवियत दौर के हथियार निष्क्रिय किए गए। और उन्नीस सौ चौरानवे में, एक गुप्त मिशन में, कज़ाख़स्तान से छह सौ किलो हथियार-योग्य यूरेनियम, विमान से निकाला गया।"
+  },
+  {
+   "type": "stat",
+   "kicker": "> MEANWHILE, SOUTH AFRICA",
+   "value": 6,
+   "label": "BOMBS BUILT IN SECRET, THEN DESTROYED",
+   "items": [
+    [
+     "6",
+     "bombs built in secret"
+    ],
+    [
+     "0",
+     "left: it dismantled them itself"
+    ],
+    [
+     "1st",
+     "country ever to do this"
+    ]
+   ],
+   "vo": "इसी दौर में, दक्षिण अफ़्रीका ने एक अनोखा फ़ैसला लिया। उसने चुपचाप छह परमाणु बम बनाए थे, और फिर ख़ुद ही उन्हें नष्ट कर दिया। ऐसा करने वाला, दुनिया का अकेला देश।"
+  },
+  {
+   "type": "chapter",
+   "n": 4,
+   "title": "Bombs Into Light",
+   "img": "media/007_story/powerplant_1.jpg",
+   "vo": "चौथा अध्याय। बमों से बनी रोशनी।",
+   "min": 4.5
+  },
+  {
+   "type": "bulb",
+   "kicker": "MEGATONS TO MEGAWATTS · 1993–2013",
+   "big": "20,000",
+   "lines": [
+    "Russian warheads' uranium",
+    "turned into power-plant fuel"
+   ],
+   "vo": "अब इस कहानी का सबसे अनोखा हिस्सा। उन्नीस सौ तिरानवे में, अमेरिका और रूस ने एक सौदा किया। रूस अपने पुराने हथियारों से निकला, बेहद शुद्ध यूरेनियम, पतला करके बिजलीघरों का ईंधन बनाएगा, और अमेरिका उसे ख़रीदेगा।"
+  },
+  {
+   "type": "image",
+   "img": "media/008_docu/uranium_1.jpg",
+   "kicker": "500 TONNES OF URANIUM",
+   "lines": [
+    "~10% of US electricity for ~20 years",
+    "an ~$8 billion programme"
+   ],
+   "vo": "बीस साल में, पाँच सौ टन यूरेनियम, यानी क़रीब बीस हज़ार हथियारों का, इसी तरह बिजली में बदल गया। इस दौरान अमेरिका की क़रीब दस प्रतिशत बिजली, इसी ईंधन से बनी। सोचिए, जो हथियार कभी अमेरिका को निशाना बनाए खड़े थे, उन्हीं से वहाँ के घर रोशन हुए।"
+  },
+  {
+   "type": "chapter",
+   "n": 5,
+   "title": "Taking Apart a Bomb",
+   "img": "media/005_nuclear_long/dismantle_0.jpg",
+   "vo": "पाँचवाँ अध्याय। एक बम को खोलना।",
+   "min": 4.5
+  },
+  {
+   "type": "image",
+   "img": "media/008_docu/pantex_0.jpg",
+   "kicker": "PANTEX PLANT, TEXAS",
+   "lines": [
+    "12,088 US warheads dismantled",
+    "1994–2023 (US NNSA)"
+   ],
+   "vo": "हथियार तोड़ना, बनाने जितना ही नाज़ुक काम है। अमेरिका में ये काम टेक्सास के पैंटेक्स प्लांट में होता है। उन्नीस सौ चौरानवे से दो हज़ार तेईस तक, अमेरिका ने बारह हज़ार अट्ठासी हथियार खोलकर ख़त्म किए।"
+  },
+  {
+   "type": "image",
+   "img": "media/005_nuclear_long/dismantle_0.jpg",
+   "kicker": "INSIDE A 'GRAVEL GERTIE'",
+   "lines": [
+    "~1–2 weeks to take apart one warhead (est.)",
+    "rooms built to contain an accidental blast",
+    "the plutonium core goes into storage"
+   ],
+   "vo": "एक हथियार को खोलने में, अनुमानतः एक से दो हफ़्ते लगते हैं। सबसे नाज़ुक काम होता है, विस्फोटक को परमाणु कोर से अलग करना। ये काम ग्रैवल गर्टी नाम के ख़ास कमरों में होता है, जिन पर बजरी की मोटी परत चढ़ी होती है, ताकि कोई हादसा हो भी जाए, तो धमाका और रेडियोधर्मी धूल, अंदर ही रुक जाए। फिर प्लूटोनियम का कोर, जिसे पिट कहते हैं, निकालकर बंकरों में रख दिया जाता है।"
+  },
+  {
+   "type": "stat",
+   "kicker": "> BUT IT HAS SLOWED DOWN",
+   "value": 69,
+   "label": "US WARHEADS DISMANTLED IN 2023: LOWEST SINCE 1994",
+   "items": [
+    [
+     "~2,000",
+     "US warheads retired, still waiting"
+    ],
+    [
+     "~20,000",
+     "plutonium cores kept in storage (FAS)"
+    ],
+    [
+     "31,255 → 3,748",
+     "US stockpile, 1967 → 2023"
+    ]
+   ],
+   "vo": "लेकिन अब रफ़्तार धीमी हो गई है। दो हज़ार तेईस में, अमेरिका ने सिर्फ़ उनहत्तर हथियार तोड़े, उन्नीस सौ चौरानवे के बाद सबसे कम। क़रीब दो हज़ार रिटायर हथियार अब भी इंतज़ार में हैं। और पुराने हथियारों के क़रीब बीस हज़ार प्लूटोनियम कोर, आज भी स्टोर करके रखे गए हैं।"
+  },
+  {
+   "type": "chapter",
+   "n": 6,
+   "title": "The Last Treaty",
+   "img": "media/005_nuclear_long/minuteman_1.jpg",
+   "vo": "छठा अध्याय। आख़िरी संधि।",
+   "min": 4.5
+  },
+  {
+   "type": "events",
+   "title": "THE TREATIES THAT DID IT",
+   "events": [
+    [
+     "1987",
+     "INF Treaty",
+     "2,692 missiles gone"
+    ],
+    [
+     "1991",
+     "START I",
+     "6,000 warheads max"
+    ],
+    [
+     "2002",
+     "Moscow Treaty",
+     "1,700–2,200 deployed"
+    ],
+    [
+     "2010",
+     "New START",
+     "1,550 deployed"
+    ],
+    [
+     "2019",
+     "INF ends",
+     ""
+    ],
+    [
+     "2026",
+     "New START expires",
+     "no limits left"
+    ]
+   ],
+   "vo": "उसके बाद भी संधियाँ आती रहीं। दो हज़ार दो में मॉस्को संधि, और दो हज़ार दस में न्यू स्टार्ट, जिसने तैनात हथियारों को पंद्रह सौ पचास तक सीमित किया। लेकिन दो हज़ार उन्नीस में INF संधि ख़त्म हो गई, और पाँच फ़रवरी, दो हज़ार छब्बीस को, न्यू स्टार्ट भी।",
+   "extra": 1.0
+  },
+  {
+   "type": "clock",
+   "title": "17 MINUTES → 85 SECONDS",
+   "sub": "Doomsday Clock · Bulletin of the Atomic Scientists",
+   "seconds": 85,
+   "from_minutes": 17,
+   "vo": "इस पूरे सफ़र को एक घड़ी भी दिखाती है। परमाणु वैज्ञानिकों की डूम्सडे क्लॉक, जो बताती है कि दुनिया तबाही के कितने क़रीब है। उन्नीस सौ इक्यानवे में, START संधि के बाद, ये आधी रात से सत्रह मिनट दूर थी, अपने इतिहास में सबसे दूर। और जनवरी दो हज़ार छब्बीस में, ये सिर्फ़ पचासी सेकंड पर आ गई। अब तक सबसे क़रीब।"
+  },
+  {
+   "type": "image",
+   "img": "media/005_nuclear_long/minuteman_1.jpg",
+   "kicker": "TODAY",
+   "lines": [
+    "12,187 nuclear weapons remain",
+    "military stockpiles are rising again"
+   ],
+   "vo": "आज दुनिया में, बारह हज़ार एक सौ सत्तासी परमाणु हथियार बचे हैं। और दशकों बाद, सेनाओं के भंडार फिर से बढ़ने लगे हैं। तो क्या ये कहानी, अब उल्टी दिशा में मुड़ रही है?"
+  },
+  {
+   "type": "timeline",
+   "title": "NUCLEAR WEAPONS IN THE WORLD",
+   "points": [
+    [
+     1945,
+     2,
+     "First test"
+    ],
+    [
+     1986,
+     70300,
+     "Peak ~70,300"
+    ],
+    [
+     2021,
+     13080,
+     "13,080"
+    ],
+    [
+     2026,
+     12187,
+     "12,187"
+    ]
+   ],
+   "vo": "सत्तर हज़ार से बारह हज़ार तक का ये सफ़र, एक बात साबित करता है। अगर देश चाहें, तो सबसे ख़तरनाक हथियार भी कम किए जा सकते हैं।"
+  },
+  {
+   "type": "outro",
+   "min": 15,
+   "lines": [
+    "70,300 → 12,187",
+    "Proof that it can be done."
+   ],
+   "vo": "आपके हिसाब से, क्या दुनिया कभी पूरी तरह परमाणु हथियारों से मुक्त हो पाएगी? कमेंट में बताइए। और आज कौन से देश हथियार बढ़ा रहे हैं, ये जानने के लिए हमारी पिछली वीडियो देखिए। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "thumb": {
+  "hook": [
+   "58,000 परमाणु हथियार",
+   "कहाँ ग़ायब हुए?"
+  ],
+  "number": "70,300",
+  "number_label": "IN 1986 → ONLY 12,187 TODAY",
+  "sticker": "बम बने बिजली!",
+  "img": "media/008_docu/ivymike_1.jpg",
+  "highlight": [
+   "RU",
+   "US",
+   "UA",
+   "KZ",
+   "BY"
+  ],
+  "view": [
+   68,
+   -10
+  ],
+  "mystery": []
+ }
+}

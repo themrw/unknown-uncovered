@@ -379,7 +379,7 @@ def sc_outro(img, sc, t, D, tg, k):
         text_a(img, (342, 768), "@Unknown_Uncovered_2026", F("inter", 28, "SemiBold"), T["accent2"], aa)
         rect_a(img, (340, 820, 640, 878), (230, 30, 40), aa, 29)
         text_a(img, (490, 849), "SUBSCRIBE", F("disp", 32, "Black"), WHITE, clamp((t - st - 0.3) / 0.2), "mm")
-        text_a(img, (670, 849), "👍  LIKE   ·   💬  COMMENT", F("inter", 28, "SemiBold"), WHITE, clamp((t - st - 0.5) / 0.3), "lm")
+        text_a(img, (670, 849), "LIKE   ·   COMMENT   ·   SHARE", F("inter", 28, "SemiBold"), WHITE, clamp((t - st - 0.5) / 0.3), "lm")
     chrome(img, tg, a)
 
 def sc_counter(img, sc, t, D, tg, k):
