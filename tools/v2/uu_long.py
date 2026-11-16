@@ -28,8 +28,11 @@ from uu_render import (W, H, T, F, WHITE, MUTED, clamp, ease, ease_io, back, pro
 
 REPO = os.environ.get("UU_REPO", "/home/claude/unknown-uncovered")
 CREDITS = {}
-if R.SPEC.get("credits_from") and os.path.exists(os.path.join(REPO, R.SPEC["credits_from"])):
-    CREDITS = json.load(open(os.path.join(REPO, R.SPEC["credits_from"])))
+_cf = R.SPEC.get("credits_from") or []
+for _f in ([_cf] if isinstance(_cf, str) else _cf):                  # one credits.json or a list of them
+    if os.path.exists(os.path.join(REPO, _f)):
+        _c = json.load(open(os.path.join(REPO, _f)))
+        CREDITS.update(_c if isinstance(_c, dict) else {os.path.basename(x.get("file", "")): x for x in _c})
 
 # ---------------------------------------------------------------- images
 _img = {}
@@ -377,6 +380,63 @@ def sc_outro(img, sc, t, D, tg, k):
         text_a(img, (670, 849), "👍  LIKE   ·   💬  COMMENT", F("inter", 28, "SemiBold"), WHITE, clamp((t - st - 0.5) / 0.3), "lm")
     chrome(img, tg, a)
 
+def sc_counter(img, sc, t, D, tg, k):
+    """Cold open: big counter that rolls from `from` (year y0) to `to` (year y1); only real years shown."""
+    g = GLOBE.render(30, 40 + tg * 4, dim_others=0.3)
+    paste_a(img, g, (W - g.width * 0.62, H / 2 - g.height / 2), 0.38)
+    p = prog(t, 1.2, max(2.5, D * 0.5))
+    y0s, y1s = str(sc.get("y0", "")), str(sc.get("y1", ""))
+    y = y0s if p <= 0.0 else (y1s if p > 0.98 else f"{y0s}  →  {y1s}")
+    v = sc["to"] if p > 0.98 else int(round(sc["from"] + (sc["to"] - sc["from"]) * ease_io(p)))
+    a = clamp(t / 0.5)
+    text_a(img, (140, 230), y, F("anton", 96), T["accent"], a, shadow=8)
+    big_number(img, f"{v:,}", 128, 350, 300, WHITE if p < 0.98 else T["accent"], a)
+    text_a(img, (142, 720), sc.get("label", ""), fit_font("disp", 54, sc.get("label", ""), 1300, "Black"), MUTED, a, shadow=6)
+    bw = (W - 280) * (v / max(sc["from"], sc["to"]))
+    rect_a(img, (140, 820, W - 140, 856), (40, 40, 40), 0.9 * a, 18)
+    rect_a(img, (140, 820, 140 + bw, 856), T["alert"] if p > 0.5 else T["accent"], a, 18)
+    if sc.get("chip") and p > 0.98:
+        ca = clamp((t - 1.2 - max(2.5, D * 0.5)) / 0.3)
+        chip(img, 140, 890, sc["chip"] + "  WEAPONS GONE", T["alert"], ca, 56)
+    chrome(img, tg, a)
+
+def _bomb(d, cx, cy, s, col):
+    d.rounded_rectangle([cx - 90 * s, cy - 220 * s, cx + 90 * s, cy + 160 * s], radius=int(90 * s), outline=col, width=int(12 * s))
+    for sx in (-1, 1):
+        d.polygon([(cx + sx * 60 * s, cy + 140 * s), (cx + sx * 150 * s, cy + 280 * s), (cx + sx * 40 * s, cy + 250 * s)], outline=col, width=int(10 * s))
+    d.line([cx, cy + 160 * s, cx, cy + 270 * s], fill=col, width=int(10 * s))
+
+def _bulb(d, cx, cy, s, col):
+    d.ellipse([cx - 150 * s, cy - 260 * s, cx + 150 * s, cy + 40 * s], outline=col, width=int(12 * s))
+    for sx in (-70, 70): d.line([cx + sx * s, cy + 30 * s, cx + sx * s, cy + 130 * s], fill=col, width=int(12 * s))
+    for i in range(3):
+        yy = cy + (140 + i * 34) * s; d.line([cx - 75 * s, yy, cx + 75 * s, yy], fill=col, width=int(12 * s))
+    d.line([cx - 40 * s, cy - 40 * s, cx - 15 * s, cy - 120 * s, cx + 15 * s, cy - 40 * s, cx + 40 * s, cy - 120 * s], fill=col, width=int(8 * s))
+
+def sc_bulb(img, sc, t, D, tg, k):
+    """Bomb outline morphs into a glowing bulb (right), text on the left."""
+    cx, cy = 1400, 560
+    m = ease_io(clamp((t - 1.5) / 2.0))
+    if m > 0.3:
+        glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(glow).ellipse([cx - 300, cy - 420, cx + 300, cy + 160], fill=(255, 214, 90, int(170 * (m - 0.3) / 0.7)))
+        img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(70)))
+    la = Image.new("RGBA", (W, H), (0, 0, 0, 0)); _bomb(ImageDraw.Draw(la), cx, cy - 40, 1.1, T["alert"] + (255,))
+    lb = Image.new("RGBA", (W, H), (0, 0, 0, 0)); _bulb(ImageDraw.Draw(lb), cx, cy + 40, 1.1, (255, 222, 120, 255))
+    paste_a(img, la, (0, 0), (1 - m) * clamp(t / 0.4)); paste_a(img, lb, (0, 0), m)
+    if 0.05 < m < 0.95:
+        r = np.random.default_rng(int(tg * 100)); dd = ImageDraw.Draw(img)
+        for _ in range(40):
+            an = r.uniform(0, 6.28); rr = r.uniform(100, 340) * m
+            dd.ellipse([cx + rr * math.cos(an) - 4, cy + rr * math.sin(an) - 4, cx + rr * math.cos(an) + 4, cy + rr * math.sin(an) + 4], fill=(255, 230, 150, 220))
+    a = clamp(t / 0.4)
+    text_a(img, (120, 300), typed(sc.get("kicker", ""), prog(t, 0.2, 0.6)), F("mono", 30), T["accent"], 1, shadow=4)
+    big_number(img, sc.get("big", ""), 110, 350, 230, (255, 222, 120), prog(t, 2.5, 0.5))
+    for i, ln in enumerate(sc.get("lines", [])):
+        text_a(img, (122, 640 + i * 70), typed(ln, prog(t, 3.0 + i * 0.8, 0.8)), fit_font("disp", 52, ln, 1000, "Black" if i == 0 else "Bold"), WHITE, 1, shadow=6)
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"counter": sc_counter, "bulb": sc_bulb})
 R.SCENE_FN.update({"clock": sc_clock, "image": sc_image, "disclaimer": sc_disclaimer, "chapter": sc_chapter, "timeline": sc_timeline,
                    "stat": sc_stat, "club": sc_club, "country": sc_country, "silos": sc_silos, "compare": sc_compare,
                    "events": sc_events, "bars": sc_bars, "outro": sc_outro})
