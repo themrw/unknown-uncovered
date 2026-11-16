@@ -53,8 +53,12 @@ def upload(page_id, token, video, meta_path):
     dup = already_posted(page_id, token, caption)          # a previous run may have published it before failing
     if dup:
         print(f"already on the Page as {dup}; recording it instead of posting again", file=sys.stderr)
+        thumb = os.path.join(os.path.dirname(video), "thumbnail.jpg"); ok = None
+        if os.path.exists(thumb):
+            try: set_thumbnail(dup, token, thumb); ok = True
+            except Exception as e: ok = False; print(f"thumbnail not set: {e}", file=sys.stderr)
         print(json.dumps({"id": dup, "url": f"https://www.facebook.com/reel/{dup}", "status": "published",
-                          "thumbnail": None, "note": "found existing reel"}, ensure_ascii=False))
+                          "thumbnail": ok, "note": "found existing reel"}, ensure_ascii=False))
         return
     size = os.path.getsize(video)
     s = call("POST", f"{API}/{page_id}/video_reels", {"upload_phase": "start", "access_token": token}, data=b"")
