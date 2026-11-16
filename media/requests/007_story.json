@@ -1,0 +1,44 @@
+{
+ "items": [
+  {
+   "id": "inf",
+   "search": "INF Treaty missile elimination destruction",
+   "n": 3
+  },
+  {
+   "id": "pershing",
+   "search": "Pershing II missile destroyed INF",
+   "n": 2
+  },
+  {
+   "id": "ss20",
+   "search": "SS-20 missile elimination Kapustin Yar",
+   "n": 2
+  },
+  {
+   "id": "ukraine",
+   "search": "Pervomaisk ICBM silo demolition Nunn-Lugar",
+   "n": 2
+  },
+  {
+   "id": "tu160",
+   "search": "Tu-160 dismantling Pryluky",
+   "n": 2
+  },
+  {
+   "id": "powerplant",
+   "search": "nuclear power plant cooling towers United States",
+   "n": 3
+  },
+  {
+   "id": "citynight",
+   "search": "New York City night skyline lights aerial",
+   "n": 2
+  },
+  {
+   "id": "nunnlugar",
+   "search": "Nunn-Lugar Cooperative Threat Reduction missile dismantlement",
+   "n": 3
+  }
+ ]
+}
