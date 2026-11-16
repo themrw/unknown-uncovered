@@ -14,7 +14,7 @@ OK = re.compile(r"(public domain|^pd|cc0|cc[- ]by(-sa)?[- ]?\d|cc[- ]by(-sa)?$|o
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def api(params):
-    params = dict(params, format="json", formatversion=2)
+    params = dict(params, action="query", format="json", formatversion=2)
     req = urllib.request.Request(API + "?" + urllib.parse.urlencode(params), headers=UA)
     for i in range(4):
         try:

@@ -97,6 +97,17 @@
    "id": "nevada",
    "search": "Upshot-Knothole Grable",
    "n": 2
+  },
+  {
+   "id": "arihant",
+   "search": "INS Arihant submarine",
+   "n": 2
+  },
+  {
+   "id": "mushroom",
+   "search": "nuclear test mushroom cloud Nevada",
+   "n": 3
   }
- ]
+ ],
+ "attempt": 2
 }
