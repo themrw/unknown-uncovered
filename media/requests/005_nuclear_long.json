@@ -1,0 +1,102 @@
+{
+ "items": [
+  {
+   "id": "trinity",
+   "title": "File:Trinity Detonation T&B.jpg"
+  },
+  {
+   "id": "trinity2",
+   "search": "Trinity test fireball 1945",
+   "n": 2
+  },
+  {
+   "id": "nagasaki",
+   "title": "File:Nagasakibomb.jpg"
+  },
+  {
+   "id": "ivymike",
+   "search": "Ivy Mike atmospheric nuclear test mushroom cloud",
+   "n": 2
+  },
+  {
+   "id": "castlebravo",
+   "search": "Castle Bravo Blast",
+   "n": 2
+  },
+  {
+   "id": "minuteman",
+   "search": "Minuteman III launch Vandenberg",
+   "n": 3
+  },
+  {
+   "id": "trident",
+   "search": "Trident II D5 missile launch",
+   "n": 3
+  },
+  {
+   "id": "ohio",
+   "search": "Ohio-class ballistic missile submarine underway",
+   "n": 2
+  },
+  {
+   "id": "b2",
+   "search": "B-2 Spirit stealth bomber flight",
+   "n": 2
+  },
+  {
+   "id": "earthnight",
+   "search": "Black Marble Earth at night NASA",
+   "n": 3
+  },
+  {
+   "id": "agni",
+   "search": "Agni-V missile",
+   "n": 3
+  },
+  {
+   "id": "yars",
+   "search": "RS-24 Yars parade Moscow",
+   "n": 3
+  },
+  {
+   "id": "vanguard",
+   "search": "HMS Vanguard submarine Trident",
+   "n": 2
+  },
+  {
+   "id": "triomphant",
+   "search": "Le Triomphant SSBN submarine",
+   "n": 2
+  },
+  {
+   "id": "silo",
+   "search": "Minuteman missile silo launch facility",
+   "n": 2
+  },
+  {
+   "id": "control",
+   "search": "Minuteman launch control center missileers",
+   "n": 2
+  },
+  {
+   "id": "dismantle",
+   "search": "nuclear weapon dismantlement Pantex",
+   "n": 2
+  },
+  {
+   "id": "plutonium",
+   "search": "plutonium pit Los Alamos",
+   "n": 2
+  },
+  {
+   "id": "sentinel",
+   "search": "Sentinel LGM-35 ICBM",
+   "n": 2
+  },
+  {
+   "id": "nevada",
+   "search": "Upshot-Knothole Grable",
+   "n": 2
+  }
+ ]
+}
