@@ -1,0 +1,117 @@
+{
+ "theme": "nuclear",
+ "tts": "parler",
+ "speed": 1.1,
+ "header": "WHERE DID 58,000 NUKES GO?",
+ "source": "Sources: FAS, Arms Control Association, NTI, US DOE / NNSA",
+ "ticker": "  1986: ~70,300 NUCLEAR WARHEADS   ///   2026: ~12,187   ///   58,000 GONE   ///   SOURCES: FAS · ARMS CONTROL ASSOCIATION · NTI · US DOE   ///",
+ "scenes": [
+  {
+   "type": "hook",
+   "min": 4.0,
+   "file": [
+    "> FILE 006 // THE VANISHING ARSENAL",
+    "> 1986 vs 2026",
+    "> SOURCE: FAS / ACA / NTI"
+   ],
+   "title": [
+    [
+     "70,300",
+     "WHITE"
+    ],
+    [
+     "NUKES.",
+     "WHITE"
+    ],
+    [
+     "WHERE?",
+     "accent"
+    ]
+   ],
+   "title_at": 0.7,
+   "blips": [
+    [
+     55,
+     40
+    ],
+    [
+     39,
+     -98
+    ],
+    [
+     49,
+     32
+    ],
+    [
+     -29,
+     24
+    ],
+    [
+     48,
+     68
+    ]
+   ],
+   "vo": "उन्नीस सौ छियासी में सत्तर हज़ार परमाणु हथियार, आज बारह हज़ार। बाक़ी कहाँ गए?"
+  },
+  {
+   "type": "roll",
+   "title": "WHERE 58,000 NUKES WENT",
+   "start_rank": 4,
+   "first_at": 0.8,
+   "hold": 1.4,
+   "items": [
+    [
+     "ZA",
+     "S. AFRICA",
+     "6",
+     "GONE"
+    ],
+    [
+     "UA",
+     "UKRAINE",
+     "1,900",
+     "GONE"
+    ],
+    [
+     "US",
+     "INF TREATY",
+     "2,692",
+     "CUT UP"
+    ],
+    [
+     "RU",
+     "BOMBS → POWER",
+     "20,000",
+     "10%"
+    ]
+   ],
+   "vo": "दक्षिण अफ़्रीका ने अपने छह बम ख़ुद नष्ट किए। यूक्रेन ने उन्नीस सौ हथियार रूस को सौंपे। एक संधि से, दो हज़ार छह सौ बानवे मिसाइलें ख़त्म हुईं। और बीस हज़ार हथियारों का यूरेनियम, अमेरिका की बिजली बन गया।"
+  },
+  {
+   "type": "outro",
+   "min": 5.0,
+   "highlight": [
+    "RU",
+    "US",
+    "UA",
+    "ZA"
+   ],
+   "lines": [
+    [
+     "Bombs became",
+     "WHITE"
+    ],
+    [
+     "electricity.",
+     "accent"
+    ]
+   ],
+   "vo": "पूरी वीडियो यूट्यूब पर देखें, और फ़ॉलो करें।",
+   "card": "youtube",
+   "card_at": 1.0
+  }
+ ],
+ "lead": 0.2,
+ "tail": 0.3,
+ "voice_job": "006_ig"
+}
