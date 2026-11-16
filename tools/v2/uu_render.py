@@ -12,9 +12,10 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.environ.get("UU_ASSETS", os.path.join(HERE, "assets"))
-W, H, FPS = 1080, 1920, 30
 SPEC_PATH = sys.argv[1]
 SPEC = json.load(open(SPEC_PATH))
+LONG = SPEC.get("format") == "long"          # 16:9 long-form video (scenes in uu_long.py)
+W, H, FPS = (1920, 1080, 30) if LONG else (1080, 1920, 30)
 WORK = os.path.dirname(os.path.abspath(SPEC_PATH))
 OUT = os.path.join(WORK, "out")
 
@@ -277,6 +278,15 @@ def brackets(img, box, col, alpha=1.0, L=40, w=4):
 def chrome(img, tg, a=1.0, header=True):
     if a <= 0: return
     off = int(tg * 100) % TICK_W
+    if LONG:
+        paste_a(img, TICK_IM.crop((off, 0, off + W, 44)), (0, H - 44), a * 0.9)
+        if header:
+            rect_a(img, (56, 40, 64, 72), T["alert"], a)
+            text_a(img, (78, 56), SPEC.get("header", ""), F("inter", 24, "Bold"), WHITE, a, "lm")
+            text_a(img, (56, 92), SPEC.get("source", ""), F("inter", 18, "Regular"), MUTED, a, "lm")
+        paste_a(img, LOGO.resize((72, 72), Image.LANCZOS), (W - 56 - 72, 30), a * 0.92)
+        brackets(img, (24, 20, W - 24, H - 58), T["accent2"], 0.22 * a, 40, 3)
+        return
     paste_a(img, TICK_IM.crop((off, 0, off + W, 44)), (0, 118), a)
     if header:
         rect_a(img, (70, 190, 80, 228), T["alert"], a)
@@ -565,7 +575,7 @@ def render_scene(k):
     if p.wait() == 0: os.replace(tmp, final)
     return name
 
-if __name__ == "__main__":
+def main():
     os.makedirs(OUT, exist_ok=True)
     mode = sys.argv[2]
     if mode == "still":
@@ -581,3 +591,6 @@ if __name__ == "__main__":
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", os.path.join(OUT, "list.txt"),
                         "-c", "copy", os.path.join(OUT, "video_only.mp4")], check=True)
         print(json.dumps({"duration": STARTS[-1], "starts": STARTS}))
+
+if __name__ == "__main__":
+    main()
