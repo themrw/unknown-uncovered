@@ -1,0 +1,70 @@
+{
+ "format": "story",
+ "theme": "nuclear",
+ "tts": "parler",
+ "speed": 1.1,
+ "header": "70,300 → 12,187",
+ "source": "Sources: FAS, Arms Control Association, NTI, US DOE / NNSA",
+ "ticker": "  1986: ~70,300 NUCLEAR WEAPONS   ///   2026: ~12,187   ///   WHERE DID 58,000 GO?   ///   SOURCES: FAS · ARMS CONTROL ASSOCIATION · NTI · US DOE   ///",
+ "meter": {
+  "from": "1986: 70,300",
+  "to": "2026: 12,187"
+ },
+ "credits_from": [
+  "media/005_nuclear_long/credits.json",
+  "media/007_story/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "photo",
+   "img": "media/005_nuclear_long/nevada_0.jpg",
+   "kicker": "1986 · THE PEAK",
+   "big": "70,300",
+   "lines": [
+    "nuclear weapons on Earth"
+   ],
+   "vo": "उन्नीस सौ छियासी में सत्तर हज़ार परमाणु हथियार थे। आज बारह हज़ार। बाक़ी अट्ठावन हज़ार कहाँ गए?",
+   "dark": 0.35
+  },
+  {
+   "type": "photo",
+   "img": "media/007_story/inf_1.jpg",
+   "kicker": "1987 · INF TREATY",
+   "big": "2,692",
+   "lines": [
+    "missiles destroyed (INF, 1987)"
+   ],
+   "vo": "संधियों से हज़ारों मिसाइलें ख़त्म हुईं, और हथियार एक-एक करके खोले गए।"
+  },
+  {
+   "type": "bulb",
+   "kicker": "MEGATONS TO MEGAWATTS · 1993–2013",
+   "big": "20,000",
+   "lines": [
+    "warheads' uranium",
+    "turned into power-plant fuel"
+   ],
+   "vo": "और रूस के बीस हज़ार हथियारों का यूरेनियम, अमेरिका की बिजली बन गया।"
+  },
+  {
+   "type": "outro",
+   "min": 5.0,
+   "card": "youtube",
+   "card_at": 1.0,
+   "lines": [
+    [
+     "Bombs became",
+     "WHITE"
+    ],
+    [
+     "electricity.",
+     "accent"
+    ]
+   ],
+   "vo": "पूरी कहानी यूट्यूब पर देखें, और फ़ॉलो करें।"
+  }
+ ],
+ "lead": 0.2,
+ "tail": 0.3,
+ "voice_job": "007_ig"
+}

@@ -86,6 +86,24 @@ jobs:
             fi
           done
 
+      - name: Remove Facebook reels the user asked to remove
+        if: always()
+        env:
+          FACEBOOK_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_TOKEN }}
+        run: |
+          # videos/<dir>/facebook_remove.json = {"delete": "<reel id>"}: delete that reel and never re-post this folder
+          set -uo pipefail
+          for f in videos/*/facebook_remove.json; do
+            [ -f "$f" ] || continue
+            d=$(dirname "$f"); old=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['delete'])" "$f")
+            echo "Removing Facebook reel $old for $d"
+            if python3 tools/uu_facebook.py delete "$FACEBOOK_PAGE_TOKEN" "$old"; then
+              echo "{\"removed\": \"$old\"}" > "$d/facebook.json"; git rm -q --cached "$f" 2>/dev/null; rm -f "$f"
+            else
+              echo "::warning::could not delete $old"
+            fi
+          done
+
       - name: Replace Facebook reels the user asked to replace
         if: always()
         env:
