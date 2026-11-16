@@ -1,0 +1,286 @@
+{
+ "theme": "gold",
+ "tts": "parler",
+ "speed": 1.05,
+ "header": "WHO OWNS THE WORLD'S GOLD?",
+ "source": "Sources: World Gold Council / IMF, RBI, Jefferies (Mar 2026)",
+ "ticker": "  OFFICIAL GOLD RESERVES 2026, TONNES   ///   USA 8,133 · GERMANY 3,350 · ITALY 2,452 · FRANCE 2,437 · CHINA 2,346   ///   SOURCES: WGC · IMF · RBI · JEFFERIES   ///",
+ "scenes": [
+  {
+   "type": "hook",
+   "min": 5.0,
+   "file": [
+    "> FILE 004 // THE GOLD HOARD",
+    "> STATUS: HIDDEN IN PLAIN SIGHT",
+    "> SOURCE: WGC / IMF / RBI"
+   ],
+   "title": [
+    [
+     "NOT IN",
+     "WHITE"
+    ],
+    [
+     "A VAULT.",
+     "WHITE"
+    ],
+    [
+     "WHERE?",
+     "accent"
+    ]
+   ],
+   "title_at": 1.6,
+   "blips": [
+    [
+     39,
+     -98
+    ],
+    [
+     51,
+     10
+    ],
+    [
+     42,
+     12
+    ],
+    [
+     47,
+     2
+    ],
+    [
+     35,
+     105
+    ],
+    [
+     22,
+     79
+    ]
+   ],
+   "vo": "दुनिया का सबसे बड़ा सोने का ख़ज़ाना, किसी देश की सरकारी तिजोरी में नहीं है। तो फिर, आख़िर कहाँ है?"
+  },
+  {
+   "type": "tease",
+   "min": 4.5,
+   "kicker": "> THE WORLD'S BIGGEST GOLD HOARD",
+   "big": "25,000",
+   "big_label": "TONNES OF GOLD.",
+   "hook": "Bigger than any country's reserve.",
+   "cards": 5,
+   "vo": "पच्चीस हज़ार टन सोना! पर ये कहाँ है, ये जानने से पहले, देखिए दुनिया के पाँच सबसे बड़े सरकारी गोल्ड रिज़र्व।"
+  },
+  {
+   "type": "rank",
+   "rank": 5,
+   "code": "CN",
+   "name": "CHINA",
+   "sub": "People's Bank of China · Q2 2026",
+   "tag": "STILL BUYING",
+   "from_label": "Official gold:",
+   "from": 0,
+   "to": 2346,
+   "to_label": "2,346",
+   "unit": "TONNES",
+   "delta": "",
+   "fact": [
+    "Added 33 t in Q2 2026 alone,",
+    "Russia right behind: 2,335 t"
+   ],
+   "vo": "पाँचवें नंबर पर चीन, क़रीब दो हज़ार तीन सौ छियालीस टन, और ये अब भी लगातार सोना ख़रीद रहा है।"
+  },
+  {
+   "type": "rank",
+   "rank": 4,
+   "code": "FR",
+   "name": "FRANCE",
+   "sub": "Banque de France",
+   "tag": "UNDER PARIS",
+   "from_label": "Official gold:",
+   "from": 0,
+   "to": 2437,
+   "to_label": "2,437",
+   "unit": "TONNES",
+   "delta": "",
+   "fact": [
+    "Most of it sits in a vault",
+    "deep beneath Paris"
+   ],
+   "vo": "चौथे नंबर पर फ़्रांस, दो हज़ार चार सौ सैंतीस टन, जिसका ज़्यादातर हिस्सा पेरिस में ज़मीन के नीचे बनी तिजोरी में रखा है।"
+  },
+  {
+   "type": "rank",
+   "rank": 3,
+   "code": "IT",
+   "name": "ITALY",
+   "sub": "Banca d'Italia",
+   "tag": "NECK AND NECK",
+   "from_label": "Official gold:",
+   "from": 0,
+   "to": 2452,
+   "to_label": "2,452",
+   "unit": "TONNES",
+   "delta": "",
+   "fact": [
+    "Just 15 tonnes",
+    "more than France"
+   ],
+   "vo": "तीसरे नंबर पर इटली, दो हज़ार चार सौ बावन टन, यानी फ़्रांस से सिर्फ़ पंद्रह टन ज़्यादा।"
+  },
+  {
+   "type": "rank",
+   "rank": 2,
+   "code": "DE",
+   "name": "GERMANY",
+   "sub": "Deutsche Bundesbank",
+   "tag": "BROUGHT IT HOME",
+   "from_label": "Official gold:",
+   "from": 0,
+   "to": 3350,
+   "to_label": "3,350",
+   "unit": "TONNES",
+   "delta": "",
+   "fact": [
+    "Moved 674 t home from",
+    "New York & Paris (2013–17)"
+   ],
+   "vo": "दूसरे नंबर पर जर्मनी, तीन हज़ार तीन सौ पचास टन। जर्मनी ने अपना छह सौ चौहत्तर टन सोना, न्यूयॉर्क और पेरिस से वापस अपने देश मँगवाया।"
+  },
+  {
+   "type": "rank",
+   "rank": 1,
+   "code": "US",
+   "name": "USA",
+   "sub": "Fort Knox + New York Fed",
+   "tag": "FORT KNOX",
+   "from_label": "Official gold:",
+   "from": 0,
+   "to": 8133,
+   "to_label": "8,133",
+   "unit": "TONNES",
+   "delta": "",
+   "fact": [
+    "≈ Germany + Italy + France",
+    "combined"
+   ],
+   "vo": "और पहले नंबर पर अमेरिका, आठ हज़ार एक सौ तैंतीस टन, जितना जर्मनी, इटली और फ़्रांस, तीनों के पास मिलाकर है।",
+   "reveal_at": 1.8
+  },
+  {
+   "type": "stat",
+   "twist": true,
+   "view": [
+    20,
+    79
+   ],
+   "highlight": [
+    "IN"
+   ],
+   "kicker": "> BUT THE BIGGEST HOARD IS...",
+   "value": 25000,
+   "label": "TONNES IN INDIAN HOMES",
+   "items": [
+    [
+     "18,718 t",
+     "top 5 central banks, all combined"
+    ],
+    [
+     "~3x",
+     "the entire US reserve"
+    ],
+    [
+     "~$3.9 trillion",
+     "estimated value (Jefferies, Mar 2026)"
+    ]
+   ],
+   "vo": "लेकिन दुनिया का सबसे बड़ा सोने का ढेर है, भारतीय घरों में! अनुमान है, कम से कम पच्चीस हज़ार टन। यानी इन पाँचों देशों के सरकारी सोने से भी ज़्यादा, और अमेरिका के पूरे रिज़र्व का क़रीब तीन गुना।"
+  },
+  {
+   "type": "bars",
+   "title": "WHO HOLDS MORE?",
+   "kicker": "> gold, tonnes (2026)",
+   "rows": [
+    [
+     "IN",
+     "Indian homes (estimate)",
+     25000,
+     "25,000+"
+    ],
+    [
+     "US",
+     "USA · Federal Reserve",
+     8133,
+     "8,133"
+    ],
+    [
+     "DE",
+     "Germany · Bundesbank",
+     3350,
+     "3,350"
+    ],
+    [
+     "IT",
+     "Italy · Banca d'Italia",
+     2452,
+     "2,452"
+    ],
+    [
+     "IN",
+     "India · RBI (official)",
+     881,
+     "880"
+    ]
+   ],
+   "note": "Official: WGC/IMF, RBI (Mar 2026). Households: WGC & Jefferies estimates",
+   "vo": "और मज़े की बात, भारत सरकार, यानी रिज़र्व बैंक के पास क़रीब आठ सौ अस्सी टन सोना है, जबकि भारतीय घरों में इससे लगभग तीस गुना ज़्यादा।"
+  },
+  {
+   "type": "outro",
+   "min": 8.5,
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "The world's biggest",
+     "WHITE"
+    ],
+    [
+     "gold vault?",
+     "WHITE"
+    ],
+    [
+     "Indian homes.",
+     "accent"
+    ]
+   ],
+   "vo": "आपके घर में सबसे पुराना गहना कितने साल पुराना है? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "thumb": {
+  "hook": [
+   "सबसे ज़्यादा सोना",
+   "किसके पास?"
+  ],
+  "number": "25,000",
+  "number_label": "TONNES OF GOLD. WHERE?",
+  "sticker": "जवाब चौंका देगा!",
+  "highlight": [
+   "US",
+   "DE",
+   "IT",
+   "FR",
+   "CN",
+   "IN"
+  ],
+  "view": [
+   32,
+   40
+  ],
+  "mystery": [
+   "CN",
+   "FR",
+   "IT",
+   "DE",
+   "US"
+  ]
+ },
+ "voice_job": "004_main"
+}

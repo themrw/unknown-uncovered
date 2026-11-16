@@ -1,0 +1,125 @@
+{
+ "theme": "gold",
+ "tts": "parler",
+ "speed": 1.1,
+ "header": "WHO OWNS THE WORLD'S GOLD?",
+ "source": "Sources: World Gold Council / IMF, RBI, Jefferies (Mar 2026)",
+ "ticker": "  OFFICIAL GOLD RESERVES 2026, TONNES   ///   USA 8,133 · GERMANY 3,350 · ITALY 2,452 · FRANCE 2,437 · CHINA 2,346   ///   SOURCES: WGC · IMF · RBI · JEFFERIES   ///",
+ "scenes": [
+  {
+   "type": "hook",
+   "min": 4.0,
+   "file": [
+    "> FILE 004 // THE GOLD HOARD",
+    "> STATUS: HIDDEN IN PLAIN SIGHT",
+    "> SOURCE: WGC / IMF / RBI"
+   ],
+   "title": [
+    [
+     "NOT IN",
+     "WHITE"
+    ],
+    [
+     "A VAULT.",
+     "WHITE"
+    ],
+    [
+     "WHERE?",
+     "accent"
+    ]
+   ],
+   "title_at": 0.7,
+   "blips": [
+    [
+     39,
+     -98
+    ],
+    [
+     51,
+     10
+    ],
+    [
+     42,
+     12
+    ],
+    [
+     47,
+     2
+    ],
+    [
+     35,
+     105
+    ],
+    [
+     22,
+     79
+    ]
+   ],
+   "vo": "दुनिया का सबसे बड़ा सोने का ख़ज़ाना, किसी सरकारी तिजोरी में नहीं है। तो कहाँ है?"
+  },
+  {
+   "type": "roll",
+   "title": "OFFICIAL GOLD (TONNES)",
+   "start_rank": 5,
+   "first_at": 0.8,
+   "hold": 1.4,
+   "items": [
+    [
+     "CN",
+     "CHINA",
+     "2,346",
+     ""
+    ],
+    [
+     "FR",
+     "FRANCE",
+     "2,437",
+     ""
+    ],
+    [
+     "IT",
+     "ITALY",
+     "2,452",
+     ""
+    ],
+    [
+     "DE",
+     "GERMANY",
+     "3,350",
+     ""
+    ],
+    [
+     "US",
+     "USA",
+     "8,133",
+     ""
+    ]
+   ],
+   "vo": "चीन, दो हज़ार तीन सौ छियालीस टन। फ़्रांस, दो हज़ार चार सौ सैंतीस। इटली, दो हज़ार चार सौ बावन। जर्मनी, तीन हज़ार तीन सौ पचास। और अमेरिका, आठ हज़ार एक सौ तैंतीस टन।"
+  },
+  {
+   "type": "outro",
+   "min": 5.0,
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "But Indian homes:",
+     "WHITE"
+    ],
+    [
+     "25,000 t+ !",
+     "accent"
+    ]
+   ],
+   "vo": "लेकिन भारतीय घरों में है, कम से कम पच्चीस हज़ार टन! पूरी वीडियो यूट्यूब पर देखें, और फ़ॉलो करें।",
+   "card": "youtube",
+   "card_at": 1.0,
+   "twist": true
+  }
+ ],
+ "lead": 0.2,
+ "tail": 0.3,
+ "voice_job": "004_ig"
+}

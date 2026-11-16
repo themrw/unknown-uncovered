@@ -47,7 +47,7 @@ if TH.get("highlight") and TH["highlight"][0] in R.CENTROID:
 R.paste_a(img, R.LOGO.resize((120, 120), Image.LANCZOS), (W - 70 - 120, 250), 1)
 hook = TH.get("hook", [])
 for i, line in enumerate(hook):
-    f = R.F("hindi", 150 if len(line) <= 12 else 124)
+    f = R.fit_font("hindi", 150, line, W - 64 - (210 if i == 0 else 64))   # line 1 leaves room for the logo
     R.text_a(img, (64, 250 + i * 165), line, f, R.WHITE if i == 0 else T["accent"], 1, stroke=10, shadow=14)
 
 # sticker

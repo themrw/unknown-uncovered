@@ -59,6 +59,14 @@ def F(name, size, wght=None):
     return _fc[k]
 
 # ---------------------------------------------------------------- drawing helpers
+def fit_font(kind, size, s, max_w, weight=None):
+    """Largest font <= size whose rendering of s fits max_w pixels."""
+    while size > 24:
+        f = F(kind, size, weight) if weight else F(kind, size)
+        if ImageDraw.Draw(Image.new("L", (1, 1))).textlength(s, font=f) <= max_w: return f
+        size -= 4
+    return F(kind, size, weight) if weight else F(kind, size)
+
 def text_a(img, xy, s, f, fill, alpha=1.0, anchor="la", stroke=0, shadow=0):
     if alpha <= 0 or not s: return
     d = ImageDraw.Draw(img)
@@ -337,7 +345,7 @@ def sc_stat(img, sc, t, D, tg, k):
     text_a(img, (80, 330), typed(sc["kicker"], prog(t, 0.1, 0.9)), F("mono", 30), T["accent2"], 1)
     v = sc["value"] * prog(t, 0.3, max(1.2, D * 0.45))
     big_number(img, sc.get("fmt", "{:,.0f}").format(v), 80, 380, 250, WHITE, prog(t, 0.2, 0.3))
-    text_a(img, (88, 680), sc["label"], F("disp", 84, "Black"), T["accent"], prog(t, 0.5, 0.4), shadow=6)
+    text_a(img, (88, 680), sc["label"], fit_font("disp", 84, sc["label"], W - 170, "Black"), T["accent"], prog(t, 0.5, 0.4), shadow=6)
     for i, (kk, s) in enumerate(sc.get("items", [])):
         st = D * 0.35 + i * D * 0.18; a = clamp((t - st) / 0.3); dx = (1 - back((t - st) / 0.5)) * -120; y = 830 + i * 150
         rect_a(img, (80 + dx, y, 1000 + dx, y + 124), (10, 14, 12), a * 0.85, 14, T["land_edge"], 2)
@@ -374,7 +382,9 @@ def sc_rank(img, sc, t, D, tg, k):
     reveal = sc.get("reveal_at", 1.4)
     hide = t < reveal
     pulse = 0.5 + 0.5 * math.sin(tg * 6)
-    g = GLOBE.render(clat, clon, highlight=[sc["code"]] + sc.get("also", []), hl_alpha=prog(t, 0.6, 0.5), dim_others=0.35, pulse=pulse, hide=hide)
+    # while hidden, no country fill (its shape would give the answer away): only the pulsing target rings below
+    g = GLOBE.render(clat, clon, highlight=None if hide else [sc["code"]] + sc.get("also", []),
+                     hl_alpha=prog(t, reveal, 0.4), dim_others=0.35, pulse=pulse, hide=hide)
     gx, gy = W / 2 - g.width / 2, 700 - g.width / 2
     paste_a(img, g, (gx, gy), 1)
     (px, py), vis = GLOBE.point(*CENTROID.get(sc["code"], (lat, lon)), clat, clon)
@@ -411,12 +421,12 @@ def sc_rank(img, sc, t, D, tg, k):
     text_a(img, (90, 1325), sc.get("from_label", ""), F("inter", 34, "SemiBold"), MUTED, na)
     v0, v1 = sc["from"], sc["to"]; g2 = prog(t, reveal + 0.3, max(1.0, D * 0.3))
     cur = sc["to_label"] if g2 >= 0.999 else (sc.get("prefix", "") + f"{int(round(v0 + (v1 - v0) * g2)):,}")
-    big_number(img, cur, 86, 1360, 170, T["accent"], na)
-    tw = ImageDraw.Draw(img).textlength(cur, font=F("anton", 170))
-    text_a(img, (100 + tw + 20, 1470), sc.get("unit", ""), F("disp", 44, "Black"), T["alert"], na)
+    big_number(img, cur, 86, 1365, 148, T["accent"], na)
+    tw = ImageDraw.Draw(img).textlength(cur, font=F("anton", 148))
+    text_a(img, (100 + tw + 20, 1458), sc.get("unit", ""), F("disp", 44, "Black"), T["alert"], na)
     fa = clamp((t - reveal - 1.0) / 0.4)
     for i, ln in enumerate(sc.get("fact", [])):
-        text_a(img, (90, 1560 + i * 44), typed(ln, prog(t, reveal + 1.0 + i * 0.6, 0.7)), F("inter", 36, "SemiBold"), T["accent2"], fa)
+        text_a(img, (90, 1566 + i * 42), typed(ln, prog(t, reveal + 1.0 + i * 0.6, 0.7)), F("inter", 36, "SemiBold"), T["accent2"], fa)
     # delta chip
     if sc.get("delta"):
         rect_a(img, (W - 330, 1355, W - 90, 1455), T["alert"], na * 0.95, 18)
