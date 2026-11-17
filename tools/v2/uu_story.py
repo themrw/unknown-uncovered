@@ -13,6 +13,9 @@ Scene types:
   map     {pin:[lat,lon], pin_label, pin_sub, zoom, zoom_at, labels:[[text,lat,lon]], kicker, big, lines}   India map zoom to a pin
   dossier {file, ref, rows:[[key,val]], stamp, stamp_at, img}   classified file, typed rows, stamp slam
   blast   {date, time, blast_at, hud, kicker, big, lines}       seismograph + night desert shock + dust plume
+  booklet {cover, cover_sub, scale, y, stamp, stamp_at, open_at, pages, pages_at, dims_at}   animated passport/booklet
+  timeline {kicker, events:[[year, label, note, at?]]}   vertical milestones, last one in red
+  borders {lock_at, follow_at, lines}   Europe 1913 free travel -> 1914 routes lock (no internal borders drawn)
   outro   (uu_render's vertical outro: lines + subscribe card; "card": "youtube" for short edits)
 Images are repo-relative ($UU_REPO); spec["credits_from"] may be one path or a list of credits.json files.
 """
@@ -82,12 +85,13 @@ def caption(img, sc, t, D, y0=1110):
         g = back(clamp((t - 0.5) / 0.5)); s = sc["big"]
         f = fit_font("anton", int(230 * (0.85 + 0.15 * clamp(g, 0, 1.2))), s, W - 120)
         text_a(img, (W / 2, y0 + 170), s, f, WHITE, clamp((t - 0.5) / 0.25), "mm", shadow=12)
+    ly = y0 + (330 if sc.get("big") else 110)
     for i, ln in enumerate(sc.get("lines", [])):
         st = 1.0 + i * 0.7
         if R.LOOK == "cinematic":
-            rise_line(img, ln, W / 2, y0 + 330 + i * 70, fit_font("disp", 54, ln, W - 120, "Bold"), t - st)
+            rise_line(img, ln, W / 2, ly + i * 70, fit_font("disp", 54, ln, W - 120, "Bold"), t - st)
         else:
-            text_a(img, (W / 2, y0 + 330 + i * 70), typed(ln, prog(t, st, 0.7)), fit_font("disp", 54, ln, W - 120, "Bold"),
+            text_a(img, (W / 2, ly + i * 70), typed(ln, prog(t, st, 0.7)), fit_font("disp", 54, ln, W - 120, "Bold"),
                    (238, 236, 228), 1, "mm", shadow=8)
 
 def sc_photo(img, sc, t, D, tg, k):
@@ -345,6 +349,7 @@ def sc_dossier(img, sc, t, D, tg, k):
     img.alpha_composite(sh.filter(ImageFilter.GaussianBlur(18)), (int(x + 16), int(y + 24)))
     paste_a(img, card, (x, y), a)
     caption(img, sc, t, D, 1180)
+    if sc.get("img"): credit(img, sc["img"], a)
     chrome(img, tg, a)
 
 def sc_blast(img, sc, t, D, tg, k):
@@ -388,6 +393,222 @@ def sc_blast(img, sc, t, D, tg, k):
     text_a(img, (W / 2, 750), sc.get("time", ""), F("mono", 44), T["accent"], prog(t, 0.5, 0.4), "mm", shadow=6)
     caption(img, sc, max(0, t - bt + 0.3), D, 1110)
     chrome(img, tg, a)
+
+# ------------------------------------------------------------------ passport scenes (reel 011)
+def stamp_img(lab, col=(200, 30, 30), size=92):
+    f = F("anton", size); tw = ImageDraw.Draw(Image.new("RGBA", (1, 1))).textlength(lab, font=f)
+    st = Image.new("RGBA", (int(tw) + 70, int(size * 1.6)), (0, 0, 0, 0)); sd = ImageDraw.Draw(st)
+    sd.rounded_rectangle([6, 6, st.width - 6, st.height - 6], 12, outline=col + (235,), width=8)
+    sd.text((st.width / 2, st.height / 2 + 4), lab, font=f, fill=col + (235,), anchor="mm")
+    a = np.array(st); m = np.random.default_rng(5).random(a.shape[:2]) < 0.14; a[m, 3] = a[m, 3] // 3
+    return Image.fromarray(a)
+
+BW, BH = 380, 560                                                   # booklet page size (15.5 x 10.5 ratio)
+GOLD = (214, 180, 100)
+_bk = {}
+def _cover(title, sub):
+    k = ("cover", title, sub)
+    if k in _bk: return _bk[k]
+    r = np.random.default_rng(9); n = r.normal(0, 5, (BH, BW))
+    xx = np.linspace(0, 1, BW)[None, :]
+    base = np.array([26, 40, 78], np.float32)[None, None, :] * (0.8 + 0.3 * np.sin(xx * math.pi))[..., None] + n[..., None]
+    im = Image.fromarray(np.clip(base, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+    m = Image.new("L", (BW, BH), 0); ImageDraw.Draw(m).rounded_rectangle([0, 0, BW - 1, BH - 1], 14, fill=255); im.putalpha(m)
+    d = ImageDraw.Draw(im); g = GOLD + (255,)
+    d.rounded_rectangle([16, 16, BW - 16, BH - 16], 10, outline=g, width=3)
+    d.text((BW / 2, 104), title, font=fit_font("disp", 54, title, BW - 70, "Black"), fill=g, anchor="mm")
+    cx, cy = BW / 2, 290
+    d.ellipse([cx - 80, cy - 80, cx + 80, cy + 80], outline=g, width=5)
+    pts = [(cx + (58 if i % 2 == 0 else 24) * math.sin(i * math.pi / 5), cy - (58 if i % 2 == 0 else 24) * math.cos(i * math.pi / 5)) for i in range(10)]
+    d.polygon(pts, fill=g)
+    for side in (-1, 1):
+        for j in range(8):
+            an = math.radians(200 + j * 17); rx, ry = cx + side * 108 * math.cos(an) * -1, cy + 108 * math.sin(an) * -1
+            d.ellipse([rx - 11, ry - 6, rx + 11, ry + 6], fill=g)
+    d.text((BW / 2, 450), sub, font=fit_font("inter", 26, sub, BW - 70, "SemiBold"), fill=g, anchor="mm")
+    _bk[k] = im; return im
+
+def _page(kind):
+    if kind in _bk: return _bk[kind]
+    r = np.random.default_rng(4 if kind == "right" else 6); n = r.normal(0, 7, (BH, BW))
+    base = np.array([236, 226, 200] if kind == "right" else [214, 200, 168], np.float32)[None, None, :] + n[..., None]
+    im = Image.fromarray(np.clip(base, 0, 255).astype(np.uint8), "RGB").convert("RGBA"); d = ImageDraw.Draw(im)
+    if kind == "right":
+        d.text((24, 26), "DESCRIPTION · SIGNALEMENT", font=F("mono", 20), fill=(90, 70, 50))
+        d.rectangle([BW - 140, 70, BW - 24, 220], outline=(120, 100, 80), width=2)
+        d.ellipse([BW - 108, 96, BW - 56, 152], fill=(170, 155, 130)); d.chord([BW - 126, 150, BW - 38, 240], 180, 360, fill=(170, 155, 130))
+        d.rectangle([BW - 141, 221, BW - 23, 240], fill=(236, 226, 200))
+        for i, lab in enumerate(["Profession", "Place of birth", "Residence", "Height", "Forehead", "Eyes", "Nose", "Mouth", "Face", "Complexion"]):
+            y = 82 + i * 46 if i < 3 else 270 + (i - 3) * 40
+            d.text((24, y), lab, font=F("mono", 19), fill=(110, 90, 70))
+            d.line([24, y + 30, (BW - 160) if i < 3 else BW - 24, y + 30], fill=(180, 165, 140), width=1)
+    else:
+        d.rectangle([20, 20, BW - 20, BH - 20], outline=(150, 130, 100), width=2)
+    _bk[kind] = im; return im
+
+def _squash(im, w):
+    w = max(1, int(w)); return im.resize((w, im.height), Image.BILINEAR)
+
+def sc_booklet(img, sc, t, D, tg, k):
+    """A 1920s-style passport booklet: slides in, can take a stamp, open, flip its pages and show its size."""
+    a = ease(clamp(t / 0.5)); y0 = sc.get("y", 330) + (1 - a) * 120
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(lay).ellipse([W / 2 - 520, y0 - 120, W / 2 + 520, y0 + BH + 140], fill=T["glow"] + (150,))
+    img.alpha_composite(lay.filter(ImageFilter.GaussianBlur(90)))
+    op = ease_io(clamp((t - sc["open_at"]) / 1.1)) if sc.get("open_at") is not None else 0.0
+    sx = W / 2 - BW / 2 * (1 - op)                                   # spine x
+    book = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    th = math.pi * op
+    if op > 0:
+        rp = _page("right").copy()
+        book.alpha_composite(rp, (int(sx), int(y0)))
+        for j in range(5): ImageDraw.Draw(book).line([sx + BW + j, y0 + 4 + j, sx + BW + j, y0 + BH - 4 + j], fill=(200, 190, 165, 255))
+    if th < math.pi / 2:
+        cv = _cover(sc.get("cover", "PASSPORT"), sc.get("cover_sub", ""))
+        w = BW * math.cos(th); c2 = _squash(cv, w)
+        if op > 0: c2 = Image.alpha_composite(c2, Image.new("RGBA", c2.size, (0, 0, 0, int(140 * op))))
+        book.alpha_composite(c2, (int(sx), int(y0)))
+    else:
+        lp = _page("left").copy(); d = ImageDraw.Draw(lp)
+        if sc.get("pages"):
+            pp = clamp((t - sc.get("pages_at", 3)) / 2.2); n = int(round(sc["pages"] * pp))
+            d.text((BW / 2, BH / 2 - 40), f"{n}", font=F("anton", 210), fill=(60, 40, 25), anchor="mm")
+            d.text((BW / 2, BH / 2 + 90), "PAGES", font=F("disp", 48, "Black"), fill=(110, 80, 50), anchor="mm")
+        w = BW * -math.cos(th); book.alpha_composite(_squash(lp, w), (int(sx - w), int(y0)))
+        ImageDraw.Draw(book).line([sx, y0, sx, y0 + BH], fill=(120, 100, 70, 255), width=3)
+    if sc.get("pages") and op >= 1:                                  # flipping sheets
+        ft = t - sc.get("pages_at", 3)
+        if 0 < ft < 2.2:
+            ph = (ft % 0.28) / 0.28; w = BW * math.cos(math.pi * ph)
+            sh = _page("right").copy(); sh = Image.alpha_composite(sh, Image.new("RGBA", sh.size, (0, 0, 0, int(60 * abs(math.sin(math.pi * ph))))))
+            if w > 0: book.alpha_composite(_squash(sh, w), (int(sx), int(y0)))
+            else: book.alpha_composite(_squash(_page("left"), -w), (int(sx + w), int(y0)))
+    z = sc.get("scale", 1.0)
+    if z != 1.0:                                                     # scale the whole booklet about its centre
+        cxb, cyb = W / 2, y0 + BH / 2; big = book.resize((int(W * z), int(H * z)), Image.BICUBIC)
+        book = Image.new("RGBA", (W, H), (0, 0, 0, 0)); book.alpha_composite(big, (int(cxb - cxb * z), int(cyb - cyb * z)))
+    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0)); shadow.putalpha(book.getchannel("A").point(lambda v: int(v * 0.6)))
+    img.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(22)), (14, 26))
+    if sc.get("stamp"):
+        sp = clamp((t - sc.get("stamp_at", 2.0)) / 0.18)
+        if sp > 0:
+            st = stamp_img(sc["stamp"], size=78); z = 2.4 - 1.4 * ease(sp)
+            st = st.resize((int(st.width * z), int(st.height * z)), Image.LANCZOS).rotate(14, expand=True, resample=Image.BICUBIC)
+            cx = sx + (BW / 2 if op < 0.5 else BW / 2); book.alpha_composite(st, (int(cx - st.width / 2), int(y0 + BH * 0.62 - st.height / 2)))
+    shake = 0
+    if sc.get("stamp") and t > sc.get("stamp_at", 2.0): shake = 9 * max(0, 1 - (t - sc.get("stamp_at", 2.0)) / 0.25)
+    paste_a(img, book, (shake * math.sin(t * 90), shake * math.cos(t * 70)), a)
+    if sc.get("dims_at") is not None:
+        da = ease(clamp((t - sc["dims_at"]) / 0.6)); rx0, rx1 = sx, sx + BW
+        if da > 0:
+            d = ImageDraw.Draw(img); c = T["accent"] + (int(255 * da),)
+            vx = rx1 + 34; d.line([vx, y0, vx, y0 + BH * da], fill=c, width=4)
+            for yy, dr in ((y0, 1), (y0 + BH * da, -1)): d.polygon([(vx, yy), (vx - 12, yy + dr * 20), (vx + 12, yy + dr * 20)], fill=c)
+            hy = y0 + BH + 34; d.line([rx0, hy, rx0 + BW * da, hy], fill=c, width=4)
+            for xx, dr in ((rx0, 1), (rx0 + BW * da, -1)): d.polygon([(xx, hy), (xx + dr * 20, hy - 12), (xx + dr * 20, hy + 12)], fill=c)
+            lab = Image.new("RGBA", (260, 64), (0, 0, 0, 0)); ImageDraw.Draw(lab).text((130, 32), "15.5 cm", font=F("anton", 52), fill=WHITE + (255,), anchor="mm")
+            paste_a(img, lab.rotate(90, expand=True), (vx + 6, y0 + BH / 2 - 130), da)
+            text_a(img, (rx0 + BW / 2, hy + 44), "10.5 cm", F("anton", 52), WHITE, da, "mm", shadow=6)
+    caption(img, sc, t, D, 1110 if sc.get("dims_at") is None else 1130)
+    chrome(img, tg, a)
+
+def sc_timeline(img, sc, t, D, tg, k):
+    """Vertical timeline: a gold line grows and each milestone slides in (the last one in alert red)."""
+    ev = sc["events"]; n = len(ev); a = clamp(t / 0.4)
+    text_a(img, (W / 2, 330), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 34), T["accent"], 1, "mm", shadow=4)
+    x0 = 160; ys = [470 + i * 300 for i in range(n)]
+    ats = [e[3] if len(e) > 3 else 0.6 + i * (D - 1.4) / n for i, e in enumerate(ev)]
+    rect_a(img, (x0 - 3, ys[0], x0 + 3, ys[-1]), MUTED, 0.25 * a)
+    cur = ys[0]
+    for i in range(n):
+        p = prog(t, ats[i], 0.6)
+        if p > 0: cur = ys[i - 1] + (ys[i] - ys[i - 1]) * p if i > 0 else ys[0]
+    rect_a(img, (x0 - 4, ys[0], x0 + 4, cur), T["accent"], a)
+    d = ImageDraw.Draw(img)
+    for i, e in enumerate(ev):
+        p = prog(t, ats[i], 0.6)
+        if p <= 0: continue
+        last = i == n - 1; col = T["alert"] if (last or "not" in e[2].lower()) else T["accent"]
+        y = ys[i]; dx = (1 - p) * 80
+        if i == max(j for j in range(n) if t >= ats[j]):
+            for j in range(2):
+                rr = 18 + ((tg * 50 + j * 30) % 60)
+                d.ellipse([x0 - rr, y - rr, x0 + rr, y + rr], outline=col + (int(200 * (1 - rr / 80)),), width=3)
+        d.ellipse([x0 - 18, y - 18, x0 + 18, y + 18], fill=col + (255,), outline=(255, 255, 255, 255), width=3)
+        text_a(img, (x0 + 60 + dx, y - 24), e[0], F("anton", 112), col, p, "lm", shadow=8)
+        text_a(img, (x0 + 330 + dx, y - 44), e[1], fit_font("disp", 52, e[1], W - x0 - 400, "Black"), WHITE, p, "lm", shadow=6)
+        text_a(img, (x0 + 330 + dx, y + 14), typed(e[2], prog(t, ats[i] + 0.3, 0.6)), fit_font("inter", 38, e[2], W - x0 - 400, "SemiBold"),
+               T["accent2"] if not last else WHITE, p, "lm", shadow=6)
+    chrome(img, tg, a)
+
+CITIES = {"LONDON": (51.5, -0.13, 0), "PARIS": (48.86, 2.35, 0), "BERLIN": (52.52, 13.4, 0), "ROME": (41.9, 12.5, 0),
+          "MADRID": (40.42, -3.7, 1), "COPENHAGEN": (55.68, 12.57, 1), "BERN": (46.95, 7.45, 1)}
+ROUTES = [("LONDON", "PARIS"), ("PARIS", "BERLIN"), ("PARIS", "MADRID"), ("PARIS", "BERN"), ("BERN", "ROME"), ("BERLIN", "COPENHAGEN"),
+          ("BERLIN", "ROME"), ("LONDON", "COPENHAGEN"), ("MADRID", "ROME"), ("BERLIN", "BERN")]
+EU = dict(c_lat=47.5, c_lon=6.0, s=36.0, cx=W / 2, cy=660)
+_eu = None
+def _europe():
+    global _eu
+    if _eu is None:
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+        for iso, rings in R.COUNTRIES:
+            for ring in rings:
+                lons, lats = np.degrees(ring[:, 0]), np.degrees(ring[:, 1])
+                if lons.max() < -25 or lons.min() > 45 or lats.max() < 30 or lats.min() > 72: continue
+                pts = [_proj(la, lo, EU["c_lat"], EU["c_lon"], EU["s"], EU["cx"], EU["cy"]) for lo, la in zip(lons, lats)]
+                d.polygon(pts, fill=(78, 62, 42, 255), outline=(78, 62, 42, 255))
+        glow = Image.new("RGBA", (W, H), T["accent"] + (0,)); glow.putalpha(lay.getchannel("A").filter(ImageFilter.GaussianBlur(6)).point(lambda v: int(v * 0.5)))
+        out = Image.new("RGBA", (W, H), (0, 0, 0, 0)); out.alpha_composite(glow); out.alpha_composite(lay)
+        _eu = out
+    return _eu
+
+def _cpos(name):
+    la, lo, _ = CITIES[name]; return _proj(la, lo, EU["c_lat"], EU["c_lon"], EU["s"], EU["cx"], EU["cy"])
+
+def _padlock(d, x, y, col, s=1.0):
+    d.arc([x - 13 * s, y - 30 * s, x + 13 * s, y - 2 * s], 180, 360, fill=col, width=int(5 * s))
+    d.rounded_rectangle([x - 18 * s, y - 14 * s, x + 18 * s, y + 16 * s], int(5 * s), fill=col)
+
+def sc_borders(img, sc, t, D, tg, k):
+    """Europe 1913: travellers flow freely between capitals. At lock_at the warring states lock; neutrals follow at follow_at."""
+    a = clamp(t / 0.5); la_, fo_ = sc.get("lock_at", 1.6), sc.get("follow_at", 4.5)
+    paste_a(img, _europe(), (0, 0), a)
+    locked = {c for c, v in CITIES.items() if (t >= la_ and v[2] == 0) or (t >= fo_ and v[2] == 1)}
+    d = ImageDraw.Draw(img)
+    for r_i, (c1, c2) in enumerate(ROUTES):
+        (x1, y1), (x2, y2) = _cpos(c1), _cpos(c2)
+        mx, my = (x1 + x2) / 2 - (y2 - y1) * 0.18, (y1 + y2) / 2 + (x2 - x1) * 0.18
+        pts = [((1 - u) ** 2 * x1 + 2 * (1 - u) * u * mx + u * u * x2, (1 - u) ** 2 * y1 + 2 * (1 - u) * u * my + u * u * y2) for u in np.linspace(0, 1, 40)]
+        closed = c1 in locked or c2 in locked
+        col = (T["alert"] if closed else T["accent2"]) + (int((200 if closed else 150) * a),)
+        for j in range(0, 39, 2): d.line([pts[j], pts[j + 1]], fill=col, width=4)
+        if not closed:
+            for q in range(3):
+                u = ((tg * 0.35 + q / 3 + r_i * 0.13) % 1.0); x, y = pts[int(u * 39)]
+                d.ellipse([x - 7, y - 7, x + 7, y + 7], fill=(255, 240, 200, int(255 * a)))
+        else:
+            x, y = pts[20]; d.ellipse([x - 17, y - 17, x + 17, y + 17], fill=T["alert"] + (255,)); d.rectangle([x - 10, y - 3, x + 10, y + 3], fill=(255, 255, 255, 255))
+    for c, (la, lo, neu) in CITIES.items():
+        x, y = _cpos(c); lk = c in locked
+        t0 = la_ if neu == 0 else fo_
+        if lk and t - t0 < 1.0:
+            rr = 20 + 120 * (t - t0); d.ellipse([x - rr, y - rr, x + rr, y + rr], outline=T["alert"] + (int(230 * (1 - (t - t0))),), width=5)
+        d.ellipse([x - 11, y - 11, x + 11, y + 11], fill=(T["alert"] if lk else WHITE) + (255,), outline=(20, 14, 8, 255), width=3)
+        lx = x + (16 if c not in ("MADRID", "LONDON") else -16); anc = "lm" if c not in ("MADRID", "LONDON") else "rm"
+        text_a(img, (lx, y - 26), c, F("mono", 24), T["alert"] if lk else WHITE, a, anc, shadow=6)
+        if lk: _padlock(ImageDraw.Draw(img), x + (30 if anc == "lm" else -30), y + 20, T["alert"] + (255,), 0.8)
+    before = t < la_
+    yr = "1913" if before else "1914"
+    text_a(img, (W / 2, 330), yr, F("anton", 96), T["accent"] if before else T["alert"], a, "mm", shadow=8)
+    lab = "FREE TO TRAVEL" if before else "PASSPORT REQUIRED"
+    f = F("anton", 84); w = ImageDraw.Draw(img).textlength(lab, font=f); pa = 1.0 if before else ease(clamp((t - la_) / 0.3))
+    rect_a(img, (W / 2 - w / 2 - 34, 1110, W / 2 + w / 2 + 34, 1230), (T["accent2"] if before else T["alert"]), 0.92 * a * pa, 18)
+    text_a(img, (W / 2, 1170), lab, f, (14, 10, 6), a * pa, "mm")
+    for i, ln in enumerate(sc.get("lines", [])):
+        st = la_ + 0.6 + i * (max(0.8, fo_ - la_ - 0.6) if i else 0)
+        rise_line(img, ln, W / 2, 1320 + i * 72, fit_font("disp", 50, ln, W - 120, "Bold"), t - st)
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"booklet": sc_booklet, "timeline": sc_timeline, "borders": sc_borders})
 
 R.SCENE_FN.update({"satellite": sc_satellite, "map": sc_map, "dossier": sc_dossier, "blast": sc_blast})
 R.SCENE_FN.update({"iceberg": sc_iceberg})
