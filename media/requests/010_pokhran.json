@@ -1,0 +1,49 @@
+{
+ "items": [
+  {
+   "id": "fort",
+   "search": "Pokhran Fort Balagarh",
+   "n": 3
+  },
+  {
+   "id": "pokaran",
+   "search": "Pokaran Rajasthan",
+   "n": 3
+  },
+  {
+   "id": "thar",
+   "search": "Thar desert dunes Jaisalmer",
+   "n": 3
+  },
+  {
+   "id": "tharnight",
+   "search": "Thar desert night sky stars",
+   "n": 3
+  },
+  {
+   "id": "armytruck",
+   "search": "Indian Army truck convoy desert",
+   "n": 2
+  },
+  {
+   "id": "cia",
+   "search": "CIA headquarters Langley aerial",
+   "n": 2
+  },
+  {
+   "id": "spysat",
+   "search": "KH-9 Hexagon reconnaissance satellite",
+   "n": 2
+  },
+  {
+   "id": "shakti",
+   "search": "Pokhran-II Shakti nuclear test",
+   "n": 3
+  },
+  {
+   "id": "crater",
+   "search": "Pokhran test site crater",
+   "n": 2
+  }
+ ]
+}
