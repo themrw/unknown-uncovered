@@ -24,15 +24,27 @@ os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
 img = R.BG.crop((60, 60, 60 + W, 60 + H))
 R.particles(img, 2.0)
 
+if TH.get("img"):   # story topics: a real photo as the background instead of the globe
+    REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+    ph = Image.open(os.path.join(REPO, TH["img"])).convert("RGB")
+    sc_ = max(W / ph.width, H / ph.height); ph = ph.resize((int(ph.width * sc_) + 1, int(ph.height * sc_) + 1), Image.LANCZOS)
+    ox = int((ph.width - W) * TH.get("img_x", 0.5)); ph = ph.crop((ox, (ph.height - H) // 2, ox + W, (ph.height - H) // 2 + H)).convert("RGBA")
+    shade = Image.new("RGBA", (W, H), (0, 0, 0, 0)); sd = ImageDraw.Draw(shade)
+    for y in range(H):   # dark at the top (hook) and bottom (number), lighter in the middle
+        a = 0.45 + 0.5 * max(0, 1 - y / 760) ** 1.2 + 0.5 * max(0, (y - 1000) / 920) ** 1.1
+        sd.line([(0, y), (W, y)], fill=T["bg"] + (int(255 * min(0.95, a)),))
+    ph.alpha_composite(shade); img = ph
+    TH = dict(TH, highlight=[], _photo=True)
 # globe: highlighted countries glow in the alert colour (unnamed), slightly enlarged
 lat, lon = TH.get("view", [25, 75])
-g = R.GLOBE.render(lat, lon, highlight=TH.get("highlight"), hl_alpha=1, dim_others=0.35, pulse=1, hide=True)
-s = 1.35; g = g.resize((int(g.width * s),) * 2, Image.LANCZOS)
-gx, gy = W / 2 - g.width / 2, 1040 - g.height / 2
-halo = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-ImageDraw.Draw(halo).ellipse([W / 2 - 520, 1040 - 520, W / 2 + 520, 1040 + 520], fill=T["alert"] + (70,))
-img.alpha_composite(halo.filter(ImageFilter.GaussianBlur(90)))
-R.paste_a(img, g, (gx, gy), 1)
+if not TH.get("_photo"):
+  g = R.GLOBE.render(lat, lon, highlight=TH.get("highlight"), hl_alpha=1, dim_others=0.35, pulse=1, hide=True)
+  s = 1.35; g = g.resize((int(g.width * s),) * 2, Image.LANCZOS)
+  gx, gy = W / 2 - g.width / 2, 1040 - g.height / 2
+  halo = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+  ImageDraw.Draw(halo).ellipse([W / 2 - 520, 1040 - 520, W / 2 + 520, 1040 + 520], fill=T["alert"] + (70,))
+  img.alpha_composite(halo.filter(ImageFilter.GaussianBlur(90)))
+  R.paste_a(img, g, (gx, gy), 1)
 m = R.motif_img(150); R.paste_a(img, m.rotate(-20, resample=Image.BICUBIC, expand=False), (W - 260, 610), 0.18)
 
 # scan rings around the first highlighted country
@@ -63,7 +75,7 @@ if TH.get("sticker"):
 
 # big number + label
 if TH.get("number"):
-    R.text_a(img, (64, 1140), TH["number"], R.F("anton", 300), T["accent"], 1, stroke=8, shadow=16)
+    R.text_a(img, (64, 1140), TH["number"], R.fit_font("anton", 300, TH["number"], W - 140), T["accent"], 1, stroke=8, shadow=16)
     R.text_a(img, (74, 1505), TH.get("number_label", ""), R.F("disp", 56, "Black"), R.WHITE, 1, stroke=4, shadow=8)
 
 # mystery flags row

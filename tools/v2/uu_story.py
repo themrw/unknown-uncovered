@@ -137,11 +137,11 @@ def sc_bulb(img, sc, t, D, tg, k):
 
 def sc_iceberg(img, sc, t, D, tg, k):
     """Iceberg: the announced number is the tip above water; the silent part below is big and uncounted."""
-    wl = 760                                                         # water line
+    wl = 880                                                         # water line
     a = clamp(t / 0.4); d = ImageDraw.Draw(img)
-    text_a(img, (W / 2, 250), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 34), T["accent"], 1, "mm", shadow=4)
+    text_a(img, (W / 2, 330), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 34), T["accent"], 1, "mm", shadow=4)
     # water
-    sea = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(sea).rectangle([0, wl, W, 1620], fill=(14, 40, 78, int(150 * a)))
+    sea = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(sea).rectangle([0, wl, W, 1760], fill=(14, 40, 78, int(150 * a)))
     img.alpha_composite(sea)
     for x in range(0, W, 6):
         y = wl + 6 * math.sin(x / 60 + tg * 2.4)
@@ -164,7 +164,7 @@ def sc_iceberg(img, sc, t, D, tg, k):
         text_a(img, (W / 2, wl + 560), sc.get("bottom_label", "SILENT LAYOFFS"), F("disp", 58, "Black"), WHITE, pb, "mm", shadow=8)
         text_a(img, (W / 2, wl + 630), sc.get("bottom_sub", "never announced · never counted"), F("inter", 36, "SemiBold"), T["accent2"], pb, "mm", shadow=6)
     for i in range(14):                                              # rising bubbles
-        bx = (i * 173 + 90) % W; by = 1600 - ((tg * 90 + i * 113) % 840)
+        bx = (i * 173 + 90) % W; by = 1740 - ((tg * 90 + i * 113) % 840)
         d.ellipse([bx - 5, by - 5, bx + 5, by + 5], outline=T["accent"] + (120,), width=2)
     chrome(img, tg, a)
 
