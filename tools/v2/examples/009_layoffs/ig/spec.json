@@ -1,0 +1,75 @@
+{
+ "format": "story",
+ "theme": "corporate",
+ "tts": "parler",
+ "speed": 1.1,
+ "header": "THE SILENT LAYOFFS",
+ "source": "Sources: layoffs.fyi, company statements, Reuters, Fortune, Business Today",
+ "ticker": "  2022–2026: 835,000+ TECH LAYOFFS ANNOUNCED   ///   SILENT LAYOFFS: NOT COUNTED   ///   RTO · 'LOW PERFORMER' CUTS · BENCH RULES   ///   SOURCE: LAYOFFS.FYI   ///",
+ "meter": {
+  "from": "ANNOUNCED: 835,000+",
+  "to": "SILENT: ?"
+ },
+ "credits_from": [
+  "media/009_layoffs/credits.json",
+  "media/009_layoffs_b/credits.json"
+ ],
+ "thumb": {
+  "hook": [
+   "चुपचाप जा रही हैं",
+   "लाखों नौकरियाँ!"
+  ],
+  "number": "835,000+",
+  "number_label": "TECH JOBS CUT 2022–2026",
+  "sticker": "गिनती ही नहीं होती?",
+  "highlight": [],
+  "view": [
+   30,
+   20
+  ],
+  "mystery": [],
+  "img": "media/009_layoffs_b/emptyoffice_0.jpg"
+ },
+ "scenes": [
+  {
+   "type": "photo",
+   "img": "media/009_layoffs_b/emptyoffice_0.jpg",
+   "kicker": "2022 → 2026",
+   "big": "835,000+",
+   "lines": [
+    "tech jobs cut worldwide",
+    "and these are only the ones announced"
+   ],
+   "dark": 0.4,
+   "vo": "पाँच साल में, आठ लाख पैंतीस हज़ार से ज़्यादा टेक नौकरियाँ गईं। और ये सिर्फ़ एलान वाली हैं।"
+  },
+  {
+   "type": "iceberg",
+   "kicker": "BUT THAT'S ONLY THE TIP",
+   "top_label": "ANNOUNCED",
+   "top_value": "835,000+",
+   "bottom_label": "SILENT LAYOFFS",
+   "bottom_sub": "never announced · never counted",
+   "reveal_at": 1.6,
+   "vo": "असली संख्या पानी के नीचे है, साइलेंट ले-ऑफ़। ऑफ़िस वापसी के आदेश, लो परफ़ॉर्मर का ठप्पा, और बेंच पॉलिसी।"
+  },
+  {
+   "type": "outro",
+   "min": 5.0,
+   "card": "youtube",
+   "card_at": 1.0,
+   "lines": [
+    [
+     "The silent ones?",
+     "WHITE"
+    ],
+    [
+     "Never counted.",
+     "accent"
+    ]
+   ],
+   "vo": "पूरी वीडियो, यूट्यूब पर देखें, और फ़ॉलो करें।"
+  }
+ ],
+ "voice_job": "009_ig"
+}

@@ -1,0 +1,144 @@
+{
+ "format": "story",
+ "theme": "corporate",
+ "tts": "parler",
+ "speed": 1.16,
+ "header": "THE SILENT LAYOFFS",
+ "source": "Sources: layoffs.fyi, company statements, Reuters, Fortune, Business Today",
+ "ticker": "  2022–2026: 835,000+ TECH LAYOFFS ANNOUNCED   ///   SILENT LAYOFFS: NOT COUNTED   ///   RTO · 'LOW PERFORMER' CUTS · BENCH RULES   ///   SOURCE: LAYOFFS.FYI   ///",
+ "meter": {
+  "from": "ANNOUNCED: 835,000+",
+  "to": "SILENT: ?"
+ },
+ "credits_from": [
+  "media/009_layoffs/credits.json",
+  "media/009_layoffs_b/credits.json"
+ ],
+ "thumb": {
+  "hook": [
+   "चुपचाप जा रही हैं",
+   "लाखों नौकरियाँ!"
+  ],
+  "number": "835,000+",
+  "number_label": "TECH JOBS CUT 2022–2026",
+  "sticker": "गिनती ही नहीं होती?",
+  "highlight": [],
+  "view": [
+   30,
+   20
+  ],
+  "mystery": [],
+  "img": "media/009_layoffs_b/emptyoffice_0.jpg"
+ },
+ "scenes": [
+  {
+   "type": "photo",
+   "img": "media/009_layoffs_b/emptyoffice_0.jpg",
+   "kicker": "2022 → 2026",
+   "big": "835,000+",
+   "lines": [
+    "tech jobs cut worldwide",
+    "and these are only the ones announced"
+   ],
+   "dark": 0.4,
+   "vo": "पिछले पाँच सालों में, दुनिया की टेक कंपनियों ने, आठ लाख पैंतीस हज़ार से ज़्यादा लोगों की नौकरी ख़त्म की। और ये सिर्फ़ वो हैं, जिनका एलान हुआ।"
+  },
+  {
+   "type": "counter",
+   "from": 0,
+   "to": 834993,
+   "y0": 2022,
+   "y1": 2026,
+   "label": "TECH JOBS CUT · LAYOFFS.FYI",
+   "chip": "2023: RECORD 265,660",
+   "vo": "दो हज़ार तेईस में तो रिकॉर्ड टूट गया, एक साल में दो लाख पैंसठ हज़ार। और दो हज़ार छब्बीस में, सितंबर तक ही, पूरे पिछले साल से ज़्यादा।"
+  },
+  {
+   "type": "photo",
+   "img": "media/009_layoffs/amazon_0.jpg",
+   "kicker": "THE GIANTS",
+   "big": "~58,000",
+   "lines": [
+    "jobs cut at Amazon since 2020 (disclosed)",
+    "Google 12,000 at once · Meta 21,000"
+   ],
+   "vo": "दुनिया की सबसे अमीर कंपनियाँ भी इसमें शामिल हैं। अमेज़न ने दो हज़ार बीस से क़रीब अट्ठावन हज़ार, गूगल ने एक ही झटके में बारह हज़ार, और मेटा ने दो साल में इक्कीस हज़ार नौकरियाँ ख़त्म कीं।"
+  },
+  {
+   "type": "iceberg",
+   "kicker": "BUT THAT'S ONLY THE TIP",
+   "top_label": "ANNOUNCED",
+   "top_value": "835,000+",
+   "bottom_label": "SILENT LAYOFFS",
+   "bottom_sub": "never announced · never counted",
+   "reveal_at": 2.0,
+   "vo": "लेकिन ये सिर्फ़ बर्फ़ की चोटी है। अब कई कंपनियाँ छँटनी का एलान ही नहीं करतीं। लोग चुपचाप जाते हैं, और कहीं गिने नहीं जाते। इसे कहते हैं, साइलेंट ले-ऑफ़।"
+  },
+  {
+   "type": "photo",
+   "img": "media/009_layoffs_b/commute_2.jpg",
+   "kicker": "SILENT METHOD #1",
+   "big": "5 DAYS",
+   "lines": [
+    "sudden back-to-office orders",
+    "72% of US workers call it a 'stealth layoff'"
+   ],
+   "vo": "पहला तरीक़ा। अचानक हफ़्ते में पाँच दिन ऑफ़िस आने का आदेश, ताकि कुछ लोग ख़ुद इस्तीफ़ा दे दें। एक सर्वे में, अमेरिका के बहत्तर प्रतिशत कर्मचारी, इसे छुपी हुई छँटनी मानते हैं।"
+  },
+  {
+   "type": "photo",
+   "img": "media/009_layoffs_b/meta_1.jpg",
+   "kicker": "SILENT METHOD #2 · META, 2025",
+   "big": "3,600",
+   "lines": [
+    "cut as 'low performers'",
+    "some said they had good reviews"
+   ],
+   "vo": "दूसरा तरीक़ा, ख़राब परफ़ॉर्मेंस का ठप्पा। दो हज़ार पच्चीस में मेटा ने, क़रीब छत्तीस सौ लोगों को लो परफ़ॉर्मर बताकर निकाला, जबकि कई लोगों का कहना था, कि उनकी रिव्यू अच्छी थी।"
+  },
+  {
+   "type": "photo",
+   "img": "media/009_layoffs/tcs_0.jpg",
+   "kicker": "SILENT METHOD #3 · INDIA",
+   "big": "35 DAYS",
+   "lines": [
+    "max time without a project (TCS bench rule)",
+    "reports: many on the bench asked to resign"
+   ],
+   "vo": "और तीसरा तरीक़ा, भारत में, बेंच पॉलिसी। टीसीएस में, बिना प्रोजेक्ट के साल में सिर्फ़ पैंतीस दिन। रिपोर्ट्स के मुताबिक़, बेंच पर बैठे कई लोगों से इस्तीफ़ा माँगा गया।"
+  },
+  {
+   "type": "photo",
+   "img": "media/009_layoffs_b/cubicle_0.jpg",
+   "kicker": "FY26 · INDIA'S TOP 5 IT FIRMS",
+   "big": "FIRST FALL",
+   "lines": [
+    "in total staff in about 20 years",
+    "TCS alone: ~23,000 fewer in a year"
+   ],
+   "vo": "नतीजा? भारत की पाँच सबसे बड़ी आईटी कंपनियों में, क़रीब बीस साल में पहली बार, कुल कर्मचारी घट गए। अकेले टीसीएस में, एक साल में क़रीब तेईस हज़ार कम।"
+  },
+  {
+   "type": "outro",
+   "min": 8.5,
+   "lines": [
+    [
+     "835,000+ announced.",
+     "WHITE"
+    ],
+    [
+     "The silent ones?",
+     "WHITE"
+    ],
+    [
+     "Never counted.",
+     "accent"
+    ]
+   ],
+   "vo": "एलान वाली छँटनी गिनी जा सकती है, साइलेंट वाली नहीं। क्या आपके ऑफ़िस में भी ऐसा हुआ है? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "voice_job": "009_main",
+ "lead": 0.2,
+ "tail": 0.3
+}
