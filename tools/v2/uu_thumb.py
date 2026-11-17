@@ -37,7 +37,7 @@ if TH.get("scene") == "desert_night":   # painted night desert: gradient sky, st
         d0.ellipse([x - s_, y - s_, x + s_, y + s_], fill=(255, 250, 235, int(r_.uniform(90, 255))))
     glow = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(glow).ellipse([700, 430, 1000, 730], fill=(255, 230, 180, 90))
     img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(60)))
-    d0.ellipse([790, 520, 910, 640], fill=(252, 244, 222, 255)); _c = tuple(int(v) for v in sky[566]); d0.ellipse([822, 508, 932, 628], fill=_c + (255,))
+    d0.ellipse([810, 540, 890, 620], fill=(252, 244, 222, 255))
     dunes = Image.new("RGBA", (W, H), (0, 0, 0, 0)); dd = ImageDraw.Draw(dunes)
     for j, (yb, amp, col) in enumerate([(1080, 60, (92, 56, 34)), (1210, 70, (70, 42, 26)), (1360, 80, (48, 30, 20)), (1520, 60, (30, 20, 14))]):
         pts = [(x, yb + amp * math.sin(x / (230 + j * 60) + j * 2.1)) for x in range(0, W + 20, 12)]
