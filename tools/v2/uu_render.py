@@ -33,6 +33,8 @@ THEMES = {
                     land=(20, 30, 48), land_edge=(70, 112, 165), ocean=(6, 12, 26), part=(150, 210, 255), motif="radar"),
     "gold": dict(bg=(13, 9, 3), glow=(92, 62, 12), accent=(255, 198, 64), accent2=(255, 228, 160), alert=(255, 92, 58),
                  land=(42, 31, 12), land_edge=(160, 118, 42), ocean=(15, 11, 4), part=(255, 214, 120), motif="ingot"),
+    "corporate": dict(bg=(6, 8, 12), glow=(22, 40, 70), accent=(120, 196, 255), accent2=(210, 222, 236), alert=(255, 76, 76),
+                      land=(22, 28, 38), land_edge=(80, 100, 130), ocean=(8, 11, 18), part=(170, 200, 235), motif="badge"),
     "history": dict(bg=(14, 10, 6), glow=(70, 45, 15), accent=(235, 190, 110), accent2=(200, 150, 90), alert=(200, 70, 50),
                     land=(48, 38, 26), land_edge=(120, 95, 60), ocean=(20, 15, 10), part=(240, 210, 160), motif="parchment"),
 }
@@ -244,6 +246,13 @@ def motif_img(R):
             d.polygon([(cx - w * 0.5, cy + h * 0.5), (cx + w * 0.5, cy + h * 0.5), (cx + w * 0.36, cy - h * 0.5), (cx - w * 0.36, cy - h * 0.5)],
                       outline=col, width=max(3, R // 18))
             d.line([(cx - w * 0.36, cy - h * 0.5), (cx - w * 0.28, cy - h * 0.2), (cx + w * 0.28, cy - h * 0.2), (cx + w * 0.36, cy - h * 0.5)], fill=col, width=2)
+    elif T["motif"] == "badge":   # employee ID card on a lanyard, outline
+        w, h, lw = R * 1.1, R * 1.5, max(3, R // 18)
+        d.rounded_rectangle([c - w / 2, c - h / 2 + R * 0.2, c + w / 2, c + h / 2 + R * 0.2], radius=int(R * 0.12), outline=col, width=lw)
+        d.line([c - R * 0.25, c - h / 2 + R * 0.2, c, c - R * 1.0, c + R * 0.25, c - h / 2 + R * 0.2], fill=col, width=lw)
+        d.ellipse([c - R * 0.24, c - R * 0.45, c + R * 0.24, c + R * 0.03], outline=col, width=lw)
+        d.arc([c - R * 0.38, c - R * 0.02, c + R * 0.38, c + R * 0.62], 200, 340, fill=col, width=lw)
+        for k in range(2): d.line([c - w * 0.32, c + R * (0.62 + k * 0.16), c + w * 0.32, c + R * (0.62 + k * 0.16)], fill=col, width=lw)
     else:
         d.ellipse([c - R, c - R, c + R, c + R], outline=col, width=4)
     _motif[R] = im; return im

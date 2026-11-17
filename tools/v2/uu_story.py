@@ -135,6 +135,40 @@ def sc_bulb(img, sc, t, D, tg, k):
     caption(img, sc, t, D, 1130)
     chrome(img, tg)
 
+def sc_iceberg(img, sc, t, D, tg, k):
+    """Iceberg: the announced number is the tip above water; the silent part below is big and uncounted."""
+    wl = 760                                                         # water line
+    a = clamp(t / 0.4); d = ImageDraw.Draw(img)
+    text_a(img, (W / 2, 250), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 34), T["accent"], 1, "mm", shadow=4)
+    # water
+    sea = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(sea).rectangle([0, wl, W, 1620], fill=(14, 40, 78, int(150 * a)))
+    img.alpha_composite(sea)
+    for x in range(0, W, 6):
+        y = wl + 6 * math.sin(x / 60 + tg * 2.4)
+        d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=T["accent"] + (int(200 * a),))
+    # tip
+    pt = prog(t, 0.3, 0.8); dy = (1 - pt) * 160
+    tip = [(W / 2 - 170, wl), (W / 2 - 60, wl - 230 + dy), (W / 2 + 10, wl - 180 + dy), (W / 2 + 90, wl - 300 + dy), (W / 2 + 190, wl)]
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(lay).polygon(tip, fill=(232, 240, 250, 255))
+    paste_a(img, lay, (0, 0), pt)
+    text_a(img, (W / 2, wl - 420), sc.get("top_label", "ANNOUNCED"), F("disp", 46, "Black"), WHITE, pt, "mm", shadow=8)
+    text_a(img, (W / 2, wl - 350), sc.get("top_value", ""), F("anton", 64), T["accent"], pt, "mm", shadow=8)
+    # the hidden mass
+    pb = prog(t, sc.get("reveal_at", 2.2), 1.2)
+    if pb > 0:
+        body = [(W / 2 - 170, wl), (W / 2 - 420, wl + 300), (W / 2 - 380, wl + 640), (W / 2 - 80, wl + 820), (W / 2 + 300, wl + 700),
+                (W / 2 + 440, wl + 360), (W / 2 + 190, wl)]
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(lay).polygon(body, fill=(120, 170, 220, 120), outline=(190, 220, 255, 220))
+        paste_a(img, lay, (0, (1 - pb) * -120), pb)
+        text_a(img, (W / 2, wl + 330), "?", F("anton", 300), T["alert"], pb, "mm", shadow=12)
+        text_a(img, (W / 2, wl + 560), sc.get("bottom_label", "SILENT LAYOFFS"), F("disp", 58, "Black"), WHITE, pb, "mm", shadow=8)
+        text_a(img, (W / 2, wl + 630), sc.get("bottom_sub", "never announced · never counted"), F("inter", 36, "SemiBold"), T["accent2"], pb, "mm", shadow=6)
+    for i in range(14):                                              # rising bubbles
+        bx = (i * 173 + 90) % W; by = 1600 - ((tg * 90 + i * 113) % 840)
+        d.ellipse([bx - 5, by - 5, bx + 5, by + 5], outline=T["accent"] + (120,), width=2)
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"iceberg": sc_iceberg})
 R.SCENE_FN.update({"photo": sc_photo, "counter": sc_counter, "bulb": sc_bulb})
 
 if __name__ == "__main__":

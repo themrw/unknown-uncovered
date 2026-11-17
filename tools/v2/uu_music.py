@@ -64,6 +64,13 @@ if theme == "nuclear":
             rate = base + (14 * (loc / rev) if rev and loc < rev else 0) + (3 if sc["type"] == "rank" else 0)
             add(clicks, c * rng.uniform(0.4, 1.0), tt); tt += rng.exponential(1 / rate)
     music += clicks * 0.22
+if theme == "corporate":
+    # office wall clock: soft tick-tock every second, the time running out
+    tick = hp(rng.standard_normal(int(0.012 * SR)), 1800) * np.hanning(int(0.012 * SR))
+    tock = lp(hp(rng.standard_normal(int(0.016 * SR)), 600), 2500) * np.hanning(int(0.016 * SR))
+    tt = 0.5
+    while tt < t_end_beats:
+        add(music, tick if int(tt) % 2 == 0 else tock, tt, 0.16); tt += 1.0
 def chime(L=2.2, f0=1568.0):
     """Bright metallic clink (gold): inharmonic partials with fast decay."""
     t = np.arange(int(L * SR)) / SR; y = np.zeros_like(t)
