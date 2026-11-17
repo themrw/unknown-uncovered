@@ -12,7 +12,7 @@ spec["thumb"] = {
 }
 Key content stays inside the central 1080x1440 (y 240..1680) so the Instagram grid crop keeps it.
 """
-import os, sys
+import math, os, sys
 from PIL import Image, ImageDraw, ImageFilter
 import uu_render as R   # reads sys.argv[1] (the spec) on import
 
@@ -24,7 +24,28 @@ os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
 img = R.BG.crop((60, 60, 60 + W, 60 + H))
 R.particles(img, 2.0)
 
-if TH.get("img"):   # story topics: a real photo as the background instead of the globe
+if TH.get("scene") == "desert_night":   # painted night desert: gradient sky, stars, moon, rim-lit dunes
+    import numpy as _np
+    yy = _np.linspace(0, 1, H)[:, None]
+    top, mid = _np.array([6, 8, 26]), _np.array([60, 36, 40])
+    sky = top + (mid - top) * _np.clip(yy / 0.62, 0, 1) ** 1.6
+    arr = _np.repeat(sky[:, None, :], W, axis=1).reshape(H, W, 3)
+    img = Image.fromarray(arr.astype(_np.uint8)).convert("RGBA"); d0 = ImageDraw.Draw(img)
+    r_ = _np.random.default_rng(4)
+    for _ in range(420):
+        x, y = r_.uniform(0, W), r_.uniform(0, 1150) ** 1.0; s_ = r_.uniform(0.8, 2.6)
+        d0.ellipse([x - s_, y - s_, x + s_, y + s_], fill=(255, 250, 235, int(r_.uniform(90, 255))))
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(glow).ellipse([700, 430, 1000, 730], fill=(255, 230, 180, 90))
+    img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(60)))
+    d0.ellipse([790, 520, 910, 640], fill=(252, 244, 222, 255)); _c = tuple(int(v) for v in sky[566]); d0.ellipse([822, 508, 932, 628], fill=_c + (255,))
+    dunes = Image.new("RGBA", (W, H), (0, 0, 0, 0)); dd = ImageDraw.Draw(dunes)
+    for j, (yb, amp, col) in enumerate([(1080, 60, (92, 56, 34)), (1210, 70, (70, 42, 26)), (1360, 80, (48, 30, 20)), (1520, 60, (30, 20, 14))]):
+        pts = [(x, yb + amp * math.sin(x / (230 + j * 60) + j * 2.1)) for x in range(0, W + 20, 12)]
+        dd.polygon(pts + [(W, H), (0, H)], fill=col + (255,))
+        dd.line(pts, fill=(255, 190, 110, 150 - j * 30), width=4)
+    img.alpha_composite(dunes)
+    TH = dict(TH, highlight=[], _photo=True)
+elif TH.get("img"):   # story topics: a real photo as the background instead of the globe
     REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
     ph = Image.open(os.path.join(REPO, TH["img"])).convert("RGB")
     sc_ = max(W / ph.width, H / ph.height); ph = ph.resize((int(ph.width * sc_) + 1, int(ph.height * sc_) + 1), Image.LANCZOS)
@@ -51,7 +72,8 @@ if not TH.get("_photo"):
   ImageDraw.Draw(halo).ellipse([W / 2 - 520, 1040 - 520, W / 2 + 520, 1040 + 520], fill=T["alert"] + (70,))
   img.alpha_composite(halo.filter(ImageFilter.GaussianBlur(90)))
   R.paste_a(img, g, (gx, gy), 1)
-m = R.motif_img(150); R.paste_a(img, m.rotate(-20, resample=Image.BICUBIC, expand=False), (W - 260, 610), 0.18)
+if not TH.get("_photo"):
+    m = R.motif_img(150); R.paste_a(img, m.rotate(-20, resample=Image.BICUBIC, expand=False), (W - 260, 610), 0.18)
 
 # scan rings around the first highlighted country
 if TH.get("highlight") and TH["highlight"][0] in R.CENTROID:
@@ -101,7 +123,7 @@ if TH.get("stamp"):
 # big number + label
 if TH.get("number"):
     R.text_a(img, (64, 1140), TH["number"], R.fit_font("anton", 300, TH["number"], W - 140), T["accent"], 1, stroke=8, shadow=16)
-    R.text_a(img, (74, 1505), TH.get("number_label", ""), R.F("disp", 56, "Black"), R.WHITE, 1, stroke=4, shadow=8)
+    R.text_a(img, (74, 1505), TH.get("number_label", ""), R.fit_font("disp", 56, TH.get("number_label", ""), W - 148, "Black"), R.WHITE, 1, stroke=4, shadow=8)
 
 # mystery flags row
 codes = TH.get("mystery", [])

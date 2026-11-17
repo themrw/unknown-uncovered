@@ -251,8 +251,8 @@ def sc_satellite(img, sc, t, D, tg, k):
         for i in range(5):
             bx = tx - 120 + (i * 61) % 240; by = ty - 50 + (i * 37) % 100
             d.rectangle([bx - 14, by - 10, bx + 14, by + 10], outline=T["alert"] + (int(255 * rev),), width=3)
-    hud_text(img, (60, 250), sc.get("hud", "SAT-PASS  //  TARGET: POKHRAN  27.09°N 71.75°E"), 24, a=a)
-    hud_text(img, (60, 288), f"T+{tg:06.2f}s   ORBIT 400 KM   RES 0.3 M", 22, MUTED, a)
+    hud_text(img, (60, 340), sc.get("hud", "SAT-PASS  //  TARGET: POKHRAN  27.09°N 71.75°E"), 24, a=a)
+    hud_text(img, (60, 376), f"T+{tg:06.2f}s   ORBIT 400 KM   RES 0.3 M", 22, MUTED, a)
     if rev > 0:
         lab = sc.get("label", "ACTIVITY DETECTED" if det else "NO ACTIVITY FOUND")
         f = F("anton", 64); w = ImageDraw.Draw(img).textlength(lab, font=f)
@@ -281,10 +281,10 @@ def sc_map(img, sc, t, D, tg, k):
             if lons.max() < 55 or lons.min() > 100 or lats.max() < 0 or lats.min() > 40: continue
             pts = [_proj(la, lo, c_lat, c_lon, s_, cx, cy) for lo, la in zip(lons, lats)]
             if iso == "IN":
-                d.polygon(pts, fill=T["land"] + (int(200 * a),))
+                d.polygon(pts, fill=(96, 68, 38, int(230 * a)))
                 n = max(2, int(len(pts) * draw_p)); d.line(pts[:n], fill=T["accent"] + (255,), width=4)
             else:
-                d.polygon(pts, fill=(22, 20, 30, int(160 * a)), outline=T["land_edge"] + (int(70 * a),))
+                d.polygon(pts, fill=(48, 44, 60, int(210 * a)), outline=T["land_edge"] + (int(120 * a),))
     img.alpha_composite(lay)
     px, py = _proj(lat1, lon1, c_lat, c_lon, s_, cx, cy)
     pa = prog(t, sc.get("zoom_at", 1.6) + 1.2, 0.4)
@@ -298,7 +298,7 @@ def sc_map(img, sc, t, D, tg, k):
         text_a(img, (px + 42, py + 30), sc.get("pin_sub", "Jaisalmer · Rajasthan"), F("inter", 32, "SemiBold"), T["accent2"], pa, "lm", shadow=6)
     for lab, la, lo in sc.get("labels", []):
         lx, ly = _proj(la, lo, c_lat, c_lon, s_, cx, cy)
-        if 60 < lx < W - 60 and 300 < ly < 1000: text_a(img, (lx, ly), lab, F("mono", 24), MUTED, a * (1 - z * 0.5), "mm")
+        if 60 < lx < W - 60 and 300 < ly < 1000: text_a(img, (lx, ly), lab, F("mono", 24), MUTED, a * (1 - z * 0.5) * (1 - pa), "mm")
     caption(img, sc, t, D)
     chrome(img, tg, a)
 
@@ -356,15 +356,21 @@ def sc_blast(img, sc, t, D, tg, k):
     for _ in range(120):
         x, y = r.uniform(0, W), r.uniform(560, 860); dd.ellipse([x - 1.4, y - 1.4, x + 1.4, y + 1.4], fill=(255, 250, 230, 170))
     hy = 980 + shake * math.sin(t * 70)
-    if after > 0:   # dust plume + shock ring
+    if after > 0:   # glow, rising dust column with a spreading cap, ground shock ring
         lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
-        pr = clamp(after / 2.5)
-        for j in range(7):
-            rr = 60 + 260 * pr * (0.6 + j * 0.08); yy = hy - 40 - 200 * pr * (j / 6)
-            d.ellipse([W / 2 - rr, yy - rr * 0.45, W / 2 + rr, yy + rr * 0.45], fill=(200, 150, 100, int(110 * (1 - pr * 0.6))))
+        pr = ease(clamp(after / 2.2)); fade = 1 - 0.5 * clamp((after - 2.2) / 3)
+        gl = 1 - clamp(after / 1.5)
+        d.ellipse([W / 2 - 420, hy - 160, W / 2 + 420, hy + 120], fill=(255, 150, 60, int(170 * gl)))
+        top = hy - 40 - 360 * pr
+        for j in range(14):
+            yy = hy - 20 - (hy - 20 - top) * j / 13; rr = 46 + 18 * math.sin(j * 1.3 + tg * 2) + 10 * j * pr
+            d.ellipse([W / 2 - rr, yy - rr * 0.8, W / 2 + rr, yy + rr * 0.8], fill=(214, 160, 104, int(150 * fade)))
+        cw = 90 + 230 * pr
+        for j in range(5):
+            ox = (j - 2) * cw * 0.42; d.ellipse([W / 2 + ox - cw * 0.55, top - cw * 0.35, W / 2 + ox + cw * 0.55, top + cw * 0.3], fill=(226, 176, 120, int(140 * fade)))
         rw = 80 + 900 * clamp(after / 1.2)
         d.ellipse([W / 2 - rw, hy - rw * 0.08, W / 2 + rw, hy + rw * 0.08], outline=T["accent"] + (int(230 * (1 - clamp(after / 1.2))),), width=8)
-        img.alpha_composite(lay.filter(ImageFilter.GaussianBlur(14)))
+        img.alpha_composite(lay.filter(ImageFilter.GaussianBlur(10)))
     desert_ground(img, hy, tg, a, 0.7)
     # seismograph panel
     px0, py0, px1, py1 = 70, 300, W - 70, 520
