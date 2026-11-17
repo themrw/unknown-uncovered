@@ -225,5 +225,41 @@
    "vo": "ग्यारह मई, आज भारत का राष्ट्रीय प्रौद्योगिकी दिवस है। क्या आपको ये कहानी पता थी? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
   }
  ],
- "voice_job": "010_main_c"
+ "voice_job": "010_main_c",
+ "thumb_split": {
+  "A": {
+   "chip": "POKHRAN · 11 MAY 1998",
+   "title": [
+    "INDIA FOOLED",
+    "US INTELLIGENCE"
+   ],
+   "hook": "भारत ने CIA को चकमा दिया!",
+   "sticker": "कैसे?",
+   "top": {
+    "label": "WHAT THE CIA SAW",
+    "status": "NO ACTIVITY"
+   },
+   "bottom": {
+    "label": "WHAT HAPPENED",
+    "status": "5 NUCLEAR TESTS"
+   }
+  },
+  "B": {
+   "chip": "OPERATION SHAKTI · 1998",
+   "title": [
+    "HOW INDIA FOOLED",
+    "THE CIA"
+   ],
+   "hook": "अमेरिकी सैटेलाइट देखते रह गए!",
+   "sticker": "पूरा सच",
+   "top": {
+    "label": "US SATELLITE VIEW",
+    "status": "ALL CLEAR"
+   },
+   "bottom": {
+    "label": "POKHRAN, 15:45 IST",
+    "status": "5 NUCLEAR TESTS"
+   }
+  }
+ }
 }
