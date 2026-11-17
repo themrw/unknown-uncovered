@@ -1,0 +1,49 @@
+{
+ "items": [
+  {
+   "id": "office",
+   "search": "empty office cubicles",
+   "n": 3
+  },
+  {
+   "id": "officenight",
+   "search": "office building at night windows",
+   "n": 3
+  },
+  {
+   "id": "amazon",
+   "search": "Amazon Spheres Seattle",
+   "n": 2
+  },
+  {
+   "id": "google",
+   "search": "Googleplex Mountain View building",
+   "n": 2
+  },
+  {
+   "id": "meta",
+   "search": "Meta Platforms headquarters Menlo Park sign",
+   "n": 2
+  },
+  {
+   "id": "tcs",
+   "search": "Tata Consultancy Services campus",
+   "n": 3
+  },
+  {
+   "id": "bengaluru",
+   "search": "Electronic City Bangalore IT park",
+   "n": 3
+  },
+  {
+   "id": "commute",
+   "search": "office workers commuting crowd station",
+   "n": 3
+  },
+  {
+   "id": "box",
+   "search": "cardboard moving box office desk",
+   "n": 2
+  }
+ ]
+}
