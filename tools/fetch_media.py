@@ -33,7 +33,7 @@ def info(pages):
         md = ii.get("extmetadata", {})
         lic = clean(md.get("LicenseShortName", {}).get("value", ""))
         mime = ii.get("mime", "")
-        if not ii or not mime.startswith("image/") or "svg" in mime: continue
+        if not ii or not mime.startswith("image/") or "svg" in mime or "djvu" in mime or "tiff" in mime: continue
         if not OK.search(lic): print("skip licence", p["title"], lic); continue
         if ii.get("width", 0) < 900: continue
         out.append({"title": p["title"], "license": lic, "artist": clean(md.get("Artist", {}).get("value", ""))[:120],
@@ -47,7 +47,7 @@ PROPS = {"prop": "imageinfo", "iiprop": "url|mime|size|extmetadata", "iiurlwidth
 def find(item):
     if item.get("title"):
         return info(api(dict(PROPS, titles=item["title"])).get("query", {}).get("pages", []))
-    r = api(dict(PROPS, generator="search", gsrnamespace=6, gsrsearch=item["search"], gsrlimit=15))
+    r = api(dict(PROPS, generator="search", gsrnamespace=6, gsrsearch=item["search"] + " filetype:bitmap", gsrlimit=15))
     pages = sorted(r.get("query", {}).get("pages", []), key=lambda p: p.get("index", 99))
     return info(pages)[: item.get("n", 3)]
 

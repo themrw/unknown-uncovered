@@ -1,0 +1,39 @@
+{
+ "items": [
+  {
+   "id": "meta",
+   "search": "Meta headquarters Menlo Park Hacker Way",
+   "n": 2
+  },
+  {
+   "id": "metasign",
+   "search": "Facebook Menlo Park thumbs up sign",
+   "n": 2
+  },
+  {
+   "id": "bengaluru",
+   "search": "Electronic City Bengaluru",
+   "n": 3
+  },
+  {
+   "id": "commute",
+   "search": "rush hour commuters",
+   "n": 3
+  },
+  {
+   "id": "emptyoffice",
+   "search": "empty open plan office",
+   "n": 3
+  },
+  {
+   "id": "cubicle",
+   "search": "cubicles office",
+   "n": 2
+  },
+  {
+   "id": "laptop",
+   "search": "laptop office desk",
+   "n": 2
+  }
+ ]
+}
