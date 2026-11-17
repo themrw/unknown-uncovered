@@ -16,6 +16,9 @@ Scene types (all fields optional unless noted):
   compare    {title, sub, years[2], rows[[code, name, v0, v1]]}        before/after bars
   events     {title, events[[year, name, sub]]}                        horizontal treaty/event timeline
   bars       {title, sub, rows[[code, name, value]]}                   ranked horizontal bars (up to 9)
+  booklet    {cover, cover_sub, stamp, stamp_at, open_at, pages, pages_at, dims_at, kicker, big, lines}  passport booklet right, text left
+  borders    {lock_at, follow_at, lines}                               Europe 1913 open routes -> 1914 locked (lock_at > scene = stays open)
+  dossier    {file, ref, rows[[k, v]], stamp, img, kicker, big, lines} file card right, text left
   outro      {lines[]}                                                 closing lines + subscribe card
 Images are paths relative to $UU_REPO (default /home/claude/unknown-uncovered); credits come from spec["credits_from"].
 """
@@ -442,6 +445,54 @@ R.SCENE_FN.update({"counter": sc_counter, "bulb": sc_bulb})
 R.SCENE_FN.update({"clock": sc_clock, "image": sc_image, "disclaimer": sc_disclaimer, "chapter": sc_chapter, "timeline": sc_timeline,
                    "stat": sc_stat, "club": sc_club, "country": sc_country, "silos": sc_silos, "compare": sc_compare,
                    "events": sc_events, "bars": sc_bars, "outro": sc_outro})
+
+# ---------------------------------------------------------------- passport scenes (reel 012), 16:9 versions of uu_story's
+import uu_story as S
+
+def left_text(img, sc, t, D, y=330, w=760):
+    """Kicker, big headline and rising lines in the left column (x=120)."""
+    text_a(img, (120, y), typed(sc.get("kicker", ""), prog(t, 0.2, 0.6)), F("mono", 30), T["accent"], 1, shadow=4)
+    yy = y + 60
+    if sc.get("big"):
+        g = back(clamp((t - 0.5) / 0.5)); b = sc["big"]
+        f = fit_font("anton", int(150 * (0.85 + 0.15 * clamp(g, 0, 1.2))), b, w)
+        text_a(img, (114, yy), b, f, WHITE, clamp((t - 0.5) / 0.25), shadow=10); yy += 190
+    for i, ln in enumerate(sc.get("lines", [])):
+        st = 1.0 + i * 0.8; f = fit_font("disp", 52 if i == 0 else 44, ln, w, "Black" if i == 0 else "Bold")
+        x = 120
+        S.rise_line(img, ln, x + ImageDraw.Draw(img).textlength(ln, font=f) / 2, yy + 30 + i * 72, f, t - st,
+                    WHITE if i == 0 else (225, 222, 212))
+
+def sc_booklet_l(img, sc, t, D, tg, k):
+    a = S.draw_booklet(img, sc, t, sc.get("cx", 1330), sc.get("y", 250))
+    left_text(img, sc, t, D)
+    chrome(img, tg, a)
+
+EU_L = dict(c_lat=48.0, c_lon=7.0, s=34.0, cx=1330, cy=560)
+def sc_borders_l(img, sc, t, D, tg, k):
+    a = clamp(t / 0.5); la_ = sc.get("lock_at", 1.6)
+    before = S.draw_borders(img, sc, t, tg, a, EU_L)
+    yr = "1913" if before else "1914"
+    text_a(img, (120, 230), yr, F("anton", 190), T["accent"] if before else T["alert"], a, shadow=10)
+    lab = "FREE TO TRAVEL" if before else "PASSPORT REQUIRED"
+    f = F("anton", 70); w = ImageDraw.Draw(img).textlength(lab, font=f); pa = 1.0 if before else ease(clamp((t - la_) / 0.3))
+    rect_a(img, (120, 500, 120 + w + 60, 600), (T["accent2"] if before else T["alert"]), 0.92 * a * pa, 16)
+    text_a(img, (150 + w / 2, 550), lab, f, (14, 10, 6), a * pa, "mm")
+    for i, ln in enumerate(sc.get("lines", [])):
+        base = la_ if la_ < D else 0.4                                # map with no lock (lock_at beyond the scene): lines come early
+        st = base + 0.6 + i * (max(0.8, sc.get("follow_at", 4.5) - la_ - 0.6) if la_ < D else 1.2)
+        ff = fit_font("disp", 46, ln, 700, "Bold")
+        S.rise_line(img, ln, 120 + ImageDraw.Draw(img).textlength(ln, font=ff) / 2, 680 + i * 70, ff, t - st)
+    chrome(img, tg, a)
+
+def sc_dossier_l(img, sc, t, D, tg, k):
+    a = S.draw_dossier(img, sc, t, x0=sc.get("x0", 960), y0=sc.get("y0", 200))
+    left_text(img, sc, t, D, y=360, w=760)
+    if sc.get("img"): credit(img, sc["img"], a)
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"booklet": sc_booklet_l, "borders": sc_borders_l, "dossier": sc_dossier_l})
+R.SCENE_FN.update({"counter": sc_counter, "bulb": sc_bulb, "timeline": sc_timeline})   # uu_story registers vertical versions of these
 
 if __name__ == "__main__":
     R.main()
