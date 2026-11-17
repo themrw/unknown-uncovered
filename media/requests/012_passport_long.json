@@ -1,0 +1,19 @@
+{"items": [
+ {"id": "tower", "search": "Tower of London", "n": 3},
+ {"id": "safeconduct", "search": "safe conduct sauf-conduit document", "n": 3},
+ {"id": "passport1700", "search": "18th century passport document", "n": 3},
+ {"id": "passport1800", "search": "19th century passport", "n": 3},
+ {"id": "emigrants", "search": "emigrants Hamburg ship 1900s", "n": 2},
+ {"id": "station", "search": "railway station 1900s Europe crowd", "n": 2},
+ {"id": "checkpoint", "search": "World War I border checkpoint soldiers", "n": 3},
+ {"id": "photo1915", "search": "passport photograph 1915", "n": 3},
+ {"id": "refugees", "search": "Russian refugees 1920 Constantinople", "n": 3},
+ {"id": "bombay", "search": "Ballard Pier Bombay 1920s", "n": 3},
+ {"id": "scindia", "search": "Supreme Court of India building", "n": 3},
+ {"id": "indpass", "search": "Indian passport cover", "n": 3},
+ {"id": "schengen", "search": "Schengen monument Luxembourg", "n": 3},
+ {"id": "openborder", "search": "former border checkpoint Schengen area", "n": 3},
+ {"id": "nepal", "search": "India Nepal border gate", "n": 3},
+ {"id": "egate", "search": "airport e-gates passport control", "n": 3},
+ {"id": "chip", "search": "biometric passport chip", "n": 2}
+]}
