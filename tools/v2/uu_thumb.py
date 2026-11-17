@@ -34,6 +34,12 @@ if TH.get("img"):   # story topics: a real photo as the background instead of th
         a = 0.45 + 0.5 * max(0, 1 - y / 760) ** 1.2 + 0.5 * max(0, (y - 1000) / 920) ** 1.1
         sd.line([(0, y), (W, y)], fill=T["bg"] + (int(255 * min(0.95, a)),))
     ph.alpha_composite(shade); img = ph
+    if TH.get("vignette"):
+        import numpy as _np
+        yy, xx = _np.mgrid[0:H, 0:W]
+        v = 1 - 0.55 * _np.clip(((xx - W / 2) / (W * 0.6)) ** 2 + ((yy - H / 2) / (H * 0.62)) ** 2, 0, 1) ** 1.3
+        arr = _np.asarray(img.convert("RGB")).astype(_np.float32) * v[..., None]
+        img = Image.fromarray(_np.clip(arr, 0, 255).astype(_np.uint8)).convert("RGBA")
     TH = dict(TH, highlight=[], _photo=True)
 # globe: highlighted countries glow in the alert colour (unnamed), slightly enlarged
 lat, lon = TH.get("view", [25, 75])
@@ -72,6 +78,25 @@ if TH.get("sticker"):
     sh = Image.new("RGBA", st.size, (0, 0, 0, 0)); sh.putalpha(st.getchannel("A").point(lambda v: v // 2))
     img.alpha_composite(sh.filter(ImageFilter.GaussianBlur(10)), (W - st.width - 40, 640))
     img.alpha_composite(st, (W - st.width - 50, 625))
+
+# premium extras: spy satellite with a red scan beam onto the subject, and a slammed "classified" stamp
+if TH.get("sat"):
+    sx, sy, tx, ty = TH["sat"]                      # satellite position -> beam target
+    beam = Image.new("RGBA", (W, H), (0, 0, 0, 0)); bd = ImageDraw.Draw(beam)
+    bd.polygon([(sx, sy + 40), (tx - 170, ty), (tx + 170, ty)], fill=T["alert"] + (70,))
+    for dx in (-170, 170): bd.line([sx, sy + 40, tx + dx, ty], fill=T["alert"] + (200,), width=4)
+    img.alpha_composite(beam.filter(ImageFilter.GaussianBlur(2)))
+    import uu_story as _S   # reuse the satellite drawing
+    _S.draw_sat(ImageDraw.Draw(img), sx, sy, 1.5)
+    _S.brackets(ImageDraw.Draw(img), (tx - 190, ty - 60, tx + 190, ty + 60), T["alert"] + (255,), 44, 6)
+if TH.get("stamp"):
+    f = R.F("anton", 110); tw = ImageDraw.Draw(img).textlength(TH["stamp"], font=f)
+    st = Image.new("RGBA", (int(tw) + 90, 180), (0, 0, 0, 0)); sd = ImageDraw.Draw(st)
+    sd.rounded_rectangle([8, 8, st.width - 8, 172], 14, outline=(220, 36, 36, 245), width=10)
+    sd.text((st.width / 2, 92), TH["stamp"], font=f, fill=(220, 36, 36, 245), anchor="mm")
+    st = st.rotate(TH.get("stamp_rot", 10), expand=True, resample=Image.BICUBIC)
+    sxy = TH.get("stamp_xy", [W - st.width - 30, 860])
+    img.alpha_composite(st, (int(sxy[0]), int(sxy[1])))
 
 # big number + label
 if TH.get("number"):

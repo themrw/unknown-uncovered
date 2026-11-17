@@ -99,6 +99,24 @@ for i, sc in enumerate(spec["scenes"]):   # short edits: an impact on every roll
         for j in range(ni):
             tj = ST[i] + (a + j * (b - a) / max(1, ni - 1) if ni > 1 else a)
             add(music, riser(0.5), tj - 0.5, 0.25); add(music, boom(0.9 if j == ni - 1 else 0.6, 80, 3.5, 1.5), tj, 0.8)
+if theme == "desert":   # desert wind: band-passed noise with slow gusts
+    wind = bp(rng.standard_normal(n), 250, 1400) * (0.5 + 0.5 * np.sin(2 * np.pi * t * 0.07) * np.sin(2 * np.pi * t * 0.031 + 1))
+    music += wind * 0.10
+for i, sc in enumerate(spec["scenes"]):
+    if sc["type"] == "satellite":   # sonar pings while the satellite sweeps
+        L = int(1.2 * SR); tp = np.arange(L) / SR
+        ping = np.sin(2 * np.pi * 1760 * tp) * np.exp(-tp * 5)
+        for j in range(int(D[i] / 1.4)): add(music, ping, ST[i] + 0.4 + j * 1.4, 0.10)
+        if sc.get("status") == "detected": add(music, boom(0.8, 70, 3.5, 2), ST[i] + sc.get("reveal_at", 2.0), 0.7)
+    if sc["type"] == "dossier":
+        st = sc.get("stamp_at", 0.5 + len(sc.get("rows", [])) * 0.55 + 0.4)
+        add(music, boom(0.5, 60, 9, 1.2), ST[i] + st + 0.16, 0.9)
+    if sc["type"] == "blast":
+        bt = sc.get("blast_at", 1.6)
+        add(music, riser(bt), ST[i], 0.4); add(music, boom(2.5, 45, 1.2, 4), ST[i] + bt, 1.0)
+    if sc["type"] == "map":
+        L = int(1.0 * SR); tp = np.arange(L) / SR
+        add(music, np.sin(2 * np.pi * 1320 * tp) * np.exp(-tp * 4), ST[i] + sc.get("zoom_at", 1.6) + 1.2, 0.12)
 for s0 in ST[1:-1]:
     Lw = int(0.45 * SR); tw = np.arange(Lw) / SR
     add(music, bp(rng.standard_normal(Lw), 700, 5000) * np.sin(np.pi * tw / 0.45) ** 2, s0 - 0.3, 0.16)

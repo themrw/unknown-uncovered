@@ -33,6 +33,8 @@ THEMES = {
                     land=(20, 30, 48), land_edge=(70, 112, 165), ocean=(6, 12, 26), part=(150, 210, 255), motif="radar"),
     "gold": dict(bg=(13, 9, 3), glow=(92, 62, 12), accent=(255, 198, 64), accent2=(255, 228, 160), alert=(255, 92, 58),
                  land=(42, 31, 12), land_edge=(160, 118, 42), ocean=(15, 11, 4), part=(255, 214, 120), motif="ingot"),
+    "desert": dict(bg=(9, 8, 16), glow=(70, 42, 18), accent=(255, 178, 70), accent2=(240, 222, 190), alert=(255, 66, 56),
+                   land=(46, 34, 24), land_edge=(170, 125, 70), ocean=(10, 12, 24), part=(255, 205, 140), motif="satellite"),
     "corporate": dict(bg=(6, 8, 12), glow=(22, 40, 70), accent=(120, 196, 255), accent2=(210, 222, 236), alert=(255, 76, 76),
                       land=(22, 28, 38), land_edge=(80, 100, 130), ocean=(8, 11, 18), part=(170, 200, 235), motif="badge"),
     "history": dict(bg=(14, 10, 6), glow=(70, 45, 15), accent=(235, 190, 110), accent2=(200, 150, 90), alert=(200, 70, 50),
@@ -246,6 +248,15 @@ def motif_img(R):
             d.polygon([(cx - w * 0.5, cy + h * 0.5), (cx + w * 0.5, cy + h * 0.5), (cx + w * 0.36, cy - h * 0.5), (cx - w * 0.36, cy - h * 0.5)],
                       outline=col, width=max(3, R // 18))
             d.line([(cx - w * 0.36, cy - h * 0.5), (cx - w * 0.28, cy - h * 0.2), (cx + w * 0.28, cy - h * 0.2), (cx + w * 0.36, cy - h * 0.5)], fill=col, width=2)
+    elif T["motif"] == "satellite":   # spy satellite: body + two solar wings + dish
+        lw = max(3, R // 20)
+        d.rectangle([c - R * 0.22, c - R * 0.3, c + R * 0.22, c + R * 0.3], outline=col, width=lw)
+        for sx in (-1, 1):
+            x0, x1 = c + sx * R * 0.3, c + sx * R * 1.0
+            d.rectangle([min(x0, x1), c - R * 0.2, max(x0, x1), c + R * 0.2], outline=col, width=lw)
+            for j in range(1, 4): xx = x0 + (x1 - x0) * j / 4; d.line([xx, c - R * 0.2, xx, c + R * 0.2], fill=col, width=max(2, lw // 2))
+            d.line([c + sx * R * 0.22, c, x0, c], fill=col, width=lw)
+        d.arc([c - R * 0.2, c + R * 0.28, c + R * 0.2, c + R * 0.62], 180, 360, fill=col, width=lw)
     elif T["motif"] == "badge":   # employee ID card on a lanyard, outline
         w, h, lw = R * 1.1, R * 1.5, max(3, R // 18)
         d.rounded_rectangle([c - w / 2, c - h / 2 + R * 0.2, c + w / 2, c + h / 2 + R * 0.2], radius=int(R * 0.12), outline=col, width=lw)
@@ -549,6 +560,11 @@ for i, sc in enumerate(SPEC["scenes"]):
     SCENES.append((sc, round(d * FPS) / FPS))
 STARTS = np.cumsum([0] + [d for _, d in SCENES]).tolist()
 
+LOOK = SPEC.get("look", "")
+_yy, _xx = np.mgrid[0:H, 0:W]
+VIGNETTE = (1 - 0.5 * np.clip(((_xx - W / 2) / (W * 0.62)) ** 2 + ((_yy - H * 0.47) / (H * 0.6)) ** 2, 0, 1) ** 1.4)[..., None] if LOOK == "cinematic" else None
+del _yy, _xx
+
 def frame(k, t, t0):
     sc, D = SCENES[k]; tg = t0 + t
     ox = 60 + 50 * math.sin(tg * 0.09); oy = 60 + 50 * math.cos(tg * 0.07)
@@ -558,8 +574,16 @@ def frame(k, t, t0):
     arr = np.asarray(img.convert("RGB")).astype(np.int16)
     gr = np.asarray(GRAIN[int(tg * FPS) % len(GRAIN)]).astype(np.int16) - 128
     arr += (gr * SPEC.get("grain", 0.18)).astype(np.int16)[..., None]
-    # transitions: whip flash + chromatic split at scene starts, fade at ends
-    g = max(0.0, 1 - t / 0.25) if k > 0 else 0.0
+    if LOOK == "cinematic":
+        L = arr.mean(axis=2, keepdims=True) / 255.0
+        arr = arr + np.concatenate([(L - 0.5) * 26, (L - 0.5) * 6, (0.5 - L) * 22], axis=2).astype(np.int16)
+        arr = (arr * VIGNETTE).astype(np.int16)
+        g = max(0.0, 1 - t / 0.35) if k > 0 else 0.0     # soft warm light-wash cut
+        if g > 0: arr = arr + (np.array([255, 190, 120]) * 0.55 * g ** 2).astype(np.int16)
+        g = 0.0
+    else:
+        # transitions: whip flash + chromatic split at scene starts, fade at ends
+        g = max(0.0, 1 - t / 0.25) if k > 0 else 0.0
     if g > 0:
         r = np.random.default_rng(int(tg * 1000))
         for _ in range(int(8 * g) + 1):
