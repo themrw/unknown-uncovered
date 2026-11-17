@@ -11,7 +11,7 @@ Commands:
                                           (Instagram API with Facebook Login, graph.facebook.com)
 
 Caption: meta["ig_caption"] if present, else built from meta title + description
-(#Shorts removed, YouTube wording swapped, at most 30 hashtags, 2200 chars).
+(#Shorts removed, YouTube wording swapped, at most 5 hashtags, 2200 chars).
 Cover: if thumbnail.jpg sits next to the video and ffmpeg is available, a 0.2 s still of it is
 appended to the end of the Instagram copy and used as the Reel cover; otherwise the frame at
 meta["ig_thumb_offset_ms"] (default 14000) is used.
@@ -39,8 +39,8 @@ def build_caption(m):
     desc = desc.replace("Subscribe to", "Follow")
     cap = f"{title}\n\n{desc}".strip()
     tags = re.findall(r"#\w+", cap)
-    if len(tags) > 30:
-        for t in tags[30:]:
+    if len(tags) > 5:                                  # Instagram now allows only 5 hashtags (Nov 2026)
+        for t in tags[5:]:
             cap = cap.replace(t, "", 1)
     return cap[:2200]
 
