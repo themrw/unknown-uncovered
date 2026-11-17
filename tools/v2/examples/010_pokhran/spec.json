@@ -1,0 +1,229 @@
+{
+ "format": "story",
+ "theme": "desert",
+ "look": "cinematic",
+ "grain": 0.12,
+ "tts": "parler",
+ "speed": 1.12,
+ "lead": 0.2,
+ "tail": 0.3,
+ "header": "POKHRAN: THE TEST THE CIA MISSED",
+ "source": "Sources: CRS report 98-672, NSA Archive, AP, NYT (1995), Atomic Heritage Foundation",
+ "ticker": "  POKHRAN · JAISALMER · RAJASTHAN   ///   18 MAY 1974: SMILING BUDDHA   ///   DEC 1995: DETECTED   ///   11 & 13 MAY 1998: OPERATION SHAKTI   ///",
+ "credits_from": [
+  "media/010_pokhran/credits.json"
+ ],
+ "thumb": {
+  "img_x": 0.55,
+  "vignette": true,
+  "hook": [
+   "पोखरण 1998:",
+   "CIA को भनक तक नहीं!"
+  ],
+  "number": "11·05·1998",
+  "number_label": "HIDDEN FROM US SPY SATELLITES",
+  "sticker": "कैसे?",
+  "stamp": "TOP SECRET",
+  "stamp_xy": [
+   560,
+   820
+  ],
+  "sat": [
+   330,
+   760,
+   560,
+   1150
+  ],
+  "highlight": [],
+  "mystery": [],
+  "scene": "desert_night"
+ },
+ "scenes": [
+  {
+   "type": "satellite",
+   "status": "blind",
+   "reveal_at": 5.5,
+   "label": "NO WARNING",
+   "kicker": "MAY 1998 · THAR DESERT",
+   "big": "NO WARNING",
+   "lines": [
+    "US spy satellites were watching",
+    "India still tested. Nobody saw it coming."
+   ],
+   "vo": "अमेरिका के जासूसी सैटेलाइट, राजस्थान के एक रेगिस्तान पर नज़र रख रहे थे। फिर भी, ग्यारह मई उन्नीस सौ अट्ठानवे को, वहाँ परमाणु धमाके हुए, और अमेरिका को भनक तक नहीं लगी। ये हुआ कैसे?"
+  },
+  {
+   "type": "map",
+   "pin": [
+    27.09,
+    71.75
+   ],
+   "pin_label": "POKHRAN",
+   "pin_sub": "Jaisalmer · Rajasthan",
+   "zoom": 1.9,
+   "zoom_at": 1.4,
+   "labels": [
+    [
+     "THAR DESERT",
+     25.6,
+     70.6
+    ],
+    [
+     "DELHI",
+     28.6,
+     77.2
+    ],
+    [
+     "ARABIAN SEA",
+     19.5,
+     66.5
+    ]
+   ],
+   "kicker": "FIRST: WHAT IS POKHRAN?",
+   "lines": [
+    "a desert town in Jaisalmer district",
+    "name: 'place of five mirages'"
+   ],
+   "vo": "पोखरण, राजस्थान के जैसलमेर ज़िले का एक छोटा सा शहर, थार रेगिस्तान के बीच। नाम का मतलब, पाँच मृगतृष्णाओं की जगह।"
+  },
+  {
+   "type": "photo",
+   "img": "media/010_pokhran/pokaran_0.jpg",
+   "kicker": "BALAGARH FORT · 14TH CENTURY",
+   "big": "POKHRAN",
+   "lines": [
+    "town of ~28,000 people (2011)",
+    "nearby: the Army's Pokhran Test Range"
+   ],
+   "dark": 0.3,
+   "vo": "यहाँ चौदहवीं सदी का बालागढ़ क़िला है, और पास के रेगिस्तान में, सेना का पोखरण टेस्ट रेंज।"
+  },
+  {
+   "type": "dossier",
+   "file": "OPERATION: SMILING BUDDHA",
+   "ref": "POKHRAN-I",
+   "rows": [
+    [
+     "DATE",
+     "18 MAY 1974"
+    ],
+    [
+     "TIME",
+     "08:05 IST"
+    ],
+    [
+     "DAY",
+     "BUDDHA PURNIMA"
+    ],
+    [
+     "CODE",
+     "'THE BUDDHA HAS SMILED'"
+    ]
+   ],
+   "stamp": "SUCCESS",
+   "kicker": "POKHRAN-I · 1974",
+   "lines": [
+    "India's first nuclear test",
+    "the 6th country to test a nuclear device"
+   ],
+   "vo": "अठारह मई उन्नीस सौ चौहत्तर, बुद्ध पूर्णिमा के दिन, यहीं भारत ने अपना पहला परमाणु परीक्षण किया। प्रधानमंत्री तक कोड संदेश पहुँचा, बुद्ध मुस्कुराए हैं।"
+  },
+  {
+   "type": "satellite",
+   "status": "detected",
+   "reveal_at": 2.4,
+   "label": "ACTIVITY DETECTED",
+   "kicker": "DECEMBER 1995",
+   "big": "CAUGHT",
+   "lines": [
+    "US satellites spot test preparations",
+    "the test is put off"
+   ],
+   "vo": "इक्कीस साल बाद, उन्नीस सौ पचानवे में, अमेरिकी सैटेलाइट ने नई तैयारी पकड़ ली, राजदूत तस्वीरें लेकर पहुँचे, और परीक्षण टल गया।"
+  },
+  {
+   "type": "satellite",
+   "status": "blind",
+   "night": 1.0,
+   "reveal_at": 3.0,
+   "label": "NO ACTIVITY",
+   "kicker": "1998 · LESSON LEARNED",
+   "big": "NIGHT SHIFT",
+   "lines": [
+    "work timed around satellite passes",
+    "by dawn, everything put back in place"
+   ],
+   "vo": "पर उन्नीस सौ अट्ठानवे में, सैटेलाइट के गुज़रने का समय समझकर, ज़्यादातर काम रात में हुआ, और सुबह से पहले हर चीज़ वापस वैसी ही रख दी जाती।"
+  },
+  {
+   "type": "dossier",
+   "file": "OPERATION SHAKTI · COVER PLAN",
+   "ref": "TOP SECRET",
+   "rows": [
+    [
+     "DISGUISE",
+     "ARMY UNIFORMS"
+    ],
+    [
+     "TRAVEL",
+     "DIFFERENT NAMES"
+    ],
+    [
+     "SHAFTS",
+     "'WHITE HOUSE', 'TAJ MAHAL'"
+    ],
+    [
+     "DUG SAND",
+     "SHAPED LIKE DUNES"
+    ]
+   ],
+   "stamp": "TOP SECRET",
+   "img": "media/010_pokhran/pokaran_2.jpg",
+   "kicker": "OPERATION SHAKTI",
+   "lines": [
+    "scientists posed as army engineers"
+   ],
+   "vo": "वैज्ञानिक सेना की वर्दी में काम करते थे, और अलग नामों से सफ़र करते थे। गड्ढों के कोड नेम थे, व्हाइट हाउस और ताज महल। और खोदी गई रेत को, टीलों जैसा बना दिया गया।"
+  },
+  {
+   "type": "blast",
+   "date": "11 · 05 · 1998",
+   "time": "15:45 IST",
+   "blast_at": 1.4,
+   "kicker": "POKHRAN-II",
+   "big": "5 TESTS",
+   "lines": [
+    "3 on 11 May · 2 on 13 May"
+   ],
+   "vo": "फिर, ग्यारह मई, दोपहर पौने चार बजे, ज़मीन के नीचे तीन परमाणु उपकरण एक साथ फटे। तेरह मई को दो और।"
+  },
+  {
+   "type": "photo",
+   "img": "media/010_pokhran/cia_1.jpg",
+   "kicker": "CIA HEADQUARTERS · LANGLEY",
+   "big": "'COLOSSAL FAILURE'",
+   "lines": [
+    "a US senator on the missed warning",
+    "the CIA ordered an inquiry"
+   ],
+   "dark": 0.35,
+   "vo": "अमेरिका में इसे भारी ख़ुफ़िया नाकामी कहा गया। एक भारतीय विशेषज्ञ बोले, उनकी जानकारी अच्छी थी, पर हमारा छलावा बेहतर।"
+  },
+  {
+   "type": "outro",
+   "min": 8.0,
+   "lines": [
+    [
+     "11 May:",
+     "WHITE"
+    ],
+    [
+     "National Technology Day",
+     "accent"
+    ]
+   ],
+   "vo": "ग्यारह मई, आज भारत का राष्ट्रीय प्रौद्योगिकी दिवस है। क्या आपको ये कहानी पता थी? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "voice_job": "010_main_c"
+}

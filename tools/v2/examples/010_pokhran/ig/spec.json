@@ -1,0 +1,113 @@
+{
+ "format": "story",
+ "theme": "desert",
+ "look": "cinematic",
+ "grain": 0.12,
+ "tts": "parler",
+ "speed": 1.12,
+ "lead": 0.2,
+ "tail": 0.3,
+ "header": "POKHRAN: THE TEST THE CIA MISSED",
+ "source": "Sources: CRS report 98-672, NSA Archive, AP, NYT (1995), Atomic Heritage Foundation",
+ "ticker": "  POKHRAN · JAISALMER · RAJASTHAN   ///   18 MAY 1974: SMILING BUDDHA   ///   DEC 1995: DETECTED   ///   11 & 13 MAY 1998: OPERATION SHAKTI   ///",
+ "credits_from": [
+  "media/010_pokhran/credits.json"
+ ],
+ "thumb": {
+  "img": "media/010_pokhran/thar_2.jpg",
+  "img_x": 0.55,
+  "vignette": true,
+  "hook": [
+   "पोखरण 1998:",
+   "CIA को भनक तक नहीं!"
+  ],
+  "number": "11·05·1998",
+  "number_label": "HOW INDIA HID IT FROM SPY SATELLITES",
+  "sticker": "कैसे?",
+  "stamp": "TOP SECRET",
+  "stamp_xy": [
+   560,
+   1010
+  ],
+  "sat": [
+   300,
+   700,
+   600,
+   1060
+  ],
+  "highlight": [],
+  "mystery": []
+ },
+ "scenes": [
+  {
+   "type": "satellite",
+   "status": "blind",
+   "reveal_at": 3.0,
+   "label": "NO WARNING",
+   "kicker": "MAY 1998 · THAR DESERT",
+   "big": "NO WARNING",
+   "lines": [
+    "US spy satellites were watching",
+    "India still tested. Nobody saw it coming."
+   ],
+   "vo": "अमेरिकी सैटेलाइट ऊपर से देख रहे थे, फिर भी भारत ने पोखरण में परमाणु परीक्षण कर दिया, और किसी को भनक नहीं लगी।"
+  },
+  {
+   "type": "dossier",
+   "file": "OPERATION SHAKTI · COVER PLAN",
+   "ref": "TOP SECRET",
+   "rows": [
+    [
+     "DISGUISE",
+     "ARMY UNIFORMS"
+    ],
+    [
+     "TRAVEL",
+     "DIFFERENT NAMES"
+    ],
+    [
+     "SHAFTS",
+     "'WHITE HOUSE', 'TAJ MAHAL'"
+    ]
+   ],
+   "stamp": "TOP SECRET",
+   "img": "media/010_pokhran/pokaran_2.jpg",
+   "kicker": "OPERATION SHAKTI",
+   "lines": [
+    "scientists posed as army engineers"
+   ],
+   "vo": "रात में काम, सेना की वर्दी, और गड्ढों के कोड नेम, ताज महल और व्हाइट हाउस।",
+   "stamp_at": 2.6
+  },
+  {
+   "type": "blast",
+   "date": "11 · 05 · 1998",
+   "time": "15:45 IST",
+   "blast_at": 0.8,
+   "kicker": "POKHRAN-II",
+   "big": "5 TESTS",
+   "lines": [
+    "3 on 11 May · 2 on 13 May"
+   ],
+   "vo": "ग्यारह मई उन्नीस सौ अट्ठानवे, तीन धमाके एक साथ।"
+  },
+  {
+   "type": "outro",
+   "min": 4.5,
+   "card": "youtube",
+   "card_at": 0.8,
+   "lines": [
+    [
+     "The full story",
+     "WHITE"
+    ],
+    [
+     "on YouTube",
+     "accent"
+    ]
+   ],
+   "vo": "पूरी कहानी, यूट्यूब पर देखें।"
+  }
+ ],
+ "voice_job": "010_ig"
+}
