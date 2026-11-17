@@ -26,6 +26,7 @@ English on-screen text, curious facts and world data explained simply.
 - `site/`: homepage + privacy policy for the Google OAuth consent screen.
 
 ## Making a reel
+0. **Novelty gate (mandatory, before pitching or making ANY topic).** The channel promise is "unknown and uncovered": never make a topic that other channels have already covered well. Run `python3 tools/uu_novelty.py "<Hindi/Hinglish query>" "<English query>"` (searches YouTube via the channel token, ~100 quota units per query) and include the verdict and top view counts in every pitch. **COVERED** (any video over 500k views, or 3+ over 100k) → drop it. **CROWDED** → only with a clearly new angle or newer data. **OPEN** → fair game. Famous "hidden" stories (Pokhran/CIA, Dead Hand, Goldsboro, lost nukes, Nanda Devi, Starfish Prime, Project Azorian, Kyshtym, Plowshare, Petrov) all fail this gate (checked Nov 2026); reel 010 (Pokhran) was published without the check and the user rightly objected. What tends to pass: fresh data from reports released in the last weeks (SIPRI, FAS, RBI, CAG, ministries, court filings), and data-driven angles that combine numbers nobody has put together (e.g. reel 007, 70,300 → 12,187).
 1. Research the topic with web search: current, sourced numbers only, never invented; neutral on politics.
 2. **Pick the FORMAT and THEME from the content, every time (the user insists on this).**
    - **Comparison / ranking topics** ("top 5 countries…", "who has the most…"): countdown format, `uu_render.py` (example `002_nuclear`, `003_missiles`, `004_gold`).
