@@ -1,0 +1,62 @@
+import json
+M="media/014_fingerprint_long/"; B="media/014b_fingerprint_long/"; P="media/013_fingerprint/"
+sc=[]
+def add(**k): sc.append(k)
+# ---- 1. the murder
+add(type="fingerprint", seed=7, left_label="CALENDAR · 1898", right_label="", kicker="1898 · JALPAIGURI, BENGAL", big="NO WITNESS", lines=["a tea garden near the Bhutan border","one clue: a thumbprint on a calendar"],
+    vo="साल अठारह सौ अट्ठानवे। बंगाल का जलपाईगुड़ी ज़िला, भूटान की सरहद के पास, एक चाय बागान। सुबह होती है, और बागान का मैनेजर, अपने कमरे में मृत मिलता है। तिजोरी ख़ाली है, कई सौ रुपये ग़ायब। कोई गवाह नहीं। बस एक चीज़, मेज़ पर रखे एक कैलेंडर पर, अंगूठे का एक धुँधला निशान।")
+add(type="image", img=P+"teagarden_0.jpg", kicker="THE QUESTION", big="WHOSE PRINT?", lines=["thousands of criminal records","no way to search them"],
+    vo="पुलिस के सामने सवाल है, ये निशान किसका है? उस ज़माने में, ये सवाल लगभग नामुमकिन था। बंगाल पुलिस के पास हज़ारों अपराधियों के रिकॉर्ड थे, पर उनमें से, एक निशान को ढूँढ़ने का कोई तरीक़ा नहीं था। या शायद, था। कलकत्ता में, दो भारतीय पुलिसवालों के पास।")
+add(type="disclaimer", min=7, lines=["Educational content only.","Facts from court and police records and published histories.","Cartoon characters are illustrations, not likenesses."],
+    vo="ये वीडियो सिर्फ़ जानकारी के लिए है। तथ्य, अदालती और पुलिस रिकॉर्ड, और प्रकाशित इतिहास से लिए गए हैं।")
+# ---- 2. the problem
+add(type="image", img=M+"bertcard_1.jpg", kicker="THE OLD WAY", big="MEASURE THE BODY", lines=["head, arm span, ear, foot","Bertillon's system, used worldwide"],
+    vo="ये कहानी समझने के लिए, थोड़ा पीछे चलते हैं। उस दौर में बंगाल की पुलिस, अपराधियों को पहचानने के लिए, उनका शरीर नापती थी। सिर की लंबाई, बाँहों का फैलाव, कान, पैर। ये तरीक़ा फ़्रांस के अल्फ़ोंस बर्टिलॉन ने बनाया था, और लगभग पूरी दुनिया में चलता था।")
+add(type="image", img=M+"bertcard_0.jpg", kicker="THE PROBLEM", lines=["a small error in measuring","could point to the wrong person"],
+    vo="पर इसमें दिक़्क़त थी। नापने वाला बदले, तो नाप बदल जाते। ज़रा सी ग़लती, और सही आदमी, ग़लत फ़ाइल से जुड़ सकता था। ऊपर से, ये काम धीमा भी था, और महँगा भी।")
+add(type="dossier", file="ROAD CONTRACT", ref="JANGIPUR · BENGAL", img=B+"herschel_0.jpg",
+    rows=[["DATE","28 JULY 1858"],["OFFICER","WILLIAM HERSCHEL"],["CONTRACTOR","RAJYADHAR KONAI"],["SIGNED WITH","A HANDPRINT"]],
+    stamp="SEALED", kicker="A CLUE FROM 40 YEARS EARLIER", big="1858", lines=["a handprint, so the deal could not be denied","the lines did not change for years"],
+    vo="और मज़े की बात ये, कि इसका जवाब, बंगाल में ही, चालीस साल पहले से छुपा था। अठाईस जुलाई अठारह सौ अट्ठावन को, जंगीपुर में ब्रिटिश अफ़सर विलियम हर्शेल ने, राजाधर कोनाई नाम के एक ठेकेदार से, सड़क के ठेके पर हथेली की छाप लगवाई थी, ताकि वो बाद में मुकर न सके। और हर्शेल ने पाया, कि ये लकीरें, सालों तक नहीं बदलतीं।")
+add(type="image", img=B+"galtonbook_0.jpg", kicker="BUT ONE PROBLEM REMAINED", big="HOW TO SEARCH?", lines=["Galton sorted prints into types (1892)","Argentina built its own system too"],
+    vo="बाद में इंग्लैंड के वैज्ञानिक फ़्रांसिस गैल्टन ने, निशानों को तीन तरह में बाँटा, और अर्जेंटीना में, हुआन वुचेटिच अपना अलग सिस्टम बना रहे थे। लेकिन बंगाल की असली मुश्किल, अब भी वहीं थी। हज़ारों कार्डों में से, एक निशान, जल्दी कैसे ढूँढ़ें?")
+# ---- 3. the two men
+add(type="cartoon", bg="drawers", kicker="CALCUTTA · 1890s", big="HAQUE & BOSE", lines=["a maths student from Presidency College","and a postman's son turned detective"],
+    vo="और यहीं आते हैं, इस कहानी के दो असली नायक। बंगाल के पुलिस प्रमुख एडवर्ड हेनरी को, इस काम के लिए गणित में तेज़ कोई चाहिए था। प्रेसिडेंसी कॉलेज के प्रिंसिपल ने भेजा, अज़ीज़ुल हक़ को। और उनके साथ थे हेमचंद्र बोस, एक डाकिए के बेटे, जिनके तेज़ जासूसी काम ने, उन्हें कलकत्ता के सीआईडी मुख्यालय तक पहुँचाया था।")
+add(type="patterns", kicker="FIRST, LOOK AT YOUR OWN THUMB", lines=["Their whole system began with one question:","is there a whorl, or not?"],
+    vo="पर उनका तरीक़ा समझने से पहले, एक छोटा सा काम आपके लिए। अपना अंगूठा ध्यान से देखिए। क्या उसकी लकीरें, एक गोल भँवर की तरह घूम रही हैं? या एक तरफ़ से आकर, लूप की तरह मुड़ जाती हैं? या बस मेहराब की तरह, ऊपर उठकर निकल जाती हैं? हक़ और बोस का पूरा सिस्टम, इसी एक सवाल से शुरू होता था, भँवर है, या नहीं?")
+add(type="drawers", kicker="THE HAQUE–BOSE FORMULA", whorls=[1,4,7], lines=["a mountain of cards becomes 1,024 drawers","find the drawer, not the needle"],
+    vo="उन्होंने दस उंगलियों को, पाँच जोड़ों में बाँटा। पहले जोड़े में भँवर हो, तो उसकी क़ीमत सोलह, दूसरे में आठ, फिर चार, दो, और एक। सम उंगलियों की क़ीमतें ऊपर जुड़तीं, विषम की नीचे, और दोनों में एक जोड़ा जाता। जैसे यहाँ, ऊपर नौ, नीचे उन्नीस। यानी ये कार्ड जाएगा, दराज़ नंबर नौ बटा उन्नीस में। ऐसे कुल, एक हज़ार चौबीस दराज़।")
+add(type="cartoon", bg="board", board=["16 · 8 · 4 · 2 · 1","1 + 8  /  1 + 16 + 2","= 9/19 → one drawer"], kicker="1897", big="7,000 CARDS", lines=["every card now had an address","one test remained"],
+    vo="हज़ारों कार्डों का ढेर, अब एक ऐसी अलमारी बन गया था, जिसमें हर कार्ड का पता था। दोनों ने मिलकर इस तरीक़े को परखा, और अठारह सौ सत्तानवे तक, हक़ की अलमारी में, सात हज़ार सेट जमा हो चुके थे। अब बस, एक इम्तिहान बाक़ी था।")
+add(type="versus", kicker="1897 · THE GOVERNMENT TEST", lines=["12 June 1897: Fingerprint Bureau, Writers' Building, Calcutta","the first of its kind in the British Empire"],
+    vo="अठारह सौ सत्तानवे में, सरकार ने एक कमेटी बनाई, सर्वे ऑफ़ इंडिया के प्रमुख, और प्रेसिडेंसी कॉलेज के प्रिंसिपल। उन्होंने शरीर नापने वाले तरीक़े, और फ़िंगरप्रिंट की सीधी टक्कर देखी। नतीजा साफ़ था। फ़िंगरप्रिंट सस्ता, आसान, और ज़्यादा सटीक। बारह जून अठारह सौ सत्तानवे को, कलकत्ता के राइटर्स बिल्डिंग में, फ़िंगरप्रिंट ब्यूरो शुरू हुआ, ब्रिटिश साम्राज्य में अपनी तरह का पहला।")
+# ---- 4. the payoff
+add(type="fingerprint", seed=7, left_label="CALENDAR · 1898", right_label="KANGALI CHARAN", stamp="MATCH", kicker="BACK TO THE TEA GARDEN", big="THE MATCH", lines=["the system points to one drawer","one card matches"],
+    vo="और अब, वापस उस चाय बागान पर। कैलेंडर वाला निशान कलकत्ता पहुँचता है। हक़ और बोस का सिस्टम बताता है, कौन सा दराज़ खोलना है। कार्ड एक एक कर पलटते हैं, और फिर, मिलान। ये निशान है, कंगाली चरण का।")
+add(type="dossier", file="KANGALI CHARAN", ref="CASE · 1898", rows=[["WHO","MANAGER'S EX-SERVANT"],["PAST","JAILED FOR THEFT"],["RELEASED","WEEKS BEFORE"],["ARRESTED","BIRBHUM"]],
+    stamp="ARRESTED", kicker="THE SUSPECT", big="THE MOTIVE?", lines=["the manager had sent him to jail","his thumbprint is taken again: identical"],
+    vo="कंगाली चरण, मैनेजर का पुराना नौकर। मैनेजर ने ही उसे चोरी के जुर्म में जेल भिजवाया था, और वो कुछ ही हफ़्ते पहले रिहा हुआ था। पुलिस उसे बीरभूम से गिरफ़्तार कर कलकत्ता लाती है, और उसके अंगूठे का निशान दोबारा लिया जाता है। हूबहू वही।")
+add(type="image", img=P+"teagarden_0.jpg", kicker="MAY 1898 · THE VERDICT", big="A TWIST", lines=["murder: nobody saw it, not proven","theft: proven by the thumbprint"],
+    vo="मई अठारह सौ अट्ठानवे, मुक़दमा। और यहाँ आता है एक मोड़। अदालत कहती है, क़त्ल होते किसी ने नहीं देखा, इसलिए हत्या साबित नहीं होती। लेकिन पैसे चुराए गए, ये अंगूठे के निशान से पक्के तौर पर साबित है। कंगाली चरण को, चोरी में सज़ा होती है। ब्रिटिश साम्राज्य में, फ़िंगरप्रिंट सबूत पर सज़ा का, ये सबसे शुरुआती मामलों में से एक था।")
+# ---- 5. the world and the credit
+add(type="spread", origin=["CALCUTTA",22.57,88.36], year0="1900",
+    routes=[["LONDON",51.5,-0.13,4.0,None,"1901"],["SOUTH AFRICA",-26.2,28.0,9.0,None,"1900s"],["USA",40.7,-74.0,10.0,"LONDON",""]],
+    kicker="CALCUTTA → THE WORLD", lines=["Scotland Yard bureau: 1 July 1901","on the system built in Calcutta"],
+    vo="और कलकत्ता का ये सिस्टम, अब दुनिया की तरफ़ निकलता है। उन्नीस सौ में हेनरी इस पर किताब छापते हैं, और एक जुलाई उन्नीस सौ एक को, लंदन के स्कॉटलैंड यार्ड में, फ़िंगरप्रिंट ब्यूरो शुरू होता है, इसी सिस्टम पर। और अगले ही साल, एक मज़ेदार केस आता है।")
+add(type="image", img=B+"oldbailey_1.jpg", kicker="1902 · LONDON", big="BILLIARD BALLS", lines=["a thumbprint on fresh paint","Britain's first fingerprint conviction"],
+    vo="लंदन के एक घर से, कुछ बिलियर्ड की गेंदें चोरी होती हैं। चोर, ताज़ा पेंट की हुई खिड़की पर, अपना अंगूठा छोड़ जाता है। स्कॉटलैंड यार्ड की अलमारी से मिलान होता है, और तेरह सितंबर उन्नीस सौ दो को, हैरी जैक्सन, ब्रिटेन में फ़िंगरप्रिंट से सज़ा पाने वाला पहला आदमी बनता है। इसके बाद, अंग्रेज़ी बोलने वाली लगभग पूरी दुनिया, और बाद में अमेरिका की एफ़बीआई ने भी, अपने रिकॉर्ड इसी तरीक़े पर सजाए। नब्बे के दशक तक, कंप्यूटर भी इसी वर्गीकरण पर चलते रहे।")
+add(type="dossier", file="HENRY CLASSIFICATION SYSTEM", ref="1897", rows=[["NAMED AFTER","SIR EDWARD HENRY"],["MATHS","AZIZUL HAQUE"],["WORKED ON IT","HEM CHANDRA BOSE"],["LATER REWARD","Rs 5,000 EACH + TITLES"]],
+    stamp="CREDIT?", kicker="ONE QUESTION REMAINS", big="WHOSE NAME?", lines=["Khan Bahadur & Rai Bahadur titles came later","the name stayed: 'Henry'"],
+    vo="पर एक सवाल अब भी बाक़ी है। इस सिस्टम का नाम क्या पड़ा? हेनरी क्लासिफ़िकेशन सिस्टम। हक़ और बोस का नाम, उस पर कहीं नहीं था। सालों बाद, हक़ ने अपने काम की पहचान माँगी। तब ब्रिटिश सरकार ने दोनों को, पाँच पाँच हज़ार रुपये का इनाम, और ख़ान बहादुर और राय बहादुर की उपाधियाँ दीं। लेकिन नाम, आज भी हेनरी का ही है।")
+add(type="cartoon", bg="glow", kicker="TODAY", big="144 CRORE+", lines=["Aadhaar numbers generated (UIDAI)","every thumb has a story behind it"],
+    vo="और आज, उसी देश में, आधार के एक सौ चौवालीस करोड़ से ज़्यादा नंबर बन चुके हैं, जिनमें लोगों की उंगलियों के निशान दर्ज हैं। जब आप फ़ोन पर अंगूठा लगाते हैं, तो उस छोटे से निशान के पीछे, एक लंबी कहानी है, जो शुरू हुई थी, बंगाल के एक चाय बागान से, और कलकत्ता के दो पुलिसवालों से।")
+add(type="outro", lines=["Haque & Bose built it. Henry's name is on it.","Should it be called the Haque–Bose system?","Tell us in the comments."],
+    vo="क्या इस सिस्टम का नाम, हक़ बोस सिस्टम होना चाहिए? कमेंट में ज़रूर बताइए। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।")
+spec={"format":"long","theme":"forensic","look":"cinematic","grain":0.1,"tts":"parler","speed":0.97,"lead":0.4,"tail":0.7,
+ "header":"THE THUMBPRINT THAT CALCUTTA SOLVED",
+ "source":"Sources: E. R. Henry (1913) · Britannica · Bengal CID · UIDAI",
+ "ticker":"  1858: HERSCHEL'S HANDPRINT, JANGIPUR   ///   1897: HAQUE & BOSE · CALCUTTA BUREAU   ///   1898: KANGALI CHARAN CASE   ///   1901: SCOTLAND YARD   ///   1902: FIRST UK CONVICTION   ///",
+ "credits_from":["media/014_fingerprint_long/credits.json","media/014b_fingerprint_long/credits.json","media/013_fingerprint/credits.json"],"scenes":sc}
+json.dump(spec,open("spec.json","w"),ensure_ascii=False,indent=1)
+t=sum(len(c["vo"]) for c in sc); print(len(sc),"scenes",t,"chars ~",round(t/15.4/0.97+len(sc)*1.1),"s")

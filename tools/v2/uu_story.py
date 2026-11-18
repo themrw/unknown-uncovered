@@ -644,6 +644,11 @@ def fp_field(w, h, seed=1, kind="whorl"):
     X, Y = x + wx + r.uniform(-.06, .06), y + wy + r.uniform(-.06, .06)
     if kind == "whorl":
         f = np.sqrt((X * 1.08) ** 2 + (Y * 0.92) ** 2) + 0.03 * np.arctan2(Y, X)
+    elif kind == "loop":                                                  # U-shaped ridges around a core, exiting to one side
+        x0, y0 = 0.05, -0.05; r_ = np.sqrt((X - x0) ** 2 + (Y - y0) ** 2)
+        f = np.where(Y < y0, r_, np.abs(X - x0 + 0.9 * (Y - y0)))
+        arch = Y * 0.9 + 0.35 * np.exp(-(X ** 2) * 3.0) * (1.0 - np.clip(Y + 0.4, 0, 2) * 0.5)
+        w_ = np.clip((r_ - 0.55) / 0.15, 0, 1); f = f * (1 - w_) + (arch + 0.6) * w_
     else:
         f = Y * 0.9 + 0.35 * np.exp(-(X ** 2) * 3.0) * (1.0 - np.clip(Y + 0.4, 0, 2) * 0.5)
     rid = 0.5 + 0.5 * np.cos(2 * math.pi * f * r.uniform(10.5, 12.5))

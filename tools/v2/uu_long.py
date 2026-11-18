@@ -22,6 +22,9 @@ Scene types (all fields optional unless noted):
   fingerprint {seed, scan_at, search_at, match_at, left_label, right_label, stamp, kicker, big, lines}  evidence + record search (match_at past the scene = cliffhanger)
   drawers    {kicker, whorls, finger_at, formula_at, drawer_at, lines}  Haque-Bose formula + 1,024-drawer grid
   spread     {origin, year0, routes, kicker, lines}                   arcs over a world map
+  cartoon    {bg: drawers|board|glow, board[], card, glass, kicker, big, lines}  the two cartoon sub-inspectors (uu_cartoon.py), text left
+  patterns   {kicker, show_at[3], count_at, whorl_at, lines, lines_at}  arch / loop / whorl + 'check your thumb' countdown
+  versus     {kicker, left, right, rows[[label, left, right]], row_at, win_at, stamp, lines}  head-to-head comparison
   outro      {lines[]}                                                 closing lines + subscribe card
 Images are paths relative to $UU_REPO (default /home/claude/unknown-uncovered); credits come from spec["credits_from"].
 """
@@ -554,6 +557,101 @@ def sc_spread_l(img, sc, t, D, tg, k):
     chrome(img, tg, a)
 
 R.SCENE_FN.update({"fingerprint": sc_fingerprint_l, "drawers": sc_drawers_l, "spread": sc_spread_l})
+
+# ---------------------------------------------------------------- reel 014b: cartoon officers, patterns, versus (16:9)
+import uu_cartoon
+_cart = {}
+def sc_cartoon(img, sc, t, D, tg, k):
+    """The two cartoon sub-inspectors on the right (bg: drawers | board | glow), text on the left."""
+    a = ease(clamp(t / 0.6)); bgk = sc.get("bg", "drawers"); d = ImageDraw.Draw(img)
+    g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(g).ellipse([900, 40, 1800, 1000], fill=(30, 170, 175, int(150 * a)))
+    img.alpha_composite(g.filter(ImageFilter.GaussianBlur(140)))
+    if bgk in ("drawers", "glow"):
+        fp = S.fp_img(640, 820, 7, T["accent"], 0.4 * a); img.alpha_composite(fp, (1110, 80))
+    if bgk == "drawers":
+        for r in range(11):
+            for c in range(2):
+                x0, y0 = W - (c + 1) * 92, 40 + r * 92
+                d.rectangle([x0, y0, x0 + 84, y0 + 84], fill=(16, 34, 40, int(235 * a)), outline=(60, 120, 125, int(255 * a)), width=2)
+                d.rectangle([x0 + 30, y0 + 36, x0 + 54, y0 + 44], fill=(255, 196, 96, int(200 * a)))
+                d.text((x0 + 42, y0 + 18), f"{(r * 3 + c) % 32 + 1}/{(r + 5 * c) % 32 + 1}", font=F("mono", 14), fill=(120, 170, 170, int(200 * a)), anchor="mm")
+    if bgk == "board":
+        rect_a(img, (90, 90, 960, 500), (26, 52, 40), 0.96 * a, 10); d = ImageDraw.Draw(img)
+        d.rectangle([90, 90, 960, 500], outline=(120, 90, 50, int(255 * a)), width=12)
+        chalk = (232, 236, 226)
+        for i, ln in enumerate(sc.get("board", ["16 · 8 · 4 · 2 · 1", "1 + 8  /  1 + 16 + 2", "= 9/19  →  drawer"])):
+            text_a(img, (140, 150 + i * 110), typed(ln, prog(t, 0.6 + i * 0.8, 0.8)), fit_font("disp", 64, ln, 780, "Bold"), chalk, a, shadow=0)
+    key = (sc.get("card", True), sc.get("glass", True))
+    if key not in _cart:
+        _cart[key] = uu_cartoon.officers_layer(W, H, 1240, 1620, 1040, 1050, 9.0, 9.4, card=key[0], glass=key[1], fp_img=S.fp_img)
+    bob = 5 * math.sin(tg * 2.2); slide = (1 - a) * 160
+    paste_a(img, _cart[key], (slide, bob), a)
+    if key[0]:                                                            # card glow pulse
+        gl = Image.new("RGBA", (W, H), (0, 0, 0, 0)); cx_, cy_ = 1240 + 19 * 9.0 + slide, 1040 - 50 * 9.0 + bob
+        ImageDraw.Draw(gl).ellipse([cx_ - 40, cy_ - 150, cx_ + 210, cy_ + 30], fill=(255, 240, 200, int((40 + 30 * math.sin(tg * 3)) * a)))
+        img.alpha_composite(gl.filter(ImageFilter.GaussianBlur(40)))
+    left_text(img, sc, t, D, y=sc.get("ty", 590 if bgk == "board" else 330), w=760)
+    text_a(img, (W - 24, H - 60), "Illustration · not actual likeness", F("inter", 18), (150, 170, 170), 0.8 * a, "rm")
+    chrome(img, tg, a)
+
+def sc_patterns(img, sc, t, D, tg, k):
+    """Arch, loop, whorl side by side; then 'check your thumb' countdown; whorl highlighted."""
+    a = clamp(t / 0.4); d = ImageDraw.Draw(img)
+    text_a(img, (W / 2, 150), typed(sc.get("kicker", "LOOK AT YOUR THUMB"), prog(t, 0.1, 0.6)), F("mono", 34), T["accent"], 1, "mm", shadow=4)
+    kinds = [("arch", "ARCH", "मेहराब"), ("loop", "LOOP", "लूप"), ("whorl", "WHORL", "भँवर")]
+    ats = sc.get("show_at", [0.6, 1.6, 2.6]); wa = sc.get("whorl_at", ats[-1] + 1.5)
+    for i, (kd, en, hi) in enumerate(kinds):
+        p = ease(clamp((t - ats[i]) / 0.6))
+        if p <= 0: continue
+        cx = W / 2 + (i - 1) * 440; y0 = 230 + (1 - p) * 60; hot = kd == "whorl" and t >= wa
+        rect_a(img, (cx - 170, y0, cx + 170, y0 + 520), (14, 26, 30), 0.92 * p, 18)
+        d.rounded_rectangle([cx - 170, y0, cx + 170, y0 + 520], 18, outline=(T["accent2"] if hot else (70, 120, 126)) + (int(255 * p),), width=5 if hot else 2)
+        img.alpha_composite(S.fp_img(260, 340, 60 + i, (WHITE if (hot or kd != "whorl") else (225, 235, 235)), 0.95 * p, kd), (int(cx - 130), int(y0 + 30)))
+        text_a(img, (cx, y0 + 410), en, F("anton", 64), T["accent2"] if hot else WHITE, p, "mm", shadow=6)
+        text_a(img, (cx, y0 + 475), hi, F("hindi", 44), MUTED, p, "mm")
+        if hot:
+            q = ease(clamp((t - wa) / 0.4)); rr = 30 + 20 * math.sin(tg * 5)
+            text_a(img, (cx, y0 - 40), "= 16 · 8 · 4 · 2 · 1", F("mono", 30), T["accent2"], q, "mm", shadow=6)
+    ca = sc.get("count_at")
+    if ca is not None and ca <= t < ca + 3.2:
+        n = 3 - int(t - ca); q = 1 - ((t - ca) % 1.0)
+        text_a(img, (W / 2, 900), f"CHECK YOUR THUMB  ·  {n}", F("anton", 70), T["accent2"], min(1, q * 1.6), "mm", shadow=10)
+    for i, ln in enumerate(sc.get("lines", [])):
+        f = fit_font("disp", 44, ln, 1500, "Bold"); S.rise_line(img, ln, W / 2, 900 + i * 62, f, t - sc.get("lines_at", D - 3) - i * 0.6)
+    chrome(img, tg, a)
+
+def sc_versus(img, sc, t, D, tg, k):
+    """Head-to-head: body measurements vs fingerprints, rows revealed with ✗ / ✓, then a WINNER stamp."""
+    a = clamp(t / 0.4); d = ImageDraw.Draw(img)
+    text_a(img, (W / 2, 140), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 32), T["accent"], 1, "mm", shadow=4)
+    cols = [(560, sc.get("left", "BODY MEASUREMENTS"), T["alert"]), (1360, sc.get("right", "FINGERPRINTS"), (60, 220, 140))]
+    for cx, title, col in cols:
+        rect_a(img, (cx - 360, 210, cx + 360, 880), (14, 24, 28), 0.9 * a, 18)
+        text_a(img, (cx, 270), title, fit_font("anton", 66, title, 660), WHITE, a, "mm", shadow=6)
+    text_a(img, (W / 2, 560), "VS", F("anton", 120), T["accent2"], a, "mm", shadow=12)
+    rows = sc.get("rows", [["COST", "EXPENSIVE", "CHEAP"], ["SPEED", "SLOW", "FAST"], ["ACCURACY", "ERROR-PRONE", "MORE ACCURATE"]])
+    ats = sc.get("row_at", [1.0 + i * 1.4 for i in range(len(rows))])
+    for i, (lab, lv, rv) in enumerate(rows):
+        p = ease(clamp((t - ats[i]) / 0.5))
+        if p <= 0: continue
+        y = 400 + i * 150
+        for cx, val, good in ((560, lv, False), (1360, rv, True)):
+            text_a(img, (cx - 300, y), lab, F("mono", 26), MUTED, p, "lm")
+            text_a(img, (cx - 300, y + 50), val, F("disp", 48, "Black"), WHITE, p, "lm", shadow=6)
+            ic = (60, 220, 140) if good else T["alert"]; x0 = cx + 250
+            d.ellipse([x0 - 34, y - 10, x0 + 34, y + 58], fill=ic + (int(255 * p),))
+            if good: d.line([(x0 - 16, y + 24), (x0 - 4, y + 38), (x0 + 18, y + 8)], fill=(255, 255, 255, int(255 * p)), width=8)
+            else: d.line([(x0 - 14, y + 10), (x0 + 14, y + 38)], fill=(255, 255, 255, int(255 * p)), width=8); d.line([(x0 + 14, y + 10), (x0 - 14, y + 38)], fill=(255, 255, 255, int(255 * p)), width=8)
+    wa = sc.get("win_at", ats[-1] + 1.5); zp = clamp((t - wa) / 0.18)
+    if zp > 0:
+        st = S.stamp_img(sc.get("stamp", "WINNER"), col=(60, 220, 140), size=96); z = 2.2 - 1.2 * ease(zp)
+        st = st.resize((int(st.width * z), int(st.height * z)), Image.LANCZOS).rotate(-8, expand=True, resample=Image.BICUBIC)
+        img.alpha_composite(st, (int(1460 - st.width / 2), int(835 - st.height / 2)))
+    for i, ln in enumerate(sc.get("lines", [])):
+        f = fit_font("disp", 44, ln, 1600, "Bold"); S.rise_line(img, ln, W / 2, 950 + i * 60, f, t - wa - 0.6 - i * 0.6)
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"cartoon": sc_cartoon, "patterns": sc_patterns, "versus": sc_versus})
 
 if __name__ == "__main__":
     R.main()
