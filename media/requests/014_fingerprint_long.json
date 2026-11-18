@@ -1,0 +1,16 @@
+{"items": [
+ {"id": "babylon", "search": "Babylonian clay tablet cuneiform contract", "n": 2},
+ {"id": "herschel", "search": "Herschel hand print Konai 1858", "n": 2},
+ {"id": "tsukiji", "search": "Tsukiji Tokyo 1880s", "n": 2},
+ {"id": "galton", "search": "Galton fingerprints plate arches loops whorls", "n": 3},
+ {"id": "bertillon", "search": "Bertillon measurement anthropometry photograph", "n": 4},
+ {"id": "bertcard", "search": "Bertillon card", "n": 2},
+ {"id": "laplata", "search": "La Plata Argentina 1890s", "n": 2},
+ {"id": "leavenworth", "search": "Leavenworth Penitentiary", "n": 2},
+ {"id": "oldbailey", "search": "Old Bailey Central Criminal Court 1900s", "n": 2},
+ {"id": "deptford", "search": "Deptford High Street 1900s", "n": 2},
+ {"id": "fbifiles", "search": "FBI Identification Division fingerprint files", "n": 3},
+ {"id": "aadhaar", "search": "Aadhaar enrolment centre biometric", "n": 3},
+ {"id": "scanner", "search": "fingerprint scanner biometric", "n": 3},
+ {"id": "kolkata", "search": "Kolkata Writers' Building exterior", "n": 2}
+]}
