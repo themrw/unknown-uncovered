@@ -659,10 +659,10 @@ def fp_img(w, h, seed, col, alpha=1.0, kind="whorl"):
 
 MINU = [(0.38, 0.30), (0.62, 0.36), (0.30, 0.55), (0.55, 0.52), (0.70, 0.66), (0.44, 0.74)]
 
-def sc_fingerprint(img, sc, t, D, tg, k):
-    """Evidence print on an old almanac page is scanned; a record card search flickers until it MATCHES."""
+def draw_fingerprint(img, sc, t, xl, xr, y0):
+    """Evidence card at x=xl, record search card at x=xr (each 460x650), top at y0. Returns fade alpha."""
     a = ease(clamp(t / 0.5)); seed = sc.get("seed", 7)
-    cw, chh, y0 = 460, 650, sc.get("y", 370); xl, xr = 56, W - 56 - cw
+    cw, chh = 460, 650
     pw, ph = 340, 440
     sa = sc.get("scan_at", 0.6); ma = sc.get("match_at")
     # evidence card (paper + blood print)
@@ -692,7 +692,7 @@ def sc_fingerprint(img, sc, t, D, tg, k):
                 d.ellipse([cx_ - rr, cy2 - rr, cx_ + rr, cy2 + rr], outline=T["accent2"] + (int(255 * q),), width=3)
     # record search (right)
     if ma is not None:
-        st = max(sa + 1.6, ma - 2.2); rp = clamp((t - st) / 0.4)
+        st = sc.get("search_at", max(sa + 1.6, ma - 2.2)); rp = clamp((t - st) / 0.4)
         if rp > 0:
             rc = Image.new("RGBA", (cw, chh), (18, 26, 30, 240)); rd = ImageDraw.Draw(rc)
             rd.rectangle([2, 2, cw - 3, chh - 3], outline=T["accent"] + (160,), width=2)
@@ -713,7 +713,12 @@ def sc_fingerprint(img, sc, t, D, tg, k):
                 if zp > 0:
                     stp = stamp_img(sc.get("stamp", "MATCH"), col=(60, 220, 140), size=88); z = 2.2 - 1.2 * ease(zp)
                     stp = stp.resize((int(stp.width * z), int(stp.height * z)), Image.LANCZOS).rotate(-10, expand=True, resample=Image.BICUBIC)
-                    img.alpha_composite(stp, (int(W / 2 - stp.width / 2), int(y0 + chh - 40 - stp.height / 2)))
+                    img.alpha_composite(stp, (int((xl + cw + xr) / 2 - stp.width / 2), int(y0 + chh - 40 - stp.height / 2)))
+    return a
+
+def sc_fingerprint(img, sc, t, D, tg, k):
+    """Evidence print on an old almanac page is scanned; a record card search flickers until it MATCHES."""
+    a = draw_fingerprint(img, sc, t, 56, W - 56 - 460, sc.get("y", 370))
     caption(img, sc, t, D, sc.get("cap_y", 1110))
     chrome(img, tg, a)
 
@@ -784,9 +789,9 @@ def _world_img():
         out = Image.new("RGBA", (W, H), (0, 0, 0, 0)); out.alpha_composite(glow); out.alpha_composite(lay); _world["img"] = out
     return _world["img"]
 
-def sc_spread(img, sc, t, D, tg, k):
-    """Arcs fly from an origin city to destinations one by one (origin [name, lat, lon]; routes [[name, lat, lon, at, from?, year]])."""
-    a = clamp(t / 0.5); paste_a(img, _world_img(), (0, 0), a); d = ImageDraw.Draw(img)
+def draw_spread(img, sc, t, tg, a):
+    """World map + arcs; returns the year label for the latest route that has started."""
+    paste_a(img, _world_img(), (0, 0), a); d = ImageDraw.Draw(img)
     on, ola, olo = sc["origin"]; ox, oy = _wp(ola, olo); pos = {on: (ox, oy)}
     year = sc.get("year0", "")
     for nm, la, lo, at, *rest in sc["routes"]:
@@ -806,6 +811,11 @@ def sc_spread(img, sc, t, D, tg, k):
     rr = 12 + 8 * math.sin(tg * 5); d.ellipse([ox - rr, oy - rr, ox + rr, oy + rr], outline=T["accent"] + (255,), width=4)
     d.ellipse([ox - 9, oy - 9, ox + 9, oy + 9], fill=T["accent"] + (255,))
     text_a(img, (ox + 16, oy + 26), on, F("mono", 26), T["accent"], a, "lm", shadow=6)
+    return year
+
+def sc_spread(img, sc, t, D, tg, k):
+    """Arcs fly from an origin city to destinations one by one (origin [name, lat, lon]; routes [[name, lat, lon, at, from?, year]])."""
+    a = clamp(t / 0.5); year = draw_spread(img, sc, t, tg, a)
     text_a(img, (W / 2, 330), year, F("anton", 110), T["accent2"], a, "mm", shadow=8)
     caption(img, sc, t, D, sc.get("cap_y", 1000))
     chrome(img, tg, a)

@@ -19,6 +19,9 @@ Scene types (all fields optional unless noted):
   booklet    {cover, cover_sub, stamp, stamp_at, open_at, pages, pages_at, dims_at, kicker, big, lines}  passport booklet right, text left
   borders    {lock_at, follow_at, lines}                               Europe 1913 open routes -> 1914 locked (lock_at > scene = stays open)
   dossier    {file, ref, rows[[k, v]], stamp, img, kicker, big, lines} file card right, text left
+  fingerprint {seed, scan_at, search_at, match_at, left_label, right_label, stamp, kicker, big, lines}  evidence + record search (match_at past the scene = cliffhanger)
+  drawers    {kicker, whorls, finger_at, formula_at, drawer_at, lines}  Haque-Bose formula + 1,024-drawer grid
+  spread     {origin, year0, routes, kicker, lines}                   arcs over a world map
   outro      {lines[]}                                                 closing lines + subscribe card
 Images are paths relative to $UU_REPO (default /home/claude/unknown-uncovered); credits come from spec["credits_from"].
 """
@@ -493,6 +496,64 @@ def sc_dossier_l(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"booklet": sc_booklet_l, "borders": sc_borders_l, "dossier": sc_dossier_l})
 R.SCENE_FN.update({"counter": sc_counter, "bulb": sc_bulb, "timeline": sc_timeline})   # uu_story registers vertical versions of these
+
+# ---------------------------------------------------------------- fingerprint scenes (reel 014), 16:9
+def sc_fingerprint_l(img, sc, t, D, tg, k):
+    a = S.draw_fingerprint(img, sc, t, sc.get("xl", 880), sc.get("xr", 1400), sc.get("y", 210))
+    left_text(img, sc, t, D, y=380, w=680)
+    chrome(img, tg, a)
+
+def sc_drawers_l(img, sc, t, D, tg, k):
+    """16:9 Haque-Bose primary classification: finger tiles + fraction on the left, 1,024-drawer grid on the right."""
+    a = clamp(t / 0.4); d = ImageDraw.Draw(img)
+    text_a(img, (110, 170), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 30), T["accent"], 1, shadow=4)
+    wh = sc.get("whorls", [1, 4, 7]); fat = sc.get("finger_at", [1.0 + i * 0.6 for i in range(len(wh))])
+    tw_, gap, x0 = 160, 14, 110
+    for i in range(10):
+        r_, c_ = divmod(i, 5); x = x0 + c_ * (tw_ + gap); y = 220 + r_ * 200; ap = clamp((t - 0.2 - i * 0.05) / 0.3) * a
+        n = i + 1; on = n in wh and t >= fat[wh.index(n)]; col = T["accent"] if on else (60, 80, 86)
+        rect_a(img, (x, y, x + tw_, y + 186), (14, 24, 28), 0.9 * ap, 12)
+        d.rounded_rectangle([x, y, x + tw_, y + 186], 12, outline=col + (int(255 * ap),), width=3 if on else 2)
+        img.alpha_composite(S.fp_img(90, 114, 30 + i, (WHITE if on else (110, 120, 120)), (1.0 if on else 0.5) * ap, "whorl" if n in wh else "arch"), (int(x + (tw_ - 90) / 2), int(y + 28)))
+        text_a(img, (x + tw_ / 2, y + 15), S.FNAME[i], F("mono", 16), MUTED, ap, "mm")
+        text_a(img, (x + tw_ / 2, y + 164), f"{S.FVAL[i]}" if on else "0", F("anton", 36), T["accent2"] if on else (90, 100, 100), ap, "mm")
+    fa = sc.get("formula_at", fat[-1] + 0.8); fp = ease(clamp((t - fa) / 0.6))
+    num = [S.FVAL[n - 1] for n in wh if n % 2 == 0]; den = [S.FVAL[n - 1] for n in wh if n % 2 == 1]; N, Dn = 1 + sum(num), 1 + sum(den)
+    if fp > 0:
+        text_a(img, (300, 700), " + ".join(["1"] + [str(v) for v in num]), F("anton", 56), WHITE, fp, "mm", shadow=6)
+        rect_a(img, (130, 738, 470, 744), T["accent"], fp)
+        text_a(img, (300, 782), " + ".join(["1"] + [str(v) for v in den]), F("anton", 56), WHITE, fp, "mm", shadow=6)
+        text_a(img, (540, 742), "=", F("anton", 86), MUTED, fp, "mm")
+        text_a(img, (740, 742), f"{N}/{Dn}", F("anton", 150), T["accent2"], fp, "mm", shadow=10)
+    ga = ease(clamp((t - fa - 0.6) / 0.8)); da = sc.get("drawer_at", fa + 2.2)
+    if ga > 0:
+        cs, cg = 16, 2; gx, gy = 1180, 230
+        text_a(img, (gx + 16 * (cs + cg), gy - 40), "32 × 32 = 1,024 DRAWERS", F("mono", 30), T["accent"], ga, "mm")
+        hr, hc = Dn - 1, N - 1; op = ease(clamp((t - da) / 0.5))
+        for rr_ in range(32):
+            for cc in range(32):
+                if (rr_ + cc) / 62 > ga: continue
+                xx, yy = gx + cc * (cs + cg), gy + rr_ * (cs + cg); hit = (rr_ == hr and cc == hc)
+                fill = (T["accent2"] + (255,)) if (hit and op > 0) else (70, 130, 138, 255) if (rr_ == hr or cc == hc) and op > 0 else (40, 72, 80, 255)
+                d.rectangle([xx, yy, xx + cs, yy + cs], fill=fill)
+        if op > 0:
+            xx, yy = gx + hc * (cs + cg) + cs / 2, gy + hr * (cs + cg) + cs / 2
+            rr = 16 + 10 * math.sin(tg * 6); d.ellipse([xx - rr, yy - rr, xx + rr, yy + rr], outline=T["accent2"] + (255,), width=3)
+            text_a(img, (xx + 34, yy - 4), f"DRAWER {N}/{Dn}", F("mono", 28), T["accent2"], op, "lm", shadow=6)
+    for i, ln in enumerate(sc.get("lines", [])):
+        f = fit_font("disp", 44 if i == 0 else 38, ln, 900, "Black" if i == 0 else "Bold")
+        S.rise_line(img, ln, 110 + ImageDraw.Draw(img).textlength(ln, font=f) / 2, 880 + i * 60, f, t - (da + 0.4 + i * 0.6))
+    chrome(img, tg, a)
+
+def sc_spread_l(img, sc, t, D, tg, k):
+    a = clamp(t / 0.5)
+    S.WD.update(c_lat=12.0, c_lon=30.0, s=5.0, cx=1250, cy=560)
+    year = S.draw_spread(img, sc, t, tg, a)
+    text_a(img, (110, 250), year, F("anton", 150), T["accent2"], a, shadow=10)
+    left_text(img, dict(sc, big=None), t, D, y=470, w=520)
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"fingerprint": sc_fingerprint_l, "drawers": sc_drawers_l, "spread": sc_spread_l})
 
 if __name__ == "__main__":
     R.main()
