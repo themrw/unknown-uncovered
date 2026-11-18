@@ -1,0 +1,208 @@
+{
+ "format": "story",
+ "theme": "forensic",
+ "look": "cinematic",
+ "grain": 0.1,
+ "tts": "parler",
+ "speed": 1.03,
+ "lead": 0.2,
+ "tail": 0.4,
+ "header": "THE INDIANS BEHIND FINGERPRINT FILES",
+ "source": "Sources: Britannica · Bengal CID · E. R. Henry (1913)",
+ "ticker": "  12 JUNE 1897: WORLD'S FIRST FINGERPRINT BUREAU, CALCUTTA   ///   1,024 PRIMARY GROUPS   ///   1898: KANGALI CHARAN CASE   ///   1901: SCOTLAND YARD   ///",
+ "credits_from": [
+  "media/013_fingerprint/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "fingerprint",
+   "seed": 7,
+   "scan_at": 5.51,
+   "match_at": 10.47,
+   "left_label": "ALMANAC · 1898",
+   "right_label": "RECORD: EX-CONVICT",
+   "stamp": "MATCH",
+   "kicker": "1898 · A TEA GARDEN IN BENGAL",
+   "lines": [
+    "No witness. Just a thumbprint.",
+    "and a match among thousands of cards"
+   ],
+   "vo": "अठारह सौ अट्ठानवे, बंगाल का एक चाय बागान। मैनेजर का क़त्ल, और कोई गवाह नहीं। बस कैलेंडर पर, ख़ून से सना अंगूठे का एक निशान, और हज़ारों कार्ड में से, उसका मिलान हो गया।"
+  },
+  {
+   "type": "photo",
+   "img": "media/013_fingerprint/writers_2.jpg",
+   "dark": 0.35,
+   "kicker": "12 JUNE 1897 · CALCUTTA",
+   "big": "WORLD'S FIRST",
+   "lines": [
+    "Fingerprint Bureau, Writers' Building",
+    "behind it: two Indian policemen"
+   ],
+   "vo": "ये मुमकिन हुआ, कलकत्ता में बने दुनिया के पहले फ़िंगरप्रिंट ब्यूरो से। और इसके पीछे थे, दो भारतीय पुलिसवाले।"
+  },
+  {
+   "type": "dossier",
+   "file": "ANTHROPOMETRIC BUREAU",
+   "ref": "CALCUTTA · 1890s",
+   "rows": [
+    [
+     "SUB-INSPECTOR",
+     "AZIZUL HAQUE"
+    ],
+    [
+     "STUDIED",
+     "MATHS & SCIENCE"
+    ],
+    [
+     "SUB-INSPECTOR",
+     "HEM CHANDRA BOSE"
+    ],
+    [
+     "THE TASK",
+     "FIND 1 CARD IN 1,000s"
+    ]
+   ],
+   "stamp": "ASSIGNED",
+   "kicker": "THE TWO MEN",
+   "lines": [
+    "Their boss: Edward Henry, IG of Police",
+    "the problem: searching thousands of records"
+   ],
+   "vo": "सब-इंस्पेक्टर अज़ीज़ुल हक़, जिन्होंने गणित पढ़ा था, और हेमचंद्र बोस। अफ़सर एडवर्ड हेनरी ने काम दिया, हज़ारों अपराधियों के निशान ऐसे सजाओ, कि कोई भी कार्ड जल्दी मिल जाए।",
+   "img": "media/013_fingerprint/calcutta1890_0.jpg"
+  },
+  {
+   "type": "drawers",
+   "kicker": "THE HAQUE–BOSE FORMULA",
+   "whorls": [
+    1,
+    4,
+    7
+   ],
+   "lines": [
+    "Find the drawer, not the needle",
+    "by 1897: about 7,000 cards on file"
+   ],
+   "vo": "जवाब निकला गणित से। दस उंगलियों के पाँच जोड़े, और भँवर जैसे गोल निशान वाली उंगली को एक नंबर, सोलह, आठ, चार, दो या एक। इनसे बनता एक भिन्न, और हर भिन्न का अपना दराज़, कुल एक हज़ार चौबीस।",
+   "finger_at": [
+    7.03,
+    7.47,
+    8.14
+   ],
+   "formula_at": 8.86,
+   "drawer_at": 10.56
+  },
+  {
+   "type": "photo",
+   "img": "media/013_fingerprint/teagarden_0.jpg",
+   "dark": 0.35,
+   "kicker": "1898 · KANGALI CHARAN CASE",
+   "big": "CONVICTED",
+   "lines": [
+    "no eyewitness to the murder",
+    "theft proven by a thumbprint"
+   ],
+   "vo": "निशान मिला, एक पुराने नौकर कंगाली चरण से। क़त्ल का चश्मदीद नहीं था, इसलिए उसे चोरी में सज़ा हुई। फ़िंगरप्रिंट सबूत पर सज़ा के, ये सबसे शुरुआती मामलों में से एक है।"
+  },
+  {
+   "type": "spread",
+   "origin": [
+    "CALCUTTA",
+    22.57,
+    88.36
+   ],
+   "year0": "1897",
+   "routes": [
+    [
+     "LONDON",
+     51.5,
+     -0.13,
+     1.56,
+     null,
+     "1901"
+    ],
+    [
+     "SOUTH AFRICA",
+     -26.2,
+     28.0,
+     4.27,
+     null,
+     "1900s"
+    ],
+    [
+     "USA",
+     40.7,
+     -74.0,
+     5.24,
+     "LONDON",
+     ""
+    ]
+   ],
+   "kicker": "CALCUTTA → THE WORLD",
+   "lines": [
+    "Scotland Yard adopts it in 1901",
+    "then the English-speaking world"
+   ],
+   "vo": "फिर उन्नीस सौ एक में, स्कॉटलैंड यार्ड ने यही तरीक़ा अपनाया, और ये अंग्रेज़ी बोलने वाली दुनिया का मानक बन गया। नब्बे के दशक तक, कंप्यूटर सिस्टम भी इसी पर टिके थे।"
+  },
+  {
+   "type": "dossier",
+   "file": "HENRY CLASSIFICATION SYSTEM",
+   "ref": "1897",
+   "rows": [
+    [
+     "NAMED AFTER",
+     "SIR EDWARD HENRY"
+    ],
+    [
+     "MATHS",
+     "AZIZUL HAQUE"
+    ],
+    [
+     "TABLES & TESTS",
+     "HEM CHANDRA BOSE"
+    ],
+    [
+     "LATER REWARD",
+     "Rs 5,000 EACH + TITLES"
+    ]
+   ],
+   "stamp": "CREDIT?",
+   "kicker": "BUT WHOSE NAME?",
+   "lines": [
+    "Khan Bahadur & Rai Bahadur titles came later",
+    "the name stayed: 'Henry'"
+   ],
+   "vo": "पर नाम पड़ा, हेनरी क्लासिफ़िकेशन सिस्टम। दोनों भारतीयों को बाद में इनाम और उपाधियाँ मिलीं, पर दुनिया इसे आज भी, एक अंग्रेज़ अफ़सर के नाम से जानती है।"
+  },
+  {
+   "type": "outro",
+   "lines": [
+    [
+     "Next time you unlock your phone,",
+     "WHITE"
+    ],
+    [
+     "remember Haque & Bose.",
+     "accent"
+    ]
+   ],
+   "vo": "अगली बार अंगूठे से फ़ोन खोलें, तो याद कीजिए, अज़ीज़ुल हक़ और हेमचंद्र बोस। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "voice_job": "013_main",
+ "thumb": {
+  "img": "/home/claude/work/013/thumb_bg.jpg",
+  "vignette": false,
+  "hook": [
+   "फ़िंगरप्रिंट से चोर पकड़ने का",
+   "तरीक़ा 2 भारतीयों ने बनाया!"
+  ],
+  "number": "1897",
+  "number_label": "WORLD'S FIRST FINGERPRINT BUREAU · CALCUTTA",
+  "sticker": "नाम किसका?",
+  "highlight": [],
+  "mystery": []
+ }
+}

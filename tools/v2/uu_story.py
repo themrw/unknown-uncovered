@@ -16,6 +16,9 @@ Scene types:
   booklet {cover, cover_sub, scale, y, stamp, stamp_at, open_at, pages, pages_at, dims_at}   animated passport/booklet
   timeline {kicker, events:[[year, label, note, at?]]}   vertical milestones, last one in red
   borders {lock_at, follow_at, lines}   Europe 1913 free travel -> 1914 routes lock (no internal borders drawn)
+  fingerprint {seed, scan_at, match_at, left_label, right_label, stamp}   evidence print scanned, record search flickers, MATCH
+  drawers {kicker, whorls:[finger numbers], finger_at, formula_at, drawer_at, lines}   Henry/Haque-Bose primary classification -> 1 of 1,024 drawers
+  spread  {origin:[name,lat,lon], year0, routes:[[name,lat,lon,at,from?,year?]]}   arcs across a world map (land only, no borders)
   outro   (uu_render's vertical outro: lines + subscribe card; "card": "youtube" for short edits)
 Images are repo-relative ($UU_REPO); spec["credits_from"] may be one path or a list of credits.json files.
 """
@@ -626,6 +629,188 @@ def sc_borders(img, sc, t, D, tg, k):
     chrome(img, tg, a)
 
 R.SCENE_FN.update({"booklet": sc_booklet, "timeline": sc_timeline, "borders": sc_borders})
+
+# ------------------------------------------------------------------ fingerprint scenes (reel 013)
+_fp = {}
+def fp_field(w, h, seed=1, kind="whorl"):
+    """Synthetic fingerprint ridge intensity in 0..1 (whorl or arch), inside a soft oval."""
+    key = (w, h, seed, kind)
+    if key in _fp: return _fp[key]
+    r = np.random.default_rng(seed)
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    x = (xx - w * 0.5) / (w * 0.5); y = (yy - h * 0.55) / (h * 0.5)
+    wx = sum(r.uniform(.02, .05) * np.sin(r.uniform(2, 5) * y + r.uniform(0, 6)) for _ in range(3))
+    wy = sum(r.uniform(.02, .05) * np.sin(r.uniform(2, 5) * x + r.uniform(0, 6)) for _ in range(3))
+    X, Y = x + wx + r.uniform(-.06, .06), y + wy + r.uniform(-.06, .06)
+    if kind == "whorl":
+        f = np.sqrt((X * 1.08) ** 2 + (Y * 0.92) ** 2) + 0.03 * np.arctan2(Y, X)
+    else:
+        f = Y * 0.9 + 0.35 * np.exp(-(X ** 2) * 3.0) * (1.0 - np.clip(Y + 0.4, 0, 2) * 0.5)
+    rid = 0.5 + 0.5 * np.cos(2 * math.pi * f * r.uniform(10.5, 12.5))
+    rid = np.clip((rid - 0.38) * 2.6, 0, 1)
+    br = r.random((h // 6 + 1, w // 6 + 1)) > 0.06                       # small breaks = minutiae
+    rid *= np.kron(br, np.ones((6, 6)))[:h, :w]
+    m = np.clip((1 - ((x / 0.88) ** 2 + (y / 1.0) ** 2)) * 7, 0, 1)
+    out = (rid * m).astype(np.float32); _fp[key] = out; return out
+
+def fp_img(w, h, seed, col, alpha=1.0, kind="whorl"):
+    f = fp_field(w, h, seed, kind); a = (f * 255 * alpha).astype(np.uint8)
+    im = Image.new("RGBA", (w, h), col + (0,)); im.putalpha(Image.fromarray(a)); return im
+
+MINU = [(0.38, 0.30), (0.62, 0.36), (0.30, 0.55), (0.55, 0.52), (0.70, 0.66), (0.44, 0.74)]
+
+def sc_fingerprint(img, sc, t, D, tg, k):
+    """Evidence print on an old almanac page is scanned; a record card search flickers until it MATCHES."""
+    a = ease(clamp(t / 0.5)); seed = sc.get("seed", 7)
+    cw, chh, y0 = 460, 650, sc.get("y", 370); xl, xr = 56, W - 56 - cw
+    pw, ph = 340, 440
+    sa = sc.get("scan_at", 0.6); ma = sc.get("match_at")
+    # evidence card (paper + blood print)
+    card = paper(cw, chh).copy(); d = ImageDraw.Draw(card)
+    d.text((24, 22), sc.get("left_label", "EVIDENCE"), font=F("mono", 22), fill=(110, 40, 30))
+    card.alpha_composite(fp_img(pw, ph, seed, (150, 24, 20), 0.92), ((cw - pw) // 2, 90))
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    sh = Image.new("RGBA", (cw, chh), (0, 0, 0, 170)); lay.alpha_composite(sh, (xl + 14, int(y0 + 20)))
+    lay = lay.filter(ImageFilter.GaussianBlur(14)); lay.alpha_composite(card.rotate(-3, expand=False, resample=Image.BICUBIC), (xl, int(y0)))
+    paste_a(img, lay, ((1 - a) * -200, 0), a)
+    px, py = xl + (cw - pw) // 2, y0 + 90
+    sp = clamp((t - sa) / 1.4)
+    if 0 < sp < 1:                                                       # scan beam
+        by = py + ph * sp
+        rect_a(img, (xl + 10, by - 3, xl + cw - 10, by + 3), T["accent"], 0.9)
+        g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(g).rectangle([xl, by - 40, xl + cw, by + 40], fill=T["accent"] + (70,))
+        img.alpha_composite(g.filter(ImageFilter.GaussianBlur(20)))
+    if sp > 0:                                                           # scanned part glows cyan
+        cy_ = fp_img(pw, ph, seed, T["accent"], 0.55)
+        crop = cy_.crop((0, 0, pw, max(1, int(ph * sp)))); img.alpha_composite(crop, (int(px), int(py)))
+    d = ImageDraw.Draw(img)
+    if sp >= 1:
+        for j, (mx, my) in enumerate(MINU):
+            q = clamp((t - sa - 1.4 - j * 0.12) / 0.3)
+            if q > 0:
+                cx_, cy2 = px + mx * pw, py + my * ph; rr = 16
+                d.ellipse([cx_ - rr, cy2 - rr, cx_ + rr, cy2 + rr], outline=T["accent2"] + (int(255 * q),), width=3)
+    # record search (right)
+    if ma is not None:
+        st = max(sa + 1.6, ma - 2.2); rp = clamp((t - st) / 0.4)
+        if rp > 0:
+            rc = Image.new("RGBA", (cw, chh), (18, 26, 30, 240)); rd = ImageDraw.Draw(rc)
+            rd.rectangle([2, 2, cw - 3, chh - 3], outline=T["accent"] + (160,), width=2)
+            rd.text((24, 22), "RECORD SEARCH", font=F("mono", 22), fill=T["accent"] + (255,))
+            matched = t >= ma
+            s2 = seed if matched else 100 + int((t - st) / 0.11) % 40
+            rc.alpha_composite(fp_img(pw, ph, s2, (230, 236, 236), 0.9, "whorl" if (s2 % 3 or matched) else "arch"), ((cw - pw) // 2, 90))
+            lab = sc.get("right_label", "MATCH") if matched else f"CARD #{(int((t - st) * 97) % 7000) + 1:04d}"
+            rd.text((cw / 2, chh - 40), lab, font=fit_font("mono", 26, lab, cw - 40), fill=(T["accent2"] if matched else MUTED) + (255,), anchor="mm")
+            paste_a(img, rc, (xr + (1 - rp) * 200, y0), rp)
+            if matched:
+                q = ease(clamp((t - ma) / 0.5)); d = ImageDraw.Draw(img); rx = xr + (cw - pw) // 2
+                for (mx, my) in MINU:
+                    x1, y1 = px + mx * pw, py + my * ph; x2, y2 = rx + mx * pw, py + my * ph
+                    d.line([x1, y1, x1 + (x2 - x1) * q, y1 + (y2 - y1) * q], fill=T["accent2"] + (200,), width=3)
+                    if q >= 1: d.ellipse([x2 - 16, y2 - 16, x2 + 16, y2 + 16], outline=T["accent2"] + (255,), width=3)
+                zp = clamp((t - ma - 0.4) / 0.18)
+                if zp > 0:
+                    stp = stamp_img(sc.get("stamp", "MATCH"), col=(60, 220, 140), size=88); z = 2.2 - 1.2 * ease(zp)
+                    stp = stp.resize((int(stp.width * z), int(stp.height * z)), Image.LANCZOS).rotate(-10, expand=True, resample=Image.BICUBIC)
+                    img.alpha_composite(stp, (int(W / 2 - stp.width / 2), int(y0 + chh - 40 - stp.height / 2)))
+    caption(img, sc, t, D, sc.get("cap_y", 1110))
+    chrome(img, tg, a)
+
+FVAL = [16, 16, 8, 8, 4, 4, 2, 2, 1, 1]
+FNAME = ["R THUMB", "R INDEX", "R MIDDLE", "R RING", "R LITTLE", "L THUMB", "L INDEX", "L MIDDLE", "L RING", "L LITTLE"]
+def sc_drawers(img, sc, t, D, tg, k):
+    """The Haque-Bose primary classification: whorl fingers light up with 16/8/4/2/1, a fraction forms, one drawer of 1,024 opens."""
+    a = clamp(t / 0.4)
+    text_a(img, (W / 2, 300), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 32), T["accent"], 1, "mm", shadow=4)
+    wh = sc.get("whorls", [1, 4, 7]); fat = sc.get("finger_at", [1.0 + i * 0.6 for i in range(len(wh))])
+    tw_, gap = 172, 16; x0 = (W - (5 * tw_ + 4 * gap)) / 2
+    d = ImageDraw.Draw(img)
+    for i in range(10):
+        r_, c_ = divmod(i, 5); x = x0 + c_ * (tw_ + gap); y = 350 + r_ * 215; ap = clamp((t - 0.2 - i * 0.05) / 0.3) * a
+        n = i + 1; on = n in wh and t >= fat[wh.index(n)]
+        col = T["accent"] if on else (60, 80, 86)
+        rect_a(img, (x, y, x + tw_, y + 200), (14, 24, 28), 0.9 * ap, 12)
+        d.rounded_rectangle([x, y, x + tw_, y + 200], 12, outline=col + (int(255 * ap),), width=3 if on else 2)
+        fi = fp_img(96, 122, 30 + i, (WHITE if on else (110, 120, 120)), (1.0 if on else 0.5) * ap, "whorl" if n in wh else "arch")
+        img.alpha_composite(fi, (int(x + (tw_ - 96) / 2), int(y + 30)))
+        text_a(img, (x + tw_ / 2, y + 16), FNAME[i], F("mono", 17), MUTED, ap, "mm")
+        v = f"{FVAL[i]}" if on else "0"
+        text_a(img, (x + tw_ / 2, y + 176), v, F("anton", 40), T["accent2"] if on else (90, 100, 100), ap, "mm")
+        if on and t - fat[wh.index(n)] < 0.6:
+            rr = 30 + 160 * (t - fat[wh.index(n)]); d.ellipse([x + tw_ / 2 - rr, y + 92 - rr, x + tw_ / 2 + rr, y + 92 + rr], outline=T["accent"] + (int(200 * (1 - (t - fat[wh.index(n)]) / 0.6)),), width=3)
+    fa = sc.get("formula_at", fat[-1] + 0.8); fp = ease(clamp((t - fa) / 0.6))
+    num = [FVAL[n - 1] for n in wh if n % 2 == 0]; den = [FVAL[n - 1] for n in wh if n % 2 == 1]
+    N, Dn = 1 + sum(num), 1 + sum(den)
+    if fp > 0:
+        ns = " + ".join(["1"] + [str(v) for v in num]); ds = " + ".join(["1"] + [str(v) for v in den])
+        text_a(img, (330, 845), ns, F("anton", 58), WHITE, fp, "mm", shadow=6)
+        rect_a(img, (150, 884, 510, 890), T["accent"], fp)
+        text_a(img, (330, 930), ds, F("anton", 58), WHITE, fp, "mm", shadow=6)
+        text_a(img, (580, 888), "=", F("anton", 90), MUTED, fp, "mm")
+        text_a(img, (800, 888), f"{N}/{Dn}", F("anton", 150), T["accent2"], fp, "mm", shadow=10)
+    ga = ease(clamp((t - fa - 0.6) / 0.8)); da = sc.get("drawer_at", fa + 2.2)
+    if ga > 0:
+        text_a(img, (W / 2, 1030), "32 × 32 = 1,024 DRAWERS", F("mono", 30), T["accent"], ga, "mm")
+        cs, cg = 13, 2; gx = (W - 32 * (cs + cg)) / 2; gy = 1060
+        hr, hc = Dn - 1, N - 1; op = ease(clamp((t - da) / 0.5))
+        for rr_ in range(32):
+            for cc in range(32):
+                if (rr_ + cc) / 62 > ga: continue
+                xx, yy = gx + cc * (cs + cg), gy + rr_ * (cs + cg)
+                hit = (rr_ == hr and cc == hc)
+                fill = (T["accent2"] + (255,)) if (hit and op > 0) else (70, 130, 138, 255) if (rr_ == hr or cc == hc) and op > 0 else (40, 72, 80, 255)
+                d.rectangle([xx, yy, xx + cs, yy + cs], fill=fill)
+        if op > 0:
+            xx, yy = gx + hc * (cs + cg) + cs / 2, gy + hr * (cs + cg) + cs / 2
+            rr = 14 + 10 * math.sin(tg * 6); d.ellipse([xx - rr, yy - rr, xx + rr, yy + rr], outline=T["accent2"] + (255,), width=3)
+            text_a(img, (min(W - 140, xx + 40), yy - 4), f"DRAWER {N}/{Dn}", F("mono", 26), T["accent2"], op, "lm", shadow=6)
+    for i, ln in enumerate(sc.get("lines", [])):
+        rise_line(img, ln, W / 2, 1560 + i * 66, fit_font("disp", 46 if i == 0 else 40, ln, W - 120, "Black" if i == 0 else "Bold"), t - (da + 0.4 + i * 0.6))
+    chrome(img, tg, a)
+
+_world = {}
+WD = dict(c_lat=12.0, c_lon=30.0, s=4.0, cx=W / 2, cy=660)
+def _wp(lat, lon): return WD["cx"] + (lon - WD["c_lon"]) * WD["s"], WD["cy"] - (lat - WD["c_lat"]) * WD["s"]
+def _world_img():
+    if "img" not in _world:
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+        for iso, rings in R.COUNTRIES:
+            for ring in rings:
+                pts = [_wp(la, lo) for lo, la in zip(np.degrees(ring[:, 0]), np.degrees(ring[:, 1]))]
+                if max(abs(p[0] - pts[0][0]) for p in pts) > W * 0.8: continue   # skip dateline-wrapping rings
+                d.polygon(pts, fill=T["land"] + (255,), outline=T["land"] + (255,))
+        glow = Image.new("RGBA", (W, H), T["accent"] + (0,)); glow.putalpha(lay.getchannel("A").filter(ImageFilter.GaussianBlur(5)).point(lambda v: int(v * 0.45)))
+        out = Image.new("RGBA", (W, H), (0, 0, 0, 0)); out.alpha_composite(glow); out.alpha_composite(lay); _world["img"] = out
+    return _world["img"]
+
+def sc_spread(img, sc, t, D, tg, k):
+    """Arcs fly from an origin city to destinations one by one (origin [name, lat, lon]; routes [[name, lat, lon, at, from?, year]])."""
+    a = clamp(t / 0.5); paste_a(img, _world_img(), (0, 0), a); d = ImageDraw.Draw(img)
+    on, ola, olo = sc["origin"]; ox, oy = _wp(ola, olo); pos = {on: (ox, oy)}
+    year = sc.get("year0", "")
+    for nm, la, lo, at, *rest in sc["routes"]:
+        fr = rest[0] if rest and rest[0] else on; x1, y1 = pos.get(fr, (ox, oy)); x2, y2 = _wp(la, lo); pos[nm] = (x2, y2)
+        p = ease(clamp((t - at) / 0.9))
+        if p <= 0: continue
+        if len(rest) > 1 and rest[1]: year = rest[1]
+        mx, my = (x1 + x2) / 2, min(y1, y2) - abs(x2 - x1) * 0.28 - 30
+        pts = [((1 - u) ** 2 * x1 + 2 * (1 - u) * u * mx + u * u * x2, (1 - u) ** 2 * y1 + 2 * (1 - u) * u * my + u * u * y2) for u in np.linspace(0, p, 40)]
+        d.line(pts, fill=T["accent2"] + (230,), width=4)
+        hx, hy = pts[-1]; d.ellipse([hx - 7, hy - 7, hx + 7, hy + 7], fill=(255, 255, 255, 255))
+        if p >= 1:
+            q = t - at - 0.9; rr = 10 + (q * 30 % 30)
+            d.ellipse([x2 - rr, y2 - rr, x2 + rr, y2 + rr], outline=T["accent2"] + (int(220 * (1 - (rr - 10) / 30)),), width=3)
+            d.ellipse([x2 - 9, y2 - 9, x2 + 9, y2 + 9], fill=T["accent2"] + (255,))
+            anc = "rm" if x2 > W - 220 else "lm"; text_a(img, (x2 + (-16 if anc == "rm" else 16), y2 - 24), nm, F("mono", 24), WHITE, clamp(q / 0.3), anc, shadow=6)
+    rr = 12 + 8 * math.sin(tg * 5); d.ellipse([ox - rr, oy - rr, ox + rr, oy + rr], outline=T["accent"] + (255,), width=4)
+    d.ellipse([ox - 9, oy - 9, ox + 9, oy + 9], fill=T["accent"] + (255,))
+    text_a(img, (ox + 16, oy + 26), on, F("mono", 26), T["accent"], a, "lm", shadow=6)
+    text_a(img, (W / 2, 330), year, F("anton", 110), T["accent2"], a, "mm", shadow=8)
+    caption(img, sc, t, D, sc.get("cap_y", 1000))
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"fingerprint": sc_fingerprint, "drawers": sc_drawers, "spread": sc_spread})
 
 R.SCENE_FN.update({"satellite": sc_satellite, "map": sc_map, "dossier": sc_dossier, "blast": sc_blast})
 R.SCENE_FN.update({"iceberg": sc_iceberg})

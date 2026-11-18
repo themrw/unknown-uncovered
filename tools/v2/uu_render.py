@@ -39,6 +39,8 @@ THEMES = {
                       land=(22, 28, 38), land_edge=(80, 100, 130), ocean=(8, 11, 18), part=(170, 200, 235), motif="badge"),
     "history": dict(bg=(14, 10, 6), glow=(70, 45, 15), accent=(235, 190, 110), accent2=(200, 150, 90), alert=(200, 70, 50),
                     land=(48, 38, 26), land_edge=(120, 95, 60), ocean=(20, 15, 10), part=(240, 210, 160), motif="parchment"),
+    "forensic": dict(bg=(5, 10, 14), glow=(12, 58, 66), accent=(90, 228, 220), accent2=(255, 196, 96), alert=(240, 62, 72),
+                     land=(20, 36, 42), land_edge=(60, 130, 135), ocean=(6, 12, 16), part=(160, 240, 235), motif="fingerprint"),
 }
 T = THEMES[SPEC.get("theme", "war")]
 WHITE = (242, 242, 238); MUTED = (150, 156, 150); BLACK = (0, 0, 0)
@@ -264,6 +266,11 @@ def motif_img(R):
         d.ellipse([c - R * 0.24, c - R * 0.45, c + R * 0.24, c + R * 0.03], outline=col, width=lw)
         d.arc([c - R * 0.38, c - R * 0.02, c + R * 0.38, c + R * 0.62], 200, 340, fill=col, width=lw)
         for k in range(2): d.line([c - w * 0.32, c + R * (0.62 + k * 0.16), c + w * 0.32, c + R * (0.62 + k * 0.16)], fill=col, width=lw)
+    elif T["motif"] == "fingerprint":   # concentric loops, open at the bottom
+        lw = max(2, R // 22)
+        for k in range(1, 8):
+            r = R * k / 7.5; d.arc([c - r * 0.8, c - r, c + r * 0.8, c + r], 200 - k * 4, 340 + k * 4, fill=col, width=lw)
+            if k > 2: d.arc([c - r * 0.8, c - r * 0.6, c + r * 0.8, c + r * 1.2], 10, 60, fill=col, width=lw)
     else:
         d.ellipse([c - R, c - R, c + R, c + R], outline=col, width=4)
     _motif[R] = im; return im

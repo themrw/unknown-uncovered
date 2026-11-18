@@ -102,7 +102,23 @@ for i, sc in enumerate(spec["scenes"]):   # short edits: an impact on every roll
 if theme == "desert":   # desert wind: band-passed noise with slow gusts
     wind = bp(rng.standard_normal(n), 250, 1400) * (0.5 + 0.5 * np.sin(2 * np.pi * t * 0.07) * np.sin(2 * np.pi * t * 0.031 + 1))
     music += wind * 0.10
+if theme == "forensic":   # lab hum + a soft scanner tick every 2 s
+    music += np.sin(2 * np.pi * 120 * t) * 0.012 * (0.6 + 0.4 * np.sin(2 * np.pi * t * 0.2))
+    L = int(0.08 * SR); tp = np.arange(L) / SR; tick = np.sin(2 * np.pi * 3200 * tp) * np.exp(-tp * 60)
+    for j in range(int(len(t) / SR / 2)): add(music, tick, j * 2.0 + 0.5, 0.05)
 for i, sc in enumerate(spec["scenes"]):
+    if sc["type"] == "fingerprint":   # scanner sweep, then an impact on the match
+        L = int(1.4 * SR); tp = np.arange(L) / SR
+        sweep = np.sin(2 * np.pi * (600 + 900 * tp) * tp) * np.sin(np.pi * tp / 1.4) * 0.5
+        add(music, sweep, ST[i] + sc.get("scan_at", 0.6), 0.10)
+        if sc.get("match_at") is not None: add(music, boom(0.8, 70, 3.5, 2), ST[i] + sc["match_at"], 0.75)
+    if sc["type"] == "drawers":   # a click for every lit finger, a boom when the drawer opens
+        L = int(0.1 * SR); tp = np.arange(L) / SR; clk = np.sin(2 * np.pi * 2200 * tp) * np.exp(-tp * 45)
+        for at in sc.get("finger_at", []): add(music, clk, ST[i] + at, 0.18)
+        if sc.get("drawer_at") is not None: add(music, boom(0.6, 80, 5, 1.5), ST[i] + sc["drawer_at"], 0.6)
+    if sc["type"] == "spread":   # a ping per destination
+        L = int(1.0 * SR); tp = np.arange(L) / SR; ping = np.sin(2 * np.pi * 1320 * tp) * np.exp(-tp * 6)
+        for r in sc.get("routes", []): add(music, ping, ST[i] + r[2], 0.12)
     if sc["type"] == "satellite":   # sonar pings while the satellite sweeps
         L = int(1.2 * SR); tp = np.arange(L) / SR
         ping = np.sin(2 * np.pi * 1760 * tp) * np.exp(-tp * 5)
