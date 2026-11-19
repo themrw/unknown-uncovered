@@ -41,6 +41,8 @@ THEMES = {
                     land=(48, 38, 26), land_edge=(120, 95, 60), ocean=(20, 15, 10), part=(240, 210, 160), motif="parchment"),
     "forensic": dict(bg=(5, 10, 14), glow=(12, 58, 66), accent=(90, 228, 220), accent2=(255, 196, 96), alert=(240, 62, 72),
                      land=(20, 36, 42), land_edge=(60, 130, 135), ocean=(6, 12, 16), part=(160, 240, 235), motif="fingerprint"),
+    "oil": dict(bg=(7, 6, 6), glow=(88, 34, 8), accent=(255, 150, 40), accent2=(120, 200, 215), alert=(240, 60, 50),
+                land=(34, 26, 20), land_edge=(130, 90, 55), ocean=(10, 9, 10), part=(255, 170, 90), motif="refinery"),
 }
 T = THEMES[SPEC.get("theme", "war")]
 WHITE = (242, 242, 238); MUTED = (150, 156, 150); BLACK = (0, 0, 0)
@@ -271,6 +273,15 @@ def motif_img(R):
         for k in range(1, 8):
             r = R * k / 7.5; d.arc([c - r * 0.8, c - r, c + r * 0.8, c + r], 200 - k * 4, 340 + k * 4, fill=col, width=lw)
             if k > 2: d.arc([c - r * 0.8, c - r * 0.6, c + r * 0.8, c + r * 1.2], 10, 60, fill=col, width=lw)
+    elif T["motif"] == "refinery":   # distillation columns, tank and a flare stack, outline
+        lw = max(3, R // 20); base = c + R * 0.8
+        d.line([c - R, base, c + R, base], fill=col, width=lw)
+        for (x, w, h) in ((-0.55, 0.22, 1.5), (-0.18, 0.16, 1.15), (0.12, 0.2, 1.35)):
+            x0 = c + x * R; d.rounded_rectangle([x0, base - h * R, x0 + w * R, base], radius=int(w * R / 2), outline=col, width=lw)
+            for j in range(1, 4): d.line([x0, base - h * R * j / 4, x0 + w * R, base - h * R * j / 4], fill=col, width=max(2, lw // 2))
+        d.ellipse([c + R * 0.42, base - R * 0.5, c + R * 0.95, base], outline=col, width=lw)
+        d.line([c + R * 0.88, base, c + R * 0.88, c - R * 0.9], fill=col, width=lw)
+        d.polygon([(c + R * 0.88, c - R * 1.15), (c + R * 0.8, c - R * 0.92), (c + R * 0.96, c - R * 0.92)], fill=T["alert"] + (255,))
     else:
         d.ellipse([c - R, c - R, c + R, c + R], outline=col, width=4)
     _motif[R] = im; return im

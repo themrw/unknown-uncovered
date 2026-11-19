@@ -102,6 +102,9 @@ for i, sc in enumerate(spec["scenes"]):   # short edits: an impact on every roll
 if theme == "desert":   # desert wind: band-passed noise with slow gusts
     wind = bp(rng.standard_normal(n), 250, 1400) * (0.5 + 0.5 * np.sin(2 * np.pi * t * 0.07) * np.sin(2 * np.pi * t * 0.031 + 1))
     music += wind * 0.10
+if theme == "oil":   # refinery: low industrial drone + slow steam hiss swells
+    music += (np.sin(2 * np.pi * 49 * t) + 0.5 * np.sin(2 * np.pi * 98.3 * t)) * 0.02 * (0.7 + 0.3 * np.sin(2 * np.pi * t * 0.11))
+    music += hp(rng.standard_normal(n), 3000) * 0.012 * np.clip(np.sin(2 * np.pi * t / 9.0), 0, 1) ** 3
 if theme == "forensic":   # lab hum + a soft scanner tick every 2 s
     music += np.sin(2 * np.pi * 120 * t) * 0.012 * (0.6 + 0.4 * np.sin(2 * np.pi * t * 0.2))
     L = int(0.08 * SR); tp = np.arange(L) / SR; tick = np.sin(2 * np.pi * 3200 * tp) * np.exp(-tp * 60)
