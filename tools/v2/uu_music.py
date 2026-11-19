@@ -133,6 +133,33 @@ for i, sc in enumerate(spec["scenes"]):
     if sc["type"] == "map":
         L = int(1.0 * SR); tp = np.arange(L) / SR
         add(music, np.sin(2 * np.pi * 1320 * tp) * np.exp(-tp * 4), ST[i] + sc.get("zoom_at", 1.6) + 1.2, 0.12)
+for i, sc in enumerate(spec["scenes"]):   # payments reel (015) scene sounds
+    if sc["type"] == "scanpay":   # scanner chirp, a two-note "payment received" ding, impact on the big number
+        L = int(1.0 * SR); tp = np.arange(L) / SR
+        add(music, np.sin(2 * np.pi * (900 + 600 * tp) * tp) * np.sin(np.pi * tp) * 0.4, ST[i] + 0.55, 0.08)
+        pa = sc.get("pay_at", 1.9)
+        add(music, chime(1.4, 1318.5), ST[i] + pa, 0.20); add(music, chime(1.8, 1760.0), ST[i] + pa + 0.16, 0.20)
+        add(music, boom(0.8, 80, 3.5, 2), ST[i] + sc.get("count_at", pa + 0.6), 0.6)
+    if sc["type"] == "keys":   # a lock click per key, a low hit on the mystery key
+        L = int(0.12 * SR); tp = np.arange(L) / SR; clk = hp(rng.standard_normal(L), 1500) * np.exp(-tp * 60)
+        ka = sc.get("key_at", [0.6, 1.6, 3.2])
+        for at in ka[:2]: add(music, clk, ST[i] + at, 0.35)
+        add(music, boom(0.9, 55, 3.0, 2), ST[i] + ka[2], 0.75)
+    if sc["type"] == "pricefall":   # falling tone as the price collapses, a rising sweep for data use
+        da = sc.get("drop_at", 2.5); L = int(0.7 * SR); tp = np.arange(L) / SR
+        add(music, np.sin(2 * np.pi * np.cumsum(1400 * np.exp(-tp * 3.5) + 120) / SR) * np.exp(-tp * 2) * 0.5, ST[i] + da, 0.12)
+        add(music, boom(0.6, 70, 4, 1.5), ST[i] + da + 0.55, 0.55)
+        ua = sc.get("use_at", da + 2.0); add(music, riser(1.2), ST[i] + ua, 0.25)
+    if sc["type"] == "qrshops":   # little pops as the stickers spread, a chime on the merchant count
+        qa = sc.get("qr_at", 1.0); L = int(0.05 * SR); tp = np.arange(L) / SR; pop = np.sin(2 * np.pi * 2600 * tp) * np.exp(-tp * 80)
+        for j in range(18): add(music, pop, ST[i] + qa + j * 0.09 + rng.uniform(0, 0.04), 0.10)
+        add(music, chime(1.6, 1568.0), ST[i] + sc.get("count_at", qa + 2.4), 0.14)
+    if sc["type"] == "network":   # riser into the switch lighting up
+        la = sc.get("link_at", 1.6); add(music, riser(min(1.5, la)), ST[i] + la - min(1.5, la), 0.35)
+        add(music, boom(1.0, 75, 3.0, 2.2), ST[i] + la, 0.8)
+    if sc["type"] == "share":
+        add(music, boom(0.6, 70, 4, 1.5), ST[i] + sc.get("hl_at", 2.1), 0.5)
+        add(music, boom(0.9, 60, 3, 2), ST[i] + sc.get("chip_at", 3.3), 0.7)
 for s0 in ST[1:-1]:
     Lw = int(0.45 * SR); tw = np.arange(Lw) / SR
     add(music, bp(rng.standard_normal(Lw), 700, 5000) * np.sin(np.pi * tw / 0.45) ** 2, s0 - 0.3, 0.16)

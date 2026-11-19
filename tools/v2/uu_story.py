@@ -19,6 +19,12 @@ Scene types:
   fingerprint {seed, scan_at, match_at, left_label, right_label, stamp}   evidence print scanned, record search flickers, MATCH
   drawers {kicker, whorls:[finger numbers], finger_at, formula_at, drawer_at, lines}   Henry/Haque-Bose primary classification -> 1 of 1,024 drawers
   spread  {origin:[name,lat,lon], year0, routes:[[name,lat,lon,at,from?,year?]]}   arcs across a world map (land only, no borders)
+  scanpay {kicker, number, label, lines, pay_at, count_at}   phone scans a QR, ₹10 PAID ripple, big monthly count
+  keys    {keys:[[label,sub]...3], key_at[3], kicker, lines}   padlock with 3 keyholes; 3rd key a red "?"
+  pricefall {p0, p1, plabel, u0, u1, ulabel, drop_at, use_at, kicker, lines}   price bar collapses, usage bar shoots up
+  qrshops {qr_at, count_at, kicker, big, lines}   grid of stalls, QR stickers pop outward, merchant count chip
+  network {banks[5], apps[5], hub, link_at, kicker, lines}   banks <-> UPI switch <-> apps with flowing dots
+  share   {bars:[[label, pct]], hl, chip, bars_at, hl_at, chip_at, kicker, lines}   market share bars, highlighted row
   outro   (uu_render's vertical outro: lines + subscribe card; "card": "youtube" for short edits)
 Images are repo-relative ($UU_REPO); spec["credits_from"] may be one path or a list of credits.json files.
 """
@@ -830,6 +836,240 @@ R.SCENE_FN.update({"fingerprint": sc_fingerprint, "drawers": sc_drawers, "spread
 R.SCENE_FN.update({"satellite": sc_satellite, "map": sc_map, "dossier": sc_dossier, "blast": sc_blast})
 R.SCENE_FN.update({"iceberg": sc_iceberg})
 R.SCENE_FN.update({"photo": sc_photo, "counter": sc_counter, "bulb": sc_bulb})
+
+# ---------------------------------------------------------------- payments scenes (reel 015: UPI)
+def qr_img(n, s, seed=3, fg=(16, 18, 20), bg=(250, 250, 246)):
+    """Illustrative QR-style code (random modules + finder squares; not a real, scannable code)."""
+    r = np.random.default_rng(seed); m = r.random((n, n)) > 0.52
+    for (cy, cx) in [(0, 0), (0, n - 7), (n - 7, 0)]:
+        m[cy:cy + 7, cx:cx + 7] = False
+        m[cy, cx:cx + 7] = m[cy + 6, cx:cx + 7] = m[cy:cy + 7, cx] = m[cy:cy + 7, cx + 6] = True
+        m[cy + 2:cy + 5, cx + 2:cx + 5] = True
+        m[cy + 1:cy + 6, cx + 1] = m[cy + 1:cy + 6, cx + 5] = m[cy + 1, cx + 1:cx + 6] = m[cy + 5, cx + 1:cx + 6] = False
+    q = Image.new("RGBA", (n + 4, n + 4), bg + (255,)); px = q.load()
+    for y in range(n):
+        for x in range(n):
+            if m[y, x]: px[x + 2, y + 2] = fg + (255,)
+    return q.resize((s, s), Image.NEAREST)
+
+def tick_mark(d, cx, cy, s, col, w):
+    d.line([cx - 0.45 * s, cy, cx - 0.12 * s, cy + 0.32 * s, cx + 0.5 * s, cy - 0.36 * s], fill=col, width=w, joint="curve")
+
+def sc_scanpay(img, sc, t, D, tg, k):
+    """Hook: a phone scans a shop QR, payment succeeds with a ripple, then the monthly UPI count ticks up."""
+    a = ease(clamp(t / 0.5)); pw, ph = 360, 640; px0 = W / 2 - pw / 2; py0 = 330 + 120 * (1 - a)
+    pay = sc.get("pay_at", 1.9); cnt = sc.get("count_at", pay + 0.6)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    d.rounded_rectangle([px0 + 16, py0 + 26, px0 + pw + 16, py0 + ph + 26], 54, fill=(0, 0, 0, 150))
+    lay = lay.filter(ImageFilter.GaussianBlur(18)); d = ImageDraw.Draw(lay)
+    d.rounded_rectangle([px0, py0, px0 + pw, py0 + ph], 54, fill=(18, 18, 22, 255), outline=T["accent"] + (200,), width=4)
+    d.rounded_rectangle([px0 + 18, py0 + 60, px0 + pw - 18, py0 + ph - 40], 26, fill=(250, 250, 246, 255))
+    d.rounded_rectangle([px0 + pw / 2 - 50, py0 + 22, px0 + pw / 2 + 50, py0 + 36], 7, fill=(40, 40, 46, 255))
+    paid = t >= pay
+    if not paid:
+        q = qr_img(25, 250); lay.alpha_composite(q, (int(px0 + pw / 2 - 125), int(py0 + 150)))
+        d.text((px0 + pw / 2, py0 + 110), "SCAN & PAY", font=F("disp", 34, "Black"), fill=(20, 20, 24, 255), anchor="mm")
+        d.text((px0 + pw / 2, py0 + 450), "CHAI STALL · ₹10", font=F("inter", 28, "Bold"), fill=(90, 90, 96, 255), anchor="mm")
+        sp = clamp((t - 0.55) / 1.1)
+        if 0 < sp < 1:
+            by = py0 + 150 + 250 * (0.5 - 0.5 * math.cos(sp * math.pi * 2))
+            d.rectangle([px0 + 40, by - 3, px0 + pw - 40, by + 3], fill=T["accent2"] + (255,))
+    else:
+        q = ease(clamp((t - pay) / 0.35)); cx, cy = px0 + pw / 2, py0 + 270
+        d.ellipse([cx - 110 * q, cy - 110 * q, cx + 110 * q, cy + 110 * q], fill=(40, 186, 110, 255))
+        if q > 0.6: tick_mark(d, cx, cy, 140, (255, 255, 255, 255), 16)
+        al = int(255 * clamp((t - pay - 0.2) / 0.3))
+        d.text((cx, py0 + 450), "₹10 PAID", font=F("anton", 64), fill=(20, 20, 24, al), anchor="mm")
+        d.text((cx, py0 + 515), "in 2 seconds", font=F("inter", 28, "Bold"), fill=(90, 90, 96, al), anchor="mm")
+    img.alpha_composite(lay)
+    if paid:                                                             # sound-box ripple
+        dd = ImageDraw.Draw(img); cx, cy = W / 2, py0 + 270
+        for j in range(3):
+            rp = (t - pay - j * 0.25)
+            if 0 < rp < 1.4:
+                rr = 140 + rp * 380; al = int(200 * (1 - rp / 1.4))
+                dd.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], outline=T["accent2"] + (al,), width=5)
+    ca = clamp((t - cnt) / 0.3); p = ease(clamp((t - cnt) / 1.6))
+    if ca > 0:
+        text_a(img, (W / 2, 1040), typed(sc.get("kicker", ""), prog(t, cnt, 0.5)), F("mono", 32), T["accent"], 1, "mm", shadow=4)
+        num = sc.get("number", "25.47 BILLION"); val = float(num.split()[0]); unit = " ".join(num.split()[1:])
+        s = f"{val * p:.2f} {unit}" if p < 1 else num
+        text_a(img, (W / 2, 1160), s, F("anton", 150), WHITE, ca, "mm", shadow=12)
+        text_a(img, (W / 2, 1265), sc.get("label", ""), fit_font("disp", 46, sc.get("label", ""), W - 140, "Black"), T["accent2"], ca, "mm")
+    for i, ln in enumerate(sc.get("lines", [])):
+        rise_line(img, ln, W / 2, 1370 + i * 70, fit_font("disp", 54, ln, W - 120, "Bold"), t - cnt - 1.2 - i * 0.5)
+    chrome(img, tg, a)
+
+def key_icon(w, col):
+    im = Image.new("RGBA", (w, w // 2), (0, 0, 0, 0)); d = ImageDraw.Draw(im); h = w // 2; r = h * 0.36
+    d.ellipse([6, h / 2 - r, 6 + 2 * r, h / 2 + r], outline=col, width=max(4, w // 22))
+    d.line([6 + 2 * r, h / 2, w - 8, h / 2], fill=col, width=max(5, w // 18))
+    for x in (w - 30, w - 58):
+        d.line([x, h / 2, x, h / 2 + h * 0.28], fill=col, width=max(5, w // 18))
+    return im
+
+def sc_keys(img, sc, t, D, tg, k):
+    """Premise: a padlock with three keyholes; two keys are the popular answer, the third is a mystery."""
+    a = ease(clamp(t / 0.4)); kat = sc.get("key_at", [0.6, 1.6, 3.2]); cx = W / 2
+    d = ImageDraw.Draw(img)
+    sh = 0 if t < kat[2] else 6 * math.sin((t - kat[2]) * 30) * max(0, 1 - (t - kat[2]) / 0.6)
+    bx0, by0, bx1, by1 = cx - 260 + sh, 470, cx + 260 + sh, 830
+    d.arc([cx - 170 + sh, 300, cx + 170 + sh, 640], 180, 360, fill=(170, 170, 160, int(255 * a)), width=34)
+    d.line([cx - 170 + sh, 470, cx - 170 + sh, 485], fill=(170, 170, 160, int(255 * a)), width=34)
+    d.line([cx + 170 + sh, 470, cx + 170 + sh, 485], fill=(170, 170, 160, int(255 * a)), width=34)
+    rect_a(img, (bx0, by0, bx1, by1), (58, 50, 30), a, 40, T["accent"], 4)
+    for i in range(3):
+        hx = cx + sh + (i - 1) * 150; hy = 640; on = t >= kat[i]
+        col = (T["accent2"] if i < 2 else T["alert"]) if on else (20, 18, 12)
+        if on and i == 2 and int(t * 4) % 2: col = (255, 150, 140)
+        d.ellipse([hx - 26, hy - 44, hx + 26, hy + 8], fill=col + (255,))
+        d.polygon([(hx - 16, hy), (hx + 16, hy), (hx + 26, hy + 70), (hx - 26, hy + 70)], fill=col + (255,))
+    tw, th, gap = 300, 230, 30; x0 = cx - (3 * tw + 2 * gap) / 2
+    for i, (lab, sub) in enumerate(sc.get("keys", [])):
+        q = ease(clamp((t - kat[i]) / 0.4))
+        if q <= 0: continue
+        x = x0 + i * (tw + gap); y = 900 + 60 * (1 - q); mystery = (lab == "?")
+        rect_a(img, (x, y, x + tw, y + th), (30, 26, 16) if not mystery else (50, 16, 16), q * 0.92, 26, T["alert"] if mystery else T["accent"], 3)
+        if mystery:
+            text_a(img, (x + tw / 2, y + 100), "?", F("anton", 140), T["alert"], q, "mm", shadow=6)
+        else:
+            ki = key_icon(160, T["accent2"] + (255,)); paste_a(img, ki, (x + tw / 2 - 80, y + 26), q)
+            text_a(img, (x + tw / 2, y + 140), lab, fit_font("anton", 66, lab, tw - 30), WHITE, q, "mm", shadow=4)
+        text_a(img, (x + tw / 2, y + 200), sub, fit_font("inter", 28, sub, tw - 30, "Bold"), MUTED if not mystery else (255, 160, 150), q, "mm")
+    text_a(img, (W / 2, 1220), typed(sc.get("kicker", ""), prog(t, 0.2, 0.5)), F("mono", 32), T["accent"], 1, "mm", shadow=4)
+    for i, ln in enumerate(sc.get("lines", [])):
+        rise_line(img, ln, W / 2, 1320 + i * 72, fit_font("disp", 58, ln, W - 120, "Bold"), t - kat[min(i + 1, 2)])
+    chrome(img, tg, a)
+
+def sc_pricefall(img, sc, t, D, tg, k):
+    """Data price per GB: a tall 2016 bar collapses to today's sliver; then data use per person shoots up."""
+    a = ease(clamp(t / 0.4)); da = sc.get("drop_at", 2.5); ua = sc.get("use_at", da + 2.0)
+    text_a(img, (W / 2, 330), typed(sc.get("kicker", ""), prog(t, 0.1, 0.5)), F("mono", 32), T["accent"], 1, "mm", shadow=4)
+    text_a(img, (W / 2, 392), sc.get("plabel", ""), F("disp", 40, "Black"), MUTED, a, "mm")
+    base = 960; hmax = 400; p0, p1 = sc["p0"], sc["p1"]
+    g0 = ease(clamp((t - 0.3) / 0.8)); h0 = hmax * g0
+    rect_a(img, (190, base - h0, 450, base), T["alert"], a, 16)
+    text_a(img, (320, base - h0 - 60), f"₹{int(p0 * g0)}", F("anton", 96), WHITE, g0, "mm", shadow=8)
+    text_a(img, (320, base + 50), "2015–16", F("disp", 40, "Black"), MUTED, a, "mm")
+    q = ease(clamp((t - da) / 0.55)); h1 = hmax * (p0 + (p1 - p0) * q) / p0
+    if t >= da - 0.01:
+        cc = tuple(int(T["alert"][j] + (T["accent2"][j] - T["alert"][j]) * q) for j in range(3))
+        rect_a(img, (630, base - h1, 890, base), cc, 1, 16)
+        v = p0 + (p1 - p0) * q
+        text_a(img, (760, base - h1 - 60), f"₹{v:.1f}" if q >= 1 else f"₹{int(v)}", F("anton", 96), cc, 1, "mm", shadow=8)
+        text_a(img, (760, base + 50), "TODAY", F("disp", 40, "Black"), MUTED, q, "mm")
+        if q >= 1:
+            ca = back(clamp((t - da - 0.55) / 0.4)); s = "−97%"
+            f = F("anton", int(88 * clamp(ca, 0, 1.2))) if ca > 0.05 else None
+            if f: rect_a(img, (585, 640, 935, 780), T["alert"], clamp((t - da - 0.55) / 0.2), 24); text_a(img, (760, 710), s, f, WHITE, 1, "mm")
+    else:
+        rect_a(img, (630, base - 4, 890, base), (70, 70, 60), a, 2)
+    rect_a(img, (150, base, W - 150, base + 4), (120, 110, 80), a)
+    u = ease(clamp((t - ua) / 1.2))
+    if t >= ua:
+        text_a(img, (W / 2, 1100), sc.get("ulabel", ""), F("disp", 38, "Black"), MUTED, clamp((t - ua) / 0.3), "mm")
+        rect_a(img, (120, 1150, W - 120, 1210), (40, 38, 30), 0.9, 30)
+        u0, u1 = sc["u0"], sc["u1"]; v = u0 + (u1 - u0) * u
+        rect_a(img, (120, 1150, 120 + max(30, (W - 240) * v / u1), 1210), T["accent"], 1, 30)
+        text_a(img, (W / 2, 1270), f"{u0} GB  →  {v:.1f} GB", F("anton", 64), WHITE, clamp((t - ua) / 0.3), "mm", shadow=6)
+    for i, ln in enumerate(sc.get("lines", [])):
+        rise_line(img, ln, W / 2, 1380 + i * 70, fit_font("disp", 58, ln, W - 120, "Bold"), t - ua - 1.4)
+    chrome(img, tg, a)
+
+def shop_icon(w, qr=0.0, lit=0.0, seed=0):
+    h = int(w * 0.9); im = Image.new("RGBA", (w, h), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    st = 6; aw = h * 0.3
+    for j in range(st):
+        x0 = j * w / st; col = (T["accent"] if j % 2 == 0 else (240, 236, 224)) if lit > 0.5 else ((120, 100, 50) if j % 2 == 0 else (110, 108, 100))
+        d.polygon([(x0, 0), (x0 + w / st, 0), (x0 + w / st + 2, aw), (x0 - 2, aw)], fill=col + (255,))
+    d.rectangle([w * 0.06, aw, w * 0.94, h - 2], fill=(46, 40, 30, 255) if lit > 0.5 else (34, 32, 28, 255))
+    d.rectangle([w * 0.06, h * 0.68, w * 0.94, h * 0.76], fill=(80, 64, 40, 255))
+    if qr > 0:
+        s = int(w * 0.38 * clamp(back(qr), 0, 1.2))
+        if s > 4: im.alpha_composite(qr_img(15, s, seed), (int(w / 2 - s / 2), int(aw + (h * 0.66 - aw) / 2 - s / 2 + 4)))
+    return im
+
+def sc_qrshops(img, sc, t, D, tg, k):
+    """A town of stalls; QR stickers pop from the centre outward (no card machine needed)."""
+    a = ease(clamp(t / 0.4)); qa = sc.get("qr_at", 1.0); ca = sc.get("count_at", qa + 2.4)
+    cols, rows, cw = 6, 4, 150; gx = W / 2 - cols * (cw + 14) / 2; gy = 340
+    for r_ in range(rows):
+        for c in range(cols):
+            dist = math.hypot(c - (cols - 1) / 2, (r_ - (rows - 1) / 2) * 1.1)
+            q = clamp((t - qa - dist * 0.32) / 0.35)
+            ic = shop_icon(cw, q, q, seed=r_ * cols + c)
+            paste_a(img, ic, (gx + c * (cw + 14), gy + r_ * (cw * 0.9 + 18)), a * (0.55 + 0.45 * (q > 0)))
+    if t >= ca:
+        cq = clamp((t - ca) / 0.3); p = ease(clamp((t - ca) / 1.0)); v = 5 + 5 * p
+        rect_a(img, (W / 2 - 330, 975, W / 2 + 330, 1125), (14, 40, 26), cq * 0.95, 28, T["accent2"], 3)
+        text_a(img, (W / 2, 1030), f"5 LAKH → {v:.0f} LAKH", F("anton", 84), WHITE, cq, "mm", shadow=6)
+        text_a(img, (W / 2, 1095), "PAYTM MERCHANTS · SEPT → NOV 2016", F("inter", 28, "Bold"), T["accent2"], cq, "mm")
+    caption(img, sc, t, D, 1190)
+    chrome(img, tg, a)
+
+def sc_network(img, sc, t, D, tg, k):
+    """UPI: every bank on the left, every app on the right, joined through one switch in the middle."""
+    a = ease(clamp(t / 0.4)); la = sc.get("link_at", 1.6); hx, hy = W / 2, 690
+    banks, apps = sc.get("banks", []), sc.get("apps", [])
+    ys = [400 + i * 145 for i in range(5)]
+    d = ImageDraw.Draw(img); lp = ease(clamp((t - la) / 0.9))
+    for side, items in ((0, banks), (1, apps)):
+        for i, lab in enumerate(items):
+            y = ys[i]; x0 = 70 if side == 0 else W - 70 - 300
+            ex = x0 + 300 if side == 0 else x0
+            if lp > 0:
+                x2 = ex + (hx - ex) * lp; y2 = y + (hy - y) * lp
+                d.line([ex, y, x2, y2], fill=T["accent2"] + (200,), width=4)
+                if lp >= 1:
+                    for j in range(2):
+                        f = ((tg * 0.9 + i * 0.37 + j * 0.5 + side * 0.2) % 1.0)
+                        f = f if side == 0 else 1 - f
+                        px = ex + (hx - ex) * f; py = y + (hy - y) * f
+                        d.ellipse([px - 7, py - 7, px + 7, py + 7], fill=T["accent"] + (255,))
+            q = ease(clamp((t - 0.2 - i * 0.1 - side * 0.3) / 0.4))
+            first = (side == 0 and i == 0)
+            rect_a(img, (x0, y - 50, x0 + 300, y + 50), (40, 34, 20) if first else (26, 26, 24), q * 0.95, 20,
+                   T["accent"] if (first or lp > 0) else (90, 90, 84), 3)
+            f = fit_font("disp" if not first else "anton", 44 if not first else 50, lab, 270, "Black" if not first else None)
+            text_a(img, (x0 + 150, y), lab, f, WHITE if (first or lp > 0) else MUTED, q, "mm")
+    text_a(img, (225, 330), "BANKS", F("mono", 28), MUTED, a, "mm"); text_a(img, (W - 225, 330), "APPS", F("mono", 28), MUTED, a, "mm")
+    g = ease(clamp((t - la + 0.3) / 0.6))
+    if g > 0:
+        glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(glow).ellipse([hx - 170, hy - 170, hx + 170, hy + 170], fill=T["accent"] + (int(120 * g),))
+        img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(40)))
+        rr = 105 * clamp(back((t - la + 0.3) / 0.6), 0, 1.15)
+        d = ImageDraw.Draw(img); d.ellipse([hx - rr, hy - rr, hx + rr, hy + rr], fill=(24, 20, 10, 255), outline=T["accent"] + (255,), width=6)
+        text_a(img, (hx, hy - 6), sc.get("hub", "UPI"), F("anton", int(86 * clamp(rr / 105, 0, 1))), T["accent"], g, "mm", shadow=6)
+    caption(img, sc, t, D, 1160)
+    chrome(img, tg, a)
+
+def sc_share(img, sc, t, D, tg, k):
+    """Market share bars; the highlighted app pulses; a chip explains the fall."""
+    a = ease(clamp(t / 0.4)); ba = sc.get("bars_at", 0.5); ha = sc.get("hl_at", ba + 1.6); cha = sc.get("chip_at", ha + 1.2)
+    text_a(img, (W / 2, 330), typed(sc.get("kicker", ""), prog(t, 0.1, 0.5)), F("mono", 32), T["accent"], 1, "mm", shadow=4)
+    x0, xm = 330, W - 150; sc_max = 50.0
+    for i, (lab, v) in enumerate(sc.get("bars", [])):
+        y = 470 + i * 150; q = ease(clamp((t - ba - i * 0.25) / 0.8)); hl = (lab == sc.get("hl"))
+        col = T["alert"] if (hl and t >= ha) else (T["accent"] if i < 2 else (120, 116, 100))
+        text_a(img, (x0 - 24, y), lab, fit_font("disp", 50, lab, 260, "Black"), WHITE if (not hl or t < ha) else T["alert"], clamp((t - ba - i * 0.25) / 0.3), "rm")
+        bw = (xm - x0) * v / sc_max * q
+        rect_a(img, (x0, y - 42, x0 + max(8, bw), y + 42), col, clamp((t - ba - i * 0.25) / 0.3), 14)
+        text_a(img, (x0 + bw + 20, y), f"{v * q:.1f}%", F("anton", 60), WHITE, clamp((t - ba - i * 0.25) / 0.3), "lm", shadow=4)
+        if hl and t >= ha:
+            pa = 0.5 + 0.5 * math.sin((t - ha) * 6)
+            rect_a(img, (x0 - 290, y - 58, xm + 40, y + 58), None, 0.5 + 0.5 * pa, 20, T["alert"], 4)
+    if t >= cha:
+        q = back(clamp((t - cha) / 0.45)); s = sc.get("chip", "")
+        f = fit_font("disp", 50, s, W - 220, "Black"); w = ImageDraw.Draw(img).textlength(s, font=f)
+        rect_a(img, (W / 2 - w / 2 - 34, 1060, W / 2 + w / 2 + 34, 1160), T["alert"], clamp((t - cha) / 0.2), 26)
+        text_a(img, (W / 2, 1110), s, f, WHITE, clamp((t - cha) / 0.2), "mm")
+    for i, ln in enumerate(sc.get("lines", [])):
+        rise_line(img, ln, W / 2, 1260 + i * 70, fit_font("disp", 48, ln, W - 120, "Bold"), t - cha - 0.5)
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"scanpay": sc_scanpay, "keys": sc_keys, "pricefall": sc_pricefall, "qrshops": sc_qrshops,
+                   "network": sc_network, "share": sc_share})
 
 if __name__ == "__main__":
     R.main()

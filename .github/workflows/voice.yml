@@ -6,6 +6,7 @@ on:
   push:
     branches: [master]
     paths: ["voice/requests/**.json"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -51,13 +52,17 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python tools/v2/uu_voice_parler.py --shard ${{ matrix.shard }} --of 8
-      - uses: actions/upload-artifact@v4
+      - name: Commit this shard's files
+        # Each shard pushes only its own new wav files (no artifacts: uploading all of voice/out hit the storage quota).
         if: always()
-        with:
-          name: voice-${{ matrix.shard }}
-          path: voice/out
-          if-no-files-found: ignore
-          retention-days: 3
+        run: |
+          git config user.name "uu-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add voice/out || true
+          git diff --cached --quiet && exit 0
+          git commit -q -m "Voice shard ${{ matrix.shard }} [skip ci]"
+          for i in 1 2 3 4 5 6 7 8 9 10; do git pull -q --rebase && git push -q && exit 0; sleep $((RANDOM % 9 + 3)); done
+          exit 1
 
   commit:
     needs: tts
@@ -70,11 +75,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: voice-*
-          path: voice/out
-          merge-multiple: true
       - name: Write done markers
         run: |
           pip install --quiet soundfile numpy
