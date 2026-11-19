@@ -897,7 +897,7 @@ def sc_scanpay(img, sc, t, D, tg, k):
         text_a(img, (W / 2, 1160), s, F("anton", 150), WHITE, ca, "mm", shadow=12)
         text_a(img, (W / 2, 1265), sc.get("label", ""), fit_font("disp", 46, sc.get("label", ""), W - 140, "Black"), T["accent2"], ca, "mm")
     for i, ln in enumerate(sc.get("lines", [])):
-        rise_line(img, ln, W / 2, 1370 + i * 70, fit_font("disp", 54, ln, W - 120, "Bold"), t - cnt - 1.2 - i * 0.5)
+        rise_line(img, ln, W / 2, 1370 + i * 70, fit_font("disp", 54, ln, W - 120, "Bold"), t - sc.get("lines_at", cnt + 1.2) - i * 0.5)
     chrome(img, tg, a)
 
 def key_icon(w, col):

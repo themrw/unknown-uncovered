@@ -9,6 +9,7 @@ spec["thumb"] = {
   "sticker": "भारत कहाँ?",                       # curiosity sticker
   "highlight": ["CN", "IN"], "view": [25, 80],  # glowing countries (red, unnamed) and globe centre
   "mystery": ["GB", "PK", "KP", "IN", "CN"]     # silhouette flags with "?" (no answers given away)
+  "img": "path.jpg", "shade": 0.3               # story topics: background image (repo-relative or absolute), darkening factor
 }
 Key content stays inside the central 1080x1440 (y 240..1680) so the Instagram grid crop keeps it.
 """
@@ -52,7 +53,7 @@ elif TH.get("img"):   # story topics: a real photo as the background instead of 
     ox = int((ph.width - W) * TH.get("img_x", 0.5)); ph = ph.crop((ox, (ph.height - H) // 2, ox + W, (ph.height - H) // 2 + H)).convert("RGBA")
     shade = Image.new("RGBA", (W, H), (0, 0, 0, 0)); sd = ImageDraw.Draw(shade)
     for y in range(H):   # dark at the top (hook) and bottom (number), lighter in the middle
-        a = 0.45 + 0.5 * max(0, 1 - y / 760) ** 1.2 + 0.5 * max(0, (y - 1000) / 920) ** 1.1
+        a = (0.45 + 0.5 * max(0, 1 - y / 760) ** 1.2 + 0.5 * max(0, (y - 1000) / 920) ** 1.1) * TH.get("shade", 1.0)
         sd.line([(0, y), (W, y)], fill=T["bg"] + (int(255 * min(0.95, a)),))
     ph.alpha_composite(shade); img = ph
     if TH.get("vignette"):

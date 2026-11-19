@@ -1,0 +1,48 @@
+import json, os
+P = "media/015_upi/"
+sc = []
+def add(**k): sc.append(k)
+add(type="scanpay", kicker="OCTOBER 2026 · NPCI DATA", number="25.47 BILLION", label="UPI PAYMENTS IN ONE MONTH",
+    lines=["49% of the world's real-time payments", "are made in India"],
+    vo="पिछले महीने, भारत में पच्चीस अरब से ज़्यादा यूपीआई पेमेंट हुए। दुनिया के लगभग आधे रियल-टाइम पेमेंट, अकेले भारत में होते हैं। पर ये हुआ कैसे?")
+add(type="keys", kicker="THE POPULAR ANSWER", keys=[["JIO", "CHEAP DATA"], ["PAYTM", "QR CODE"], ["?", "???"]],
+    lines=["right… but incomplete", "there is a third key"],
+    vo="ज़्यादातर लोग कहेंगे, जियो और पेटीएम। जवाब सही है, पर अधूरा। इस ताले में तीन चाबियाँ लगीं, और तीसरी चाबी, किसी को दिखती ही नहीं।")
+add(type="pricefall", kicker="KEY 1 · SEPT 2016 · JIO", p0=228, p1=7.9, plabel="₹ PER GB OF MOBILE DATA", u0=0.2, u1=25.7,
+    ulabel="GB USED PER PERSON / MONTH", lines=["internet in every hand"],
+    vo="पहली चाबी, सस्ता इंटरनेट। दो हज़ार सोलह में जियो आया, और एक जीबी डेटा, दो सौ अट्ठाईस रुपये से गिरकर, लगभग आठ रुपये का हो गया। इंटरनेट, हर हाथ में पहुँच गया।")
+add(type="qrshops", kicker="KEY 2 · 2015 · PAYTM", big="QR CODE",
+    lines=["a sticker, no card machine needed", "then came the 2019 Soundbox"],
+    vo="दूसरी चाबी, क्यूआर कोड। दो हज़ार पंद्रह में पेटीएम ने, दुकानों पर बिना मशीन के, क्यूआर से पेमेंट शुरू किया। नोटबंदी के बाद, एक महीने में उसके मर्चेंट लगभग दोगुने हो गए।")
+add(type="network", kicker="KEY 3 · APRIL 2016 · NPCI", hub="UPI",
+    banks=["700+ BANKS", "PUBLIC", "PRIVATE", "SMALL", "CO-OP"], apps=["PhonePe", "Google Pay", "Paytm", "BHIM", "+ MORE"],
+    lines=["one road between every bank and every app"],
+    vo="पर असली ताक़त, तीसरी चाबी में थी, यूपीआई। दो हज़ार सोलह में एनपीसीआई ने एक ऐसा रास्ता बनाया, जो हर बैंक और हर ऐप को जोड़ता है। किसी भी ऐप से, किसी भी खाते में, सेकंडों में।")
+add(type="photo", img=P + "phone_2.jpg", dark=0.3, kicker="1 JAN 2020 · ZERO MDR", big="₹0 FEE",
+    lines=["for shopkeepers on UPI", "76 crore+ UPI QR codes (RBI, March 2026)"],
+    vo="और दो हज़ार बीस से, यूपीआई पेमेंट पर दुकानदार से कोई फ़ीस नहीं ली गई। आज देश में, छिहत्तर करोड़ से ज़्यादा यूपीआई क्यूआर कोड लगे हैं।")
+add(type="share", kicker="THE TWIST · UPI SHARE, SEPT 2026",
+    bars=[["PhonePe", 45.6], ["Google Pay", 32.2], ["Paytm", 8.1], ["Others", 14.1]], hl="Paytm",
+    chip="Paytm: 13.1% (Dec 2023) → 8.1%", lines=["after RBI action on Paytm Payments Bank, 2024"],
+    vo="पर मोड़ ये है। जिस पेटीएम ने हर दुकान तक क्यूआर पहुँचाया, आज यूपीआई में उसका हिस्सा, बस आठ प्रतिशत है। दो हज़ार चौबीस में, उसके बैंक पर आरबीआई की कार्रवाई के बाद ये गिरा, और अब आगे हैं, फ़ोनपे और गूगल पे।")
+add(type="outro", highlight="IN", lines=[["JIO + QR + UPI", "accent"], ["Should UPI stay free?", "WHITE"], ["Tell us in the comments", "accent2"]],
+    vo="अब बड़े दुकानदारों के, कुछ बड़े पेमेंट पर, फ़ीस का प्रस्ताव है। क्या यूपीआई मुफ़्त रहना चाहिए? ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।")
+old = json.load(open("spec.json")) if os.path.exists("spec.json") else {}
+spec = {"format": "story", "theme": "money", "look": "cinematic", "grain": 0.1, "tts": "parler", "speed": 1.06,
+        "lead": 0.2, "tail": 0.35,
+        "header": "HOW INDIA BECAME NO.1 IN REAL-TIME PAYMENTS",
+        "source": "Sources: NPCI · RBI · ACI Worldwide · IMF · Jio/TRAI data · company filings",
+        "ticker": "  OCT 2026: 25.47 BN UPI PAYMENTS   ///   49% OF THE WORLD'S REAL-TIME PAYMENTS   ///   ₹228 → ₹7.9 PER GB   ///   1 JAN 2020: ZERO MDR ON UPI   ///   76 CRORE+ UPI QR CODES   ///",
+        "credits_from": [P + "credits.json"], "scenes": sc}
+spec["thumb"] = {"img": "/home/claude/work/015/thumb_bg.jpg", "vignette": False, "shade": 0.25,
+                 "hook": ["भारत पेमेंट में", "नंबर 1 कैसे बना?"],
+                 "number": "25.47 BN", "number_label": "UPI PAYMENTS IN ONE MONTH · OCT 2026",
+                 "sticker": "तीसरी चाबी?", "highlight": [], "mystery": []}
+for k in ("voice_job",):  # 015_mix = 015_main + 015_fix (03, 06, 07)
+    if k in old: spec[k] = old[k]
+for i, s in enumerate(old.get("scenes", [])):          # keep timing keys set after the voice
+    if i < len(sc):
+        for kk, v in s.items():
+            if kk.endswith("_at") and kk not in sc[i]: sc[i][kk] = v
+json.dump(spec, open("spec.json", "w"), ensure_ascii=False, indent=1)
+print(sum(len(s["vo"]) for s in sc), "chars;", [len(s["vo"]) for s in sc])
