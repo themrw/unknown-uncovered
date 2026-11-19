@@ -1,0 +1,6 @@
+{"items": [
+ {"id": "qrpay", "search": "QR code payment", "n": 4},
+ {"id": "upi", "search": "Unified Payments Interface", "n": 4},
+ {"id": "paytm", "search": "Paytm", "n": 4},
+ {"id": "bhim", "search": "BHIM UPI", "n": 3}
+]}
