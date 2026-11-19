@@ -1,0 +1,3 @@
+200 https://data.humdata.org/dataset/ecff7e31-055a-42bd-a7dd-0fae97baaf6a/resource/4610526b-864b-4688-8a0b-98fe98dba4c8/download/dpo-uclatest.csv
+200 https://data.humdata.org/dataset/76d1790e-1303-4284-a245-e9093419e357/resource/ee990c5a-f9c0-418c-bc1c-de4d90b60544/download/dpo-uchistorical.csv
+200 https://data.humdata.org/api/3/action/package_search?q=peacekeeping%20fatalities&rows=5
