@@ -45,8 +45,64 @@ music += lp(pad, 3000) * 0.006
 ranks = [i for i, sc in enumerate(spec["scenes"]) if sc["type"] == "rank"]
 outro = [i for i, sc in enumerate(spec["scenes"]) if sc["type"] == "outro"]
 t_end_beats = ST[outro[0]] if outro else T
+def chime(L=2.2, f0=1568.0):
+    """Bright metallic clink (gold): inharmonic partials with fast decay."""
+    t = np.arange(int(L * SR)) / SR; y = np.zeros_like(t)
+    for m, a, d in ((1, 1.0, 3.0), (2.76, 0.5, 4.5), (5.4, 0.25, 6), (8.9, 0.12, 8)):
+        y += a * np.sin(2 * np.pi * f0 * m * t) * np.exp(-d * t)
+    return y / np.max(np.abs(y))
+film = any(sc["type"] == "toon" for sc in spec["scenes"])
+def pluck(f, L=1.6, bright=1.0):
+    """Plucked string (sitar/tanpura-like): harmonics with faster decay up the series, a little jawari buzz."""
+    tt = np.arange(int(L * SR)) / SR; y = np.zeros_like(tt)
+    for k in range(1, 12):
+        y += np.sin(2 * np.pi * f * k * (1 + 0.0007 * k) * tt) * (0.9 ** k) * np.exp(-tt * (1.2 + 0.9 * k / bright))
+    return y * np.minimum(1, tt / 0.004) / 3
+if film:   # proud period-film score: tanpura drone, sitar-like phrases, brass swells on the big moments
+    music *= 0.4
+    sa = 130.81; tan = [sa * 1.5, sa * 2, sa * 2, sa]; tt = 0.2; j = 0
+    while tt < T:
+        add(music, pluck(tan[j % 4], 2.6, 0.6), tt, 0.10); tt += 1.15; j += 1
+    scale = [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8, 2]
+    phr = [[0, 2, 4, 5, 4], [4, 5, 7, 5, 4, 2], [2, 4, 2, 1, 0], [4, 4, 5, 4, 2, 1, 2], [7, 5, 4, 5, 4, 2, 0]]
+    mood = {"river": 0.35, "teagarden": 0.45, "measure": 0.6, "office": 0.6}
+    for i, sc in enumerate(spec["scenes"]):
+        g = mood.get(sc.get("set"), 1.0); tt = ST[i] + 0.4; p = i
+        while tt < ST[i + 1] - 1.0:
+            for k, nidx in enumerate(phr[p % len(phr)]):
+                add(music, pluck(sa * 2 * scale[nidx] * (0.5 if sc.get("set") in ("river", "teagarden") else 1), 1.4), tt, 0.07 * g)
+                tt += 0.36 if k % 3 != 2 else 0.54
+            tt += 1.6; p += 1
+    for i, sc in enumerate(spec["scenes"]):
+        st = sc.get("set")
+        if st in ("credit", "finale", "writers"):   # warm brass-like chord swell
+            L = D[i]; ch = sum(saw(f, L, 7) for f in (sa / 2, sa * 0.75, sa, sa * 1.25, sa * 1.5)); tq = np.arange(len(ch)) / SR
+            add(music, lp(ch, 1800) * np.minimum(1, tq / 2.5) * np.minimum(1, (L - tq) / 2.0), ST[i], 0.03)
+        if st in ("street", "finale"):   # horse carriage: clip-clop
+            hoof = bp(rng.standard_normal(int(0.05 * SR)), 300, 2500) * np.exp(-np.arange(int(0.05 * SR)) / SR * 70)
+            tq = 0.3
+            while tq < D[i] - 0.3: add(music, hoof, ST[i] + tq, 0.10); add(music, hoof, ST[i] + tq + 0.17, 0.07); tq += 0.55
+        if st == "office":   # ceiling fan hum
+            seg = np.arange(int(D[i] * SR)) / SR; add(music, lp(rng.standard_normal(len(seg)), 400) * (0.7 + 0.3 * np.sin(2 * np.pi * 3 * 3 / 6.28 * seg)), ST[i], 0.04)
+        if st == "teagarden":   # rain
+            seg = int(D[i] * SR); add(music, bp(rng.standard_normal(seg), 1500, 7000) * np.minimum(1, np.arange(seg) / SR / 1.0), ST[i], 0.05)
+        if st == "telegraph":   # morse key
+            L = int(0.09 * SR); tp = np.arange(L) / SR; beep = np.sin(2 * np.pi * 750 * tp) * np.minimum(1, tp / 0.004)
+            tq = 0.6
+            while tq < D[i] - 0.5: add(music, beep[: int(L * (2.6 if rng.random() < 0.4 else 1)) if False else L], ST[i] + tq, 0.05); tq += rng.choice([0.14, 0.14, 0.32, 0.5])
+        if st == "committee" and sc.get("stamp_at") is not None: add(music, boom(1.0, 60, 7, 1.2), ST[i] + sc["stamp_at"] + 0.3, 0.9)
+        if st == "court" and sc.get("hit_at") is not None:
+            add(music, boom(0.8, 70, 6, 1.2), ST[i] + sc["hit_at"] - 0.05, 0.8); add(music, chime(2.0, 1046.5), ST[i] + sc["hit_at"] + 0.1, 0.12)
+        if st == "drawers" and sc.get("drawer_at") is not None: add(music, boom(0.6, 80, 5, 1.5), ST[i] + sc["drawer_at"], 0.6)
+        if st == "credit":
+            if sc.get("medal_at") is not None: add(music, chime(2.0, 1568), ST[i] + sc["medal_at"], 0.12)
+            if sc.get("reveal_at") is not None: add(music, riser(1.2), ST[i] + sc["reveal_at"] - 1.2, 0.3); add(music, boom(1.0, 80, 3, 2.5), ST[i] + sc["reveal_at"], 0.7)
+        if st == "london":   # Big Ben-ish bell
+            add(music, chime(4.0, 392.0), ST[i] + 0.5, 0.10)
+        if st == "measure":
+            for at in sc.get("panel_at", []): add(music, boom(0.4, 90, 8, 0.8), ST[i] + at, 0.4)
 # heartbeat, faster as the countdown approaches #1
-bt = 0.6
+bt = 0.6 if not film else T
 while bt < t_end_beats - 0.5:
     k = sum(1 for i in ranks if ST[i] <= bt)
     bpm = 66 + 6 * k
@@ -71,12 +127,6 @@ if theme == "corporate":
     tt = 0.5
     while tt < t_end_beats:
         add(music, tick if int(tt) % 2 == 0 else tock, tt, 0.16); tt += 1.0
-def chime(L=2.2, f0=1568.0):
-    """Bright metallic clink (gold): inharmonic partials with fast decay."""
-    t = np.arange(int(L * SR)) / SR; y = np.zeros_like(t)
-    for m, a, d in ((1, 1.0, 3.0), (2.76, 0.5, 4.5), (5.4, 0.25, 6), (8.9, 0.12, 8)):
-        y += a * np.sin(2 * np.pi * f0 * m * t) * np.exp(-d * t)
-    return y / np.max(np.abs(y))
 if theme == "gold":
     reveals = [ST[i] + spec["scenes"][i].get("reveal_at", 1.4) for i in ranks]
     for i, sc in enumerate(spec["scenes"]):
@@ -121,7 +171,7 @@ for i, sc in enumerate(spec["scenes"]):
         if sc.get("drawer_at") is not None: add(music, boom(0.6, 80, 5, 1.5), ST[i] + sc["drawer_at"], 0.6)
     if sc["type"] == "spread":   # a ping per destination
         L = int(1.0 * SR); tp = np.arange(L) / SR; ping = np.sin(2 * np.pi * 1320 * tp) * np.exp(-tp * 6)
-        for r in sc.get("routes", []): add(music, ping, ST[i] + r[2], 0.12)
+        for r in sc.get("routes", []): add(music, ping, ST[i] + (r[3] if len(r) > 4 else r[2]), 0.12)
     if sc["type"] == "satellite":   # sonar pings while the satellite sweeps
         L = int(1.2 * SR); tp = np.arange(L) / SR
         ping = np.sin(2 * np.pi * 1760 * tp) * np.exp(-tp * 5)
