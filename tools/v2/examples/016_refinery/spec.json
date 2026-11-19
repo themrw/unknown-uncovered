@@ -267,17 +267,16 @@
    "IN",
    "CN"
   ],
-  "view": [
-   30,
-   90
-  ],
   "mystery": [
    "KR",
    "IN",
    "RU",
    "US",
    "CN"
-  ]
+  ],
+  "img": "/home/claude/work/016/thumb_bg.jpg",
+  "vignette": false,
+  "shade": 0.35
  },
  "voice_job": "016_main"
 }
