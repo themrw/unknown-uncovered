@@ -23,6 +23,13 @@ DESC = ("Aman speaks with a confident, expressive and engaging tone at a moderat
 POLISH = {"parler": "highpass=f=60,lowpass=f=15000,equalizer=f=220:t=q:w=1:g=1.5,acompressor=threshold=-22dB:ratio=2.5:attack=8:release=150:makeup=2",
           "kokoro": "highpass=f=70,lowpass=f=12000,equalizer=f=200:t=q:w=1:g=2,acompressor=threshold=-20dB:ratio=3:attack=5:release=120:makeup=3"}[engine]
 
+# Pronunciation fixes applied to every Parler request. The channel name is read correctly only in Latin letters
+# (tested Nov 2026: "अननोन अनकवर्ड" and other Devanagari spellings came out wrong; "Unknown Uncovered" was right).
+SAY = {"अननोन अनकवर्ड": "Unknown Uncovered", "अन्नोन अन्कवर्ड": "Unknown Uncovered", "अन-नोन अन-कवर्ड": "Unknown Uncovered"}
+def say(text):
+    for a, b in SAY.items(): text = text.replace(a, b)
+    return text
+
 def trim(a, sr, thr=0.01, pad=0.05):
     idx = np.where(np.abs(a) > thr)[0]
     if len(idx) == 0: return a
@@ -31,7 +38,7 @@ def trim(a, sr, thr=0.01, pad=0.05):
 if len(sys.argv) > 3 and sys.argv[2] == "request":
     job = sys.argv[3]
     req = {"description": spec.get("voice_desc", DESC), "seed": spec.get("voice_seed", 7),
-           "items": [{"name": f"{i:02d}", "text": sc["vo"]} for i, sc in enumerate(spec["scenes"])]}
+           "items": [{"name": f"{i:02d}", "text": say(sc["vo"])} for i, sc in enumerate(spec["scenes"])]}
     p = os.path.join(REPO, "voice", "requests", f"{job}.json"); os.makedirs(os.path.dirname(p), exist_ok=True)
     json.dump(req, open(p, "w"), ensure_ascii=False, indent=1)
     spec["voice_job"] = job; json.dump(spec, open(spec_path, "w"), ensure_ascii=False, indent=1)
