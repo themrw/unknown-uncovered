@@ -1,0 +1,283 @@
+{
+ "theme": "oil",
+ "tts": "parler",
+ "speed": 1.05,
+ "lead": 0.2,
+ "tail": 0.35,
+ "header": "WHO REFINES THE WORLD'S OIL?",
+ "source": "Sources: Energy Institute Statistical Review 2026 · BNEF · EIA · IEA",
+ "ticker": "  REFINING CAPACITY 2025, THOUSAND BARRELS/DAY   ///   CHINA 18,829 · USA 18,172 · RUSSIA 6,718 · INDIA 4,924 · S. KOREA 3,570   ///   WORLD 103,756 (−0.3%)   ///",
+ "scenes": [
+  {
+   "type": "hook",
+   "min": 5.0,
+   "file": [
+    "> FILE 016 // REFINERY POWERS",
+    "> STATUS: WORLD CAPACITY FALLING",
+    "> SOURCE: ENERGY INSTITUTE 2026"
+   ],
+   "title": [
+    [
+     "THE WORLD IS",
+     "WHITE"
+    ],
+    [
+     "SHUTTING",
+     "WHITE"
+    ],
+    [
+     "REFINERIES.",
+     "accent"
+    ]
+   ],
+   "title_at": 1.2,
+   "blips": [
+    [
+     51,
+     0
+    ],
+    [
+     29.7,
+     -95.3
+    ],
+    [
+     34,
+     -118
+    ],
+    [
+     22,
+     70
+    ],
+    [
+     35,
+     119
+    ]
+   ],
+   "vo": "दुनिया भर में, तेल रिफाइनरियाँ बंद हो रही हैं। दो हज़ार पच्चीस में, दुनिया की रिफाइनिंग क्षमता, दो हज़ार इक्कीस के बाद पहली बार घटी। पर दो देश, ठीक उल्टा कर रहे हैं।"
+  },
+  {
+   "type": "tease",
+   "min": 4.5,
+   "kicker": "> WORLD REFINING CAPACITY, END-2025",
+   "big": "103.8M",
+   "big_label": "BARRELS OF CRUDE A DAY",
+   "hook": "Who refines the most?",
+   "cards": 5,
+   "vo": "आज दुनिया हर दिन, दस करोड़ से ज़्यादा बैरल कच्चा तेल रिफाइन कर सकती है। पर सबसे बड़ा हिस्सा किसका है? चलिए, टॉप फ़ाइव गिनते हैं।"
+  },
+  {
+   "type": "rank",
+   "rank": 5,
+   "code": "KR",
+   "name": "SOUTH KOREA",
+   "sub": "Ulsan · Yeosu",
+   "tag": "ALMOST NO OIL OF ITS OWN",
+   "to": 3570,
+   "to_label": "3,570",
+   "fact": [
+    "imports nearly all its crude,",
+    "two of the world's biggest plants"
+   ],
+   "from_label": "Refining capacity:",
+   "unit": "K BARRELS/DAY",
+   "delta": "",
+   "vo": "नंबर पाँच, दक्षिण कोरिया। अपना तेल लगभग न के बराबर, फिर भी हर दिन पैंतीस लाख बैरल से ज़्यादा की क्षमता।",
+   "from": 0,
+   "reveal_at": 0.8
+  },
+  {
+   "type": "rank",
+   "rank": 4,
+   "code": "IN",
+   "name": "INDIA",
+   "sub": "Jamnagar, Gujarat",
+   "tag": "WORLD'S LARGEST SINGLE SITE",
+   "to": 4924,
+   "to_label": "4,924",
+   "fact": [
+    "Jamnagar alone: 1.4 million",
+    "barrels a day"
+   ],
+   "from_label": "Refining capacity:",
+   "unit": "K BARRELS/DAY",
+   "delta": "",
+   "vo": "नंबर चार, भारत। लगभग उनचास लाख बैरल रोज़। और दुनिया की सबसे बड़ी अकेली रिफाइनरी, गुजरात का जामनगर, भारत में ही है।",
+   "from": 0,
+   "reveal_at": 0.82
+  },
+  {
+   "type": "rank",
+   "rank": 3,
+   "code": "RU",
+   "name": "RUSSIA",
+   "sub": "6.5% of world capacity",
+   "tag": "NUMBER THREE",
+   "to": 6718,
+   "to_label": "6,718",
+   "fact": [
+    "about 1 in 15 barrels",
+    "of world capacity"
+   ],
+   "from_label": "Refining capacity:",
+   "unit": "K BARRELS/DAY",
+   "delta": "",
+   "vo": "नंबर तीन, रूस। सड़सठ लाख बैरल रोज़, यानी दुनिया की क्षमता का, साढ़े छह प्रतिशत।",
+   "from": 0,
+   "reveal_at": 0.81
+  },
+  {
+   "type": "rank",
+   "rank": 2,
+   "code": "US",
+   "name": "USA",
+   "sub": "capacity −1.3% in 2025",
+   "tag": "CLOSING PLANTS",
+   "to": 18172,
+   "to_label": "18,172",
+   "fact": [
+    "shut: Houston (Mar 2025),",
+    "Los Angeles (Oct 2025)"
+   ],
+   "from_label": "Refining capacity:",
+   "unit": "K BARRELS/DAY",
+   "delta": "",
+   "vo": "नंबर दो, अमेरिका। एक करोड़ इक्यासी लाख बैरल। पर यहाँ ह्यूस्टन और लॉस एंजेलिस की, बड़ी रिफाइनरियाँ बंद हो चुकी हैं।",
+   "from": 0,
+   "reveal_at": 0.62
+  },
+  {
+   "type": "rank",
+   "rank": 1,
+   "code": "CN",
+   "name": "CHINA",
+   "sub": "18.1% of world capacity",
+   "tag": "STILL BUILDING",
+   "to": 18829,
+   "to_label": "18,829",
+   "fact": [
+    "ahead of the USA",
+    "and still adding"
+   ],
+   "reveal_at": 0.93,
+   "from_label": "Refining capacity:",
+   "unit": "K BARRELS/DAY",
+   "delta": "",
+   "vo": "और नंबर एक, चीन। एक करोड़ अट्ठासी लाख बैरल रोज़, अमेरिका से भी आगे।",
+   "from": 0
+  },
+  {
+   "type": "stat",
+   "twist": true,
+   "view": [
+    28,
+    95
+   ],
+   "highlight": [
+    "IN",
+    "CN"
+   ],
+   "kicker": "> BUT HERE IS THE TWIST",
+   "value": 71,
+   "fmt": "{:.0f}%",
+   "label": "OF NEW CAPACITY, 2026–27",
+   "items": [
+    [
+     "India + China",
+     "share of new refining capacity (BNEF)"
+    ],
+    [
+     "−478,000",
+     "barrels/day Europe lost in 2025"
+    ],
+    [
+     "4.2M",
+     "barrels/day to be added worldwide, 2026–30"
+    ]
+   ],
+   "vo": "पर असली कहानी यहाँ है। पिछले साल यूरोप ने, चार लाख अठहत्तर हज़ार बैरल रोज़ की क्षमता खो दी। जबकि दो हज़ार छब्बीस और सत्ताईस में, दुनिया में जुड़ने वाली नई क्षमता का, इकहत्तर प्रतिशत, सिर्फ़ भारत और चीन में होगा।"
+  },
+  {
+   "type": "bars",
+   "title": "WHO REFINES MOST?",
+   "kicker": "> thousand barrels/day, end-2025",
+   "rows": [
+    [
+     "CN",
+     "China",
+     18829,
+     "18,829"
+    ],
+    [
+     "US",
+     "USA",
+     18172,
+     "18,172"
+    ],
+    [
+     "RU",
+     "Russia",
+     6718,
+     "6,718"
+    ],
+    [
+     "IN",
+     "India",
+     4924,
+     "4,924"
+    ],
+    [
+     "KR",
+     "South Korea",
+     3570,
+     "3,570"
+    ]
+   ],
+   "note": "Energy Institute, Statistical Review 2026",
+   "vo": "यानी पुरानी रिफाइनरियाँ पश्चिम में बंद हो रही हैं, और नई, एशिया में बन रही हैं।"
+  },
+  {
+   "type": "outro",
+   "min": 8.5,
+   "highlight": [
+    "IN",
+    "CN"
+   ],
+   "lines": [
+    [
+     "Old refineries close.",
+     "WHITE"
+    ],
+    [
+     "New ones rise in Asia.",
+     "accent"
+    ]
+   ],
+   "vo": "क्या भारत, एक दिन रिफाइनिंग में चीन को टक्कर देगा? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, अननोन अनकवर्ड को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "thumb": {
+  "hook": [
+   "रिफाइनरियाँ बंद,",
+   "पर 2 देश बना रहे!"
+  ],
+  "number": "71%",
+  "number_label": "OF NEW REFINING CAPACITY: JUST 2 COUNTRIES",
+  "sticker": "भारत कहाँ?",
+  "highlight": [
+   "IN",
+   "CN"
+  ],
+  "view": [
+   30,
+   90
+  ],
+  "mystery": [
+   "KR",
+   "IN",
+   "RU",
+   "US",
+   "CN"
+  ]
+ },
+ "voice_job": "016_main"
+}
