@@ -1,0 +1,18 @@
+{
+ "description": "Aman speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. The recording is very high quality, with the voice sounding clear and very close up, with no background noise.",
+ "seed": 7,
+ "items": [
+  {
+   "name": "00",
+   "text": "दुनिया जंग रोकने के लिए किसके सैनिकों पर सबसे ज़्यादा भरोसा करती है?"
+  },
+  {
+   "name": "01",
+   "text": "पाँचवाँ पाकिस्तान, चौथा बांग्लादेश, तीसरा रवांडा, दूसरा भारत, और नंबर एक नेपाल: भारत से सिर्फ़ पच्चीस ज़्यादा!"
+  },
+  {
+   "name": "02",
+   "text": "भारत ने सबसे ज़्यादा जवान भी खोए हैं। पूरी वीडियो, यूट्यूब पर देखें।"
+  }
+ ]
+}

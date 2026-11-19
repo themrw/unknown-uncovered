@@ -41,6 +41,8 @@ THEMES = {
                     land=(48, 38, 26), land_edge=(120, 95, 60), ocean=(20, 15, 10), part=(240, 210, 160), motif="parchment"),
     "forensic": dict(bg=(5, 10, 14), glow=(12, 58, 66), accent=(90, 228, 220), accent2=(255, 196, 96), alert=(240, 62, 72),
                      land=(20, 36, 42), land_edge=(60, 130, 135), ocean=(6, 12, 16), part=(160, 240, 235), motif="fingerprint"),
+    "peace": dict(bg=(4, 9, 16), glow=(18, 56, 100), accent=(100, 185, 255), accent2=(255, 214, 120), alert=(255, 120, 60),
+                  land=(22, 34, 48), land_edge=(80, 130, 180), ocean=(6, 14, 26), part=(150, 210, 255), motif="laurel"),
     "oil": dict(bg=(7, 6, 6), glow=(88, 34, 8), accent=(255, 150, 40), accent2=(120, 200, 215), alert=(240, 60, 50),
                 land=(34, 26, 20), land_edge=(130, 90, 55), ocean=(10, 9, 10), part=(255, 170, 90), motif="refinery"),
 }
@@ -282,6 +284,18 @@ def motif_img(R):
         d.ellipse([c + R * 0.42, base - R * 0.5, c + R * 0.95, base], outline=col, width=lw)
         d.line([c + R * 0.88, base, c + R * 0.88, c - R * 0.9], fill=col, width=lw)
         d.polygon([(c + R * 0.88, c - R * 1.15), (c + R * 0.8, c - R * 0.92), (c + R * 0.96, c - R * 0.92)], fill=T["alert"] + (255,))
+    elif T["motif"] == "laurel":   # two olive branches around a globe, outline (peacekeeping)
+        lw = max(3, R // 22); r0 = R * 0.52
+        d.ellipse([c - r0, c - r0, c + r0, c + r0], outline=col, width=lw)
+        d.line([c - r0, c, c + r0, c], fill=col, width=max(2, lw // 2))
+        d.ellipse([c - r0 * 0.45, c - r0, c + r0 * 0.45, c + r0], outline=col, width=max(2, lw // 2))
+        for sgn in (-1, 1):
+            pts = [(c + sgn * R * 0.86 * math.sin(math.radians(a)), c + R * 0.86 * math.cos(math.radians(a))) for a in range(20, 160, 6)]
+            d.line(pts, fill=col, width=lw)
+            for j, (x, y) in enumerate(pts[1::3]):
+                a = math.radians(20 + (j * 3 + 1) * 6); ox, oy = sgn * math.cos(a), -math.sin(a)
+                lx, ly = x + ox * R * 0.13 + sgn * R * 0.04, y + oy * R * 0.13
+                d.ellipse([lx - R * 0.07, ly - R * 0.035, lx + R * 0.07, ly + R * 0.035], outline=col, width=max(2, lw // 2))
     else:
         d.ellipse([c - R, c - R, c + R, c + R], outline=col, width=4)
     _motif[R] = im; return im

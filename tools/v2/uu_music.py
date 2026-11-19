@@ -155,6 +155,13 @@ if theme == "desert":   # desert wind: band-passed noise with slow gusts
 if theme == "oil":   # refinery: low industrial drone + slow steam hiss swells
     music += (np.sin(2 * np.pi * 49 * t) + 0.5 * np.sin(2 * np.pi * 98.3 * t)) * 0.02 * (0.7 + 0.3 * np.sin(2 * np.pi * t * 0.11))
     music += hp(rng.standard_normal(n), 3000) * 0.012 * np.clip(np.sin(2 * np.pi * t / 9.0), 0, 1) ** 3
+if theme == "peace":   # warm, hopeful: major pad swell + a soft parade snare roll under the countdown
+    for f in (130.81, 164.81, 196.0, 261.63):
+        music += np.sin(2 * np.pi * f * t) * 0.006 * (0.6 + 0.4 * np.sin(2 * np.pi * t * 0.05 + f))
+    sn = bp(rng.standard_normal(int(0.05 * SR)), 1500, 8000) * np.exp(-np.arange(int(0.05 * SR)) / SR * 60)
+    for i in ranks:
+        tt = ST[i] + 0.2; rev = spec["scenes"][i].get("reveal_at", 1.4)
+        while tt < ST[i] + rev: add(music, sn, tt, 0.05 + 0.08 * (tt - ST[i]) / rev); tt += 0.09
 if theme == "forensic":   # lab hum + a soft scanner tick every 2 s
     music += np.sin(2 * np.pi * 120 * t) * 0.012 * (0.6 + 0.4 * np.sin(2 * np.pi * t * 0.2))
     L = int(0.08 * SR); tp = np.arange(L) / SR; tick = np.sin(2 * np.pi * 3200 * tp) * np.exp(-tp * 60)

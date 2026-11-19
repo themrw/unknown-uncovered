@@ -1071,5 +1071,84 @@ def sc_share(img, sc, t, D, tg, k):
 R.SCENE_FN.update({"scanpay": sc_scanpay, "keys": sc_keys, "pricefall": sc_pricefall, "qrshops": sc_qrshops,
                    "network": sc_network, "share": sc_share})
 
+
+# ---------------------------------------------------------------- reel 019: peacekeeping
+def _heli(d, x, y, sc_, col, rot):
+    d.ellipse([x - 60 * sc_, y - 22 * sc_, x + 40 * sc_, y + 22 * sc_], fill=col)
+    d.polygon([(x + 30 * sc_, y - 6 * sc_), (x + 120 * sc_, y - 14 * sc_), (x + 120 * sc_, y - 2 * sc_), (x + 30 * sc_, y + 8 * sc_)], fill=col)
+    d.line([x + 118 * sc_, y - 30 * sc_, x + 118 * sc_, y + 6 * sc_], fill=col, width=max(2, int(4 * sc_)))
+    d.line([x - 10 * sc_, y - 22 * sc_, x - 10 * sc_, y - 36 * sc_], fill=col, width=max(2, int(5 * sc_)))
+    L = 110 * sc_ * abs(math.cos(rot)); d.line([x - 10 * sc_ - L, y - 38 * sc_, x - 10 * sc_ + L, y - 38 * sc_], fill=col, width=max(2, int(5 * sc_)))
+    d.line([x - 60 * sc_, y + 30 * sc_, x + 30 * sc_, y + 30 * sc_], fill=col, width=max(2, int(4 * sc_)))
+
+def sc_airlift(img, sc, t, D, tg, k):
+    """Korea 1953: helicopters lift troops from ships at sea straight to the demilitarised zone (no road through the country)."""
+    d = ImageDraw.Draw(img); top, bot = 300, 1060
+    q = clamp(t / 0.5)
+    rect_a(img, (60, top, W - 60, bot), (8, 18, 30), 0.85 * q, 26, T["accent"], 2)
+    sea_x = 330
+    d.rectangle([62, top + 2, sea_x, bot - 2], fill=(14, 40, 70, int(255 * q)))
+    for j in range(9):
+        y = top + 50 + j * 80; ph = math.sin(tg * 2 + j)
+        d.arc([80 + 10 * ph, y, 300 + 10 * ph, y + 30], 200, 340, fill=(80, 140, 200, int(200 * q)), width=3)
+    land = [(sea_x, top + 2), (W - 62, top + 2), (W - 62, bot - 2), (sea_x, bot - 2)]
+    d.polygon(land, fill=(26, 40, 32, int(255 * q)))
+    dz = W - 260
+    for y in range(top + 20, bot - 20, 34): d.line([dz, y, dz, y + 18], fill=T["alert"] + (int(255 * q),), width=6)
+    text_a(img, (dz, top + 40), "DMZ", F("anton", 52), T["alert"], q, "mm", shadow=6)
+    text_a(img, (196, bot - 40), "SHIPS", F("mono", 28), (180, 210, 240), q, "mm")
+    text_a(img, ((sea_x + dz) / 2, bot - 40), "NO PASSAGE BY ROAD", F("mono", 28), T["alert"], clamp((t - 1.2) / 0.5), "mm")
+    for j in range(3):
+        y = top + 170 + j * 220
+        d.polygon([(110, y), (290, y), (270, y + 40), (130, y + 40)], fill=(150, 160, 170, int(255 * q)))
+        d.rectangle([170, y - 34, 230, y], fill=(150, 160, 170, int(255 * q)))
+    la = sc.get("lift_at", 1.0)
+    for j in range(5):
+        p = ((t - la) / 3.2 - j * 0.22) % 1.3
+        if t < la or p > 1: continue
+        x = 200 + (dz - 140 - 200) * ease_io(p); y = top + 170 + (j % 3) * 220 - 80 - 120 * math.sin(p * math.pi) + 60 * (j // 3)
+        _heli(d, x, y, 0.75, (230, 236, 240, 255), tg * 30 + j)
+    ca = sc.get("count_at", 2.0)
+    if t > ca:
+        rect_a(img, (dz - 150, top + 280, dz + 150, top + 560), (60, 20, 16), 0.9 * clamp((t - ca) / 0.4), 18, T["alert"], 3)
+        text_a(img, (dz, top + 360), "POW", F("mono", 34), T["alert"], clamp((t - ca) / 0.4), "mm")
+        for j in range(6):
+            for i2 in range(5):
+                xx, yy = dz - 110 + i2 * 55, top + 410 + j * 22
+                d.ellipse([xx, yy, xx + 14, yy + 14], fill=(230, 210, 190, int(255 * clamp((t - ca - (j * 5 + i2) * 0.02) / 0.2))))
+    caption(img, sc, t, D, 1130)
+    chrome(img, tg)
+
+def sc_medal(img, sc, t, D, tg, k):
+    """A generic gallantry medal (not a reproduction of any real design) swinging in on its ribbon."""
+    cx, cy = W / 2, 640; q = back(clamp((t - 0.2) / 0.8)); a = clamp((t - 0.2) / 0.4)
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(glow).ellipse([cx - 360, cy - 360, cx + 360, cy + 300], fill=(255, 190, 90, int(120 * a)))
+    img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(90)))
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    d.polygon([(cx - 90, 220), (cx + 90, 220), (cx + 70, 470), (cx - 70, 470)], fill=(150, 40, 60, 255))
+    d.rectangle([cx - 20, 220, cx + 20, 470], fill=(110, 26, 44, 255))
+    d.rectangle([cx - 100, 470, cx + 100, 500], fill=(190, 150, 70, 255))
+    r = 190; my = 700
+    d.ellipse([cx - r, my - r, cx + r, my + r], fill=(176, 120, 60, 255), outline=(240, 200, 120, 255), width=10)
+    d.ellipse([cx - r + 34, my - r + 34, cx + r - 34, my + r - 34], outline=(120, 76, 34, 255), width=6)
+    for j in range(8):
+        an = j * math.pi / 4 + math.pi / 8
+        d.line([cx + 40 * math.cos(an), my + 40 * math.sin(an), cx + 120 * math.cos(an), my + 120 * math.sin(an)], fill=(240, 200, 120, 255), width=10)
+    d.ellipse([cx - 40, my - 40, cx + 40, my + 40], fill=(240, 200, 120, 255))
+    sh = int(255 * (0.25 + 0.25 * math.sin(tg * 3)))
+    d.chord([cx - r + 10, my - r + 10, cx + r - 10, my + r - 10], 200, 250, fill=(255, 240, 200, sh // 3))
+    ang = 8 * math.sin(t * 2.2) * math.exp(-t * 0.6)
+    lay = lay.rotate(ang, center=(cx, 220), resample=Image.BICUBIC)
+    s = clamp(q, 0.3, 1.1)
+    if s != 1:
+        lay = lay.resize((int(W * s), int(H * s)), Image.LANCZOS)
+        off = (int(cx - cx * s), int(220 - 220 * s)); tmp = Image.new("RGBA", (W, H), (0, 0, 0, 0)); tmp.alpha_composite(lay.crop((max(0, -off[0]), 0, max(0, -off[0]) + W, H)) if off[0] < 0 else lay, (max(0, off[0]), max(0, off[1]))); lay = tmp
+    paste_a(img, lay, (0, 0), a)
+    caption(img, sc, t, D, 1130)
+    chrome(img, tg)
+
+R.SCENE_FN.update({"airlift": sc_airlift, "medal": sc_medal})
+
 if __name__ == "__main__":
     R.main()
