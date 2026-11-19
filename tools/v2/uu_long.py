@@ -25,6 +25,15 @@ Scene types (all fields optional unless noted):
   cartoon    {bg: drawers|board|glow, board[], card, glass, kicker, big, lines}  the two cartoon sub-inspectors (uu_cartoon.py), text left
   patterns   {kicker, show_at[3], count_at, whorl_at, lines, lines_at}  arch / loop / whorl + 'check your thumb' countdown
   versus     {kicker, left, right, rows[[label, left, right]], row_at, win_at, stamp, lines}  head-to-head comparison
+  duel       {kicker, big, big_label, rows[[label, value, text]], mystery[3], card_at[3]}  premise counter + bars + 3 hidden 'characters'
+  stall      {props: coins|qr|soundbox|photo, photo_at, kicker, big, lines}   Raju's tea stall (fictional cartoon), text left
+  paynet     {banks[5], apps[5], hub, link_at, address, addr_at, kicker, lines}  banks <-> UPI <-> apps network, text left
+  jio        {p0, p1, price_at, kicker, lines}                         people pouring in, then the price of 1 GB collapsing
+  qrtown     {img, town_at, chip0, chip1, chip, chip_at, kicker, lines} note-ban photo, then a town where QR stickers pop
+  walletpipe {split[2], split_at, kicker, lines}                       wallet lane vs direct UPI lane + split bar
+  soundbox   {say, chart[[label, bn]], chart_at, kicker, lines}         talking box with a Hindi bubble + first-billion chart
+  festive    {img, value, unit, label, items[[big, small]], items_at}  record month over a festive photo
+  growth     {v0, v1, y0, y1, unit, grow_at, duel[[label, value]], duel_label, visa_at, kicker}  ten-year counter + UPI vs Visa
   outro      {lines[]}                                                 closing lines + subscribe card
 Images are paths relative to $UU_REPO (default /home/claude/unknown-uncovered); credits come from spec["credits_from"].
 """
@@ -652,6 +661,274 @@ def sc_versus(img, sc, t, D, tg, k):
     chrome(img, tg, a)
 
 R.SCENE_FN.update({"cartoon": sc_cartoon, "patterns": sc_patterns, "versus": sc_versus})
+
+
+# ---------------------------------------------------------------- reel 017: the UPI story (16:9)
+def _hbar(img, x, y, w, h, frac, col, a, label, val, vf=60):
+    rect_a(img, (x, y, x + w, y + h), (30, 28, 22), 0.8 * a, h // 2)
+    rect_a(img, (x, y, x + max(h, w * frac), y + h), col, a, h // 2)
+    text_a(img, (x, y - 14), label, F("disp", 38, "Black"), WHITE, a, "ls")
+    text_a(img, (x + max(h, w * frac) + 18, y + h / 2), val, F("anton", vf), col, a, "lm", shadow=4)
+
+def sc_duel(img, sc, t, D, tg, k):
+    """Premise: the daily UPI count vs Visa, then three mystery 'characters' revealed one by one."""
+    a = ease(clamp(t / 0.5))
+    text_a(img, (120, 250), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 32), T["accent"], 1, shadow=4)
+    num = sc.get("big", ""); v = float(num.split()[0]); p = ease(clamp((t - 0.3) / 1.6))
+    text_a(img, (110, 300), f"{v * p:.0f} {' '.join(num.split()[1:])}", F("anton", 190), WHITE, clamp((t - 0.3) / 0.3), shadow=12)
+    text_a(img, (120, 530), sc.get("big_label", ""), F("disp", 44, "Black"), T["accent2"], clamp((t - 0.8) / 0.4))
+    rows = sc.get("rows", []); mx = max(r[1] for r in rows)
+    for i, (lab, val, s) in enumerate(rows):
+        q = ease(clamp((t - 1.2 - i * 0.5) / 1.0))
+        _hbar(img, 1040, 340 + i * 190, 640, 64, val / mx * q, T["accent"] if i == 0 else (150, 150, 160), clamp((t - 1.2 - i * 0.5) / 0.3), lab, s)
+    ca = sc.get("card_at", [D * 0.55, D * 0.68, D * 0.8])
+    for i, lab in enumerate(sc.get("mystery", [])):
+        x = 120 + i * 560; y = 700; on = t >= ca[i]; q = ease(clamp((t - 2.0 - i * 0.25) / 0.4))
+        if q <= 0: continue
+        rect_a(img, (x, y, x + 520, y + 190), (34, 28, 14) if on else (22, 22, 24), 0.92 * q, 22, T["accent"] if on else (80, 80, 84), 3)
+        text_a(img, (x + 40, y + 50), f"CHARACTER {i + 1}", F("mono", 26), T["accent2"] if on else MUTED, q)
+        if on:
+            f = back(clamp((t - ca[i]) / 0.4)); text_a(img, (x + 40, y + 100), lab, fit_font("anton", int(70 * clamp(f, 0.6, 1.1)), lab, 450), WHITE, q)
+        else:
+            text_a(img, (x + 40, y + 100), "? ? ?", F("anton", 70), MUTED, q)
+    chrome(img, tg, a)
+
+_stall = {}
+def sc_stall(img, sc, t, D, tg, k):
+    """Raju's tea stall (fictional character): props coins | qr | soundbox | photo."""
+    a = ease(clamp(t / 0.6)); props = tuple(sc.get("props", []))
+    photo = "photo" in props; cx, base, u = (1520, 1010, 3.7) if photo else (1340, 1010, 4.4)
+    g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(g).ellipse([cx - 560, 200, cx + 560, 1120], fill=(255, 170, 60, int(110 * a)))
+    img.alpha_composite(g.filter(ImageFilter.GaussianBlur(140)))
+    key = (props, cx, u)
+    if key not in _stall: _stall[key] = uu_cartoon.stall_layer(W, H, cx, base, u, props, S.qr_img)
+    slide = (1 - a) * 140; bob = 3 * math.sin(tg * 2)
+    paste_a(img, _stall[key], (slide, bob), a)
+    ct = base - 46 * u + bob; d = ImageDraw.Draw(img)
+    text_a(img, (cx + slide, ct + 22 * u), "राजू टी स्टॉल", F("hindi", int(13 * u)), (120, 60, 20), a, "mm")
+    st = Image.new("RGBA", (W, H), (0, 0, 0, 0)); sd = ImageDraw.Draw(st)
+    for j in range(4):                                                        # soft steam from the kettle
+        ph = (tg * 0.5 + j / 4) % 1; sx = cx - 54 * u + slide + 6 * u * math.sin(tg * 1.5 + j * 2); sy = ct - 28 * u - ph * 34 * u
+        r = 2.5 * u + ph * 5 * u; sd.ellipse([sx - r, sy - r, sx + r, sy + r], fill=(235, 235, 235, int(45 * math.sin(ph * math.pi) * a)))
+    img.alpha_composite(st.filter(ImageFilter.GaussianBlur(10)))
+    if "soundbox" in props:
+        for j in range(3):
+            ph = (tg * 0.8 + j / 3) % 1; r = 8 * u + ph * 26 * u; x0 = cx - 32 * u + slide; y0 = ct - 9 * u
+            d.ellipse([x0 - r, y0 - r, x0 + r, y0 + r], outline=T["accent2"] + (int(200 * (1 - ph) * a),), width=4)
+    if "coins" in props and int(tg * 3) % 2:
+        x0 = cx - 27 * u + slide; y0 = ct - 6 * u; d.line([x0 - 8, y0, x0 + 8, y0], fill=(255, 250, 220, 220), width=2); d.line([x0, y0 - 8, x0, y0 + 8], fill=(255, 250, 220, 220), width=2)
+    if photo:
+        pa = sc.get("photo_at", D * 0.4); q = back(clamp((t - pa) / 0.6))
+        if q > 0:
+            if "eif" not in _stall: _stall["eif"] = uu_cartoon.eiffel_card(330, 560, S.qr_img)
+            pw, ph_ = int(380 * q), int(640 * q)
+            if pw > 20:
+                ph_im = Image.new("RGBA", (380, 640), (0, 0, 0, 0)); pd = ImageDraw.Draw(ph_im)
+                pd.rounded_rectangle([0, 0, 379, 639], 40, fill=(16, 16, 20, 255), outline=T["accent"] + (255,), width=4)
+                ph_im.alpha_composite(_stall["eif"], (25, 50))
+                pd.text((190, 26), "PARIS · 9:41", font=F("mono", 18), fill=(200, 200, 200, 255), anchor="mm")
+                ph_im = ph_im.resize((pw, ph_)).rotate(-6, expand=True, resample=Image.BICUBIC)
+                paste_a(img, ph_im, (900 - ph_im.width / 2 + 160, 560 - ph_im.height / 2), clamp((t - pa) / 0.3))
+    left_text(img, sc, t, D, y=260, w=620 if photo else 760)
+    text_a(img, (W - 24, H - 60), "Illustration · fictional character", F("inter", 18), (190, 180, 160), 0.8 * a, "rm")
+    chrome(img, tg, a)
+
+def sc_paynet(img, sc, t, D, tg, k):
+    """Banks <-> UPI switch <-> apps on the right; an email-like UPI address typed under the hub; text left."""
+    a = ease(clamp(t / 0.5)); la = sc.get("link_at", 1.6); hx, hy = 1420, 560
+    banks = sc.get("banks", ["BANK A", "BANK B", "BANK C", "BANK D", "BANK E"])
+    apps = sc.get("apps", ["ANY APP", "ANY APP", "ANY APP", "ANY APP", "ANY APP"])
+    ys = [270 + i * 145 for i in range(5)]; lp = ease(clamp((t - la) / 0.9)); d = ImageDraw.Draw(img)
+    for side, items in ((0, banks), (1, apps)):
+        for i, lab in enumerate(items):
+            y = ys[i]; x0 = 900 if side == 0 else 1640; ex = x0 + 240 if side == 0 else x0
+            if lp > 0:
+                d.line([ex, y, ex + (hx - ex) * lp, y + (hy - y) * lp], fill=T["accent2"] + (200,), width=4)
+                if lp >= 1:
+                    for j in range(2):
+                        f = (tg * 0.9 + i * 0.37 + j * 0.5 + side * 0.2) % 1.0; f = f if side == 0 else 1 - f
+                        px, py = ex + (hx - ex) * f, y + (hy - y) * f; d.ellipse([px - 7, py - 7, px + 7, py + 7], fill=T["accent"] + (255,))
+            q = ease(clamp((t - 0.2 - i * 0.1 - side * 0.3) / 0.4))
+            rect_a(img, (x0, y - 44, x0 + 240, y + 44), (26, 26, 24), q * 0.95, 18, T["accent"] if lp > 0 else (90, 90, 84), 3)
+            text_a(img, (x0 + 120, y), lab, fit_font("disp", 34, lab, 210, "Black"), WHITE if lp > 0 else MUTED, q, "mm")
+    text_a(img, (1020, 200), "BANKS", F("mono", 24), MUTED, a, "mm"); text_a(img, (1760, 200), "APPS", F("mono", 24), MUTED, a, "mm")
+    g = ease(clamp((t - la + 0.3) / 0.6))
+    if g > 0:
+        glow = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(glow).ellipse([hx - 160, hy - 160, hx + 160, hy + 160], fill=T["accent"] + (int(120 * g),))
+        img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(40)))
+        rr = 96 * clamp(back((t - la + 0.3) / 0.6), 0, 1.15); d = ImageDraw.Draw(img)
+        d.ellipse([hx - rr, hy - rr, hx + rr, hy + rr], fill=(24, 20, 10, 255), outline=T["accent"] + (255,), width=6)
+        text_a(img, (hx, hy - 4), sc.get("hub", "UPI"), F("anton", int(78 * clamp(rr / 96, 0, 1))), T["accent"], g, "mm", shadow=6)
+    if sc.get("address"):
+        aa = sc.get("addr_at", la + 1.2); q = clamp((t - aa) / 0.3)
+        if q > 0:
+            s = typed(sc["address"], prog(t, aa, 0.9)); rect_a(img, (hx - 190, 900, hx + 190, 980), (14, 40, 26), q * 0.95, 20, T["accent2"], 3)
+            text_a(img, (hx, 940), s, F("mono", 40), WHITE, q, "mm")
+    left_text(img, sc, t, D, y=300, w=700)
+    chrome(img, tg, a)
+
+def _person(d, x, y, s, col):
+    d.ellipse([x - 7 * s, y - 24 * s, x + 7 * s, y - 10 * s], fill=col); d.rounded_rectangle([x - 11 * s, y - 8 * s, x + 11 * s, y + 14 * s], 6 * s, fill=col)
+
+def sc_jio(img, sc, t, D, tg, k):
+    """Jio: people pour in (7 per second, 100 M in 170 days), then the price of 1 GB collapses."""
+    a = ease(clamp(t / 0.5)); pa = sc.get("price_at", D * 0.6); d = ImageDraw.Draw(img)
+    n = int(clamp((t - 0.6) / max(0.1, pa - 0.8)) * 70)
+    for i in range(70):
+        if i >= n: break
+        x = 930 + (i % 14) * 62; y = 330 + (i // 14) * 78; q = clamp((t - 0.6 - i * (pa - 0.8) / 70) / 0.25)
+        _person(d, x, y, 1.6, (T["accent2"] if i % 9 else T["accent"]) + (int(255 * q),))
+    if t < pa + 0.3:
+        c = int(clamp((t - 0.6) / max(0.1, pa - 0.8)) * 100)
+        text_a(img, (1360, 820), f"{c} MILLION", F("anton", 96), WHITE, a * clamp((pa + 0.3 - t) / 0.3), "mm", shadow=8)
+        text_a(img, (1360, 900), "USERS IN 170 DAYS", F("disp", 36, "Black"), T["accent2"], a * clamp((pa + 0.3 - t) / 0.3), "mm")
+    else:
+        q = ease(clamp((t - pa) / 0.8)); p0, p1 = sc["p0"], sc["p1"]; base = 900; hmax = 460
+        rect_a(img, (900, 220, 1860, 960), (8, 8, 6), 0.85 * clamp((t - pa) / 0.3), 24)
+        text_a(img, (1380, 270), "PRICE OF 1 GB MOBILE DATA", F("disp", 40, "Black"), MUTED, clamp((t - pa) / 0.3), "mm")
+        rect_a(img, (1040, base - hmax, 1260, base), T["alert"], clamp((t - pa) / 0.3), 16)
+        text_a(img, (1150, base - hmax - 50), f"₹{p0}", F("anton", 84), WHITE, clamp((t - pa) / 0.3), "mm")
+        text_a(img, (1150, base + 36), "2015–16", F("disp", 34, "Black"), MUTED, clamp((t - pa) / 0.3), "mm")
+        h1 = hmax * (p0 + (p1 - p0) * q) / p0; v = p0 + (p1 - p0) * q
+        rect_a(img, (1500, base - h1, 1720, base), T["accent2"], clamp((t - pa) / 0.3), 16)
+        text_a(img, (1610, base - h1 - 50), f"≈ ₹{v:.0f}", F("anton", 84), T["accent2"], clamp((t - pa) / 0.3), "mm")
+        text_a(img, (1610, base + 36), "TODAY", F("disp", 34, "Black"), MUTED, clamp((t - pa) / 0.3), "mm")
+    left_text(img, sc, t, D, y=300, w=700)
+    chrome(img, tg, a)
+
+def sc_qrtown(img, sc, t, D, tg, k):
+    """Note-ban photo first, then a town of stalls where QR stickers pop out from the centre."""
+    a = ease(clamp(t / 0.5)); ta = sc.get("town_at", D * 0.42); ca = sc.get("chip_at", D * 0.78)
+    if t < ta + 0.6:
+        kenburns(img, sc["img"], t, D, k, dark=0.5); gradient(img, "left", 0.9, 0.7)
+        fa = clamp((ta + 0.6 - t) / 0.6)
+        text_a(img, (120, 300), typed(sc.get("kicker", ""), prog(t, 0.2, 0.8)), F("mono", 32), T["accent"], fa, shadow=4)
+        text_a(img, (110, 360), "86%", F("anton", 260), WHITE, fa * clamp((t - 0.6) / 0.3), shadow=12)
+        text_a(img, (120, 660), "of India's cash, overnight", F("disp", 54, "Black"), T["accent2"], fa * clamp((t - 1.0) / 0.3), shadow=6)
+        credit(img, sc["img"], fa)
+    if t >= ta:
+        q = clamp((t - ta) / 0.6); img.alpha_composite(Image.new("RGBA", (W, H), T["bg"] + (int(255 * q),)))
+        cols, rows, cw = 9, 4, 150
+        for r_ in range(rows):
+            for c in range(cols):
+                dist = math.hypot(c - (cols - 1) / 2, (r_ - (rows - 1) / 2) * 1.2)
+                qq = clamp((t - ta - 0.6 - dist * 0.28) / 0.35)
+                paste_a(img, S.shop_icon(cw, qq, qq, seed=r_ * cols + c), (W / 2 - cols * 172 / 2 + c * 172, 200 + r_ * 160), q * (0.55 + 0.45 * (qq > 0)))
+        if t >= ca:
+            cq = clamp((t - ca) / 0.3); p = ease(clamp((t - ca) / 1.0)); v = sc["chip0"] + (sc["chip1"] - sc["chip0"]) * p
+            rect_a(img, (W / 2 - 420, 850, W / 2 + 420, 1000), (14, 40, 26), cq * 0.95, 28, T["accent2"], 3)
+            text_a(img, (W / 2, 905), f"{sc['chip0']} LAKH → {v:.0f} LAKH", F("anton", 76), WHITE, cq, "mm", shadow=6)
+            text_a(img, (W / 2, 968), sc.get("chip", ""), F("inter", 26, "Bold"), T["accent2"], cq, "mm")
+        else:
+            for i, ln in enumerate(sc.get("lines", [])):
+                S.rise_line(img, ln, W / 2, 900 + i * 70, fit_font("disp", 56, ln, W - 200, "Black"), t - ta - 1.5)
+    chrome(img, tg, a)
+
+def sc_walletpipe(img, sc, t, D, tg, k):
+    """Two lanes: money parked in a wallet box vs money flowing bank-to-bank; then the 96:4 split bar."""
+    a = ease(clamp(t / 0.5)); d = ImageDraw.Draw(img); sa = sc.get("split_at", D * 0.62)
+    for lane, (y, lab, col) in enumerate(((360, "WALLET", T["alert"]), (640, "UPI", T["accent2"]))):
+        q = ease(clamp((t - 0.3 - lane * 0.6) / 0.5))
+        if q <= 0: continue
+        rect_a(img, (860, y - 60, 1060, y + 60), (26, 26, 24), q, 18, (120, 120, 110), 3); text_a(img, (960, y), "BANK", F("disp", 36, "Black"), WHITE, q, "mm")
+        rect_a(img, (1640, y - 60, 1840, y + 60), (26, 26, 24), q, 18, (120, 120, 110), 3); text_a(img, (1740, y), "SHOP", F("disp", 36, "Black"), WHITE, q, "mm")
+        text_a(img, (860, y - 92), lab, F("mono", 30), col, q)
+        d.line([1060, y, 1640, y], fill=col + (int(160 * q),), width=6)
+        if lane == 0:
+            rect_a(img, (1260, y - 70, 1440, y + 70), (60, 24, 20), q, 20, col, 4); text_a(img, (1350, y), "WALLET", F("disp", 32, "Black"), WHITE, q, "mm")
+            for j in range(3):
+                f = (tg * 0.35 + j / 3) % 1; x = 1060 + f * 580
+                if 1240 < x < 1460: x = 1350 + 40 * math.sin(tg * 3 + j)           # money waits in the box
+                d.ellipse([x - 12, y - 12, x + 12, y + 12], fill=T["accent"] + (int(255 * q),))
+        else:
+            for j in range(5):
+                f = (tg * 0.9 + j / 5) % 1; x = 1060 + f * 580; d.ellipse([x - 12, y - 12, x + 12, y + 12], fill=T["accent"] + (int(255 * q),))
+    if t >= sa:
+        q = clamp((t - sa) / 0.3); p = ease(clamp((t - sa) / 0.8)); w0, w1 = sc["split"]
+        x0, x1, y = 860, 1840, 860; xm = x0 + (x1 - x0) * w0 / 100 * p
+        rect_a(img, (x0, y, x1, y + 80), (40, 40, 36), q, 20)
+        rect_a(img, (x0, y, xm, y + 80), T["alert"], q, 20); rect_a(img, (x1 - (x1 - x0) * w1 / 100 * p, y, x1, y + 80), T["accent2"], q, 20)
+        text_a(img, (x0 + 30, y + 40), f"WALLET {w0 * p:.0f}", F("anton", 52), WHITE, q, "lm")
+        text_a(img, (x1 + 10, y + 120), f"UPI {w1}", F("anton", 44), T["accent2"], q, "rm")
+    left_text(img, sc, t, D, y=300, w=640)
+    chrome(img, tg, a)
+
+def sc_soundbox(img, sc, t, D, tg, k):
+    """The talking box: pulses + a Hindi speech bubble; a small chart marks UPI's first billion-payment month."""
+    a = ease(clamp(t / 0.5)); d = ImageDraw.Draw(img); cx, cy = 1450, 470
+    g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(g).ellipse([cx - 380, cy - 380, cx + 380, cy + 380], fill=(60, 120, 255, int(70 * a)))
+    img.alpha_composite(g.filter(ImageFilter.GaussianBlur(120)))
+    for j in range(3):
+        ph = (tg * 0.7 + j / 3) % 1; r = 150 + ph * 260
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=T["accent2"] + (int(170 * (1 - ph) * a),), width=5)
+    bx = 150 * a
+    d.rounded_rectangle([cx - bx, cy - 170 * a, cx + bx, cy + 170 * a], 60, fill=(28, 38, 70, 255), outline=(120, 150, 230, 255), width=5)
+    for r_ in range(5):
+        for c in range(5):
+            x = cx - 64 + c * 32; y = cy - 120 + r_ * 32; d.ellipse([x - 8, y - 8, x + 8, y + 8], fill=(150, 170, 220, int(255 * a)))
+    d.rounded_rectangle([cx - 90, cy + 70, cx + 90, cy + 130], 14, fill=(12, 20, 16, int(255 * a)))
+    text_a(img, (cx, cy + 100), "₹10", F("anton", 44), T["accent2"], a, "mm")
+    sp = (tg % 3.0) / 3.0
+    if sp < 0.6:
+        q = clamp(sp / 0.08) * clamp((0.6 - sp) / 0.1); s = sc.get("say", "₹10 प्राप्त हुए")
+        f = F("hindi", 54); w = d.textlength(s, font=f)
+        rect_a(img, (cx + 150, cy - 290, cx + 150 + w + 60, cy - 190), (250, 250, 245), q, 30)
+        d.polygon([(cx + 170, cy - 192), (cx + 230, cy - 192), (cx + 140, cy - 150)], fill=(250, 250, 245, int(255 * q)))
+        text_a(img, (cx + 180 + w / 2, cy - 240), s, f, (20, 20, 24), q, "mm")
+    ch = sc.get("chart", []); ca = sc.get("chart_at", 0.6)
+    if ch:
+        x0, yb, bw = 1080, 1000, 160; mx = max(v for _, v in ch)
+        for i, (lab, v) in enumerate(ch):
+            q = ease(clamp((t - ca - i * 0.4) / 0.7)); h = max(4, 220 * v / mx * q); x = x0 + i * 250
+            rect_a(img, (x, yb - h, x + bw, yb), T["accent"] if i == len(ch) - 1 else (120, 116, 100), clamp((t - ca - i * 0.4) / 0.3), 10)
+            text_a(img, (x + bw / 2, yb - h - 30), f"{v:g} BN" if v >= 0.1 else "0.0009 BN", F("anton", 34), WHITE, clamp((t - ca - i * 0.4) / 0.3), "mm")
+            text_a(img, (x + bw / 2, yb + 26), lab, F("inter", 24, "Bold"), MUTED, clamp((t - ca - i * 0.4) / 0.3), "mm")
+    left_text(img, sc, t, D, y=300, w=760)
+    chrome(img, tg, a)
+
+def sc_festive(img, sc, t, D, tg, k):
+    """Record month over a festive photo: a big centred counter and two cards."""
+    a = ease(clamp(t / 0.5))
+    kenburns(img, sc["img"], t, D, k, dark=0.55, blur=2); gradient(img, "bottom", 0.9, 0.7)
+    text_a(img, (W / 2, 260), typed(sc.get("kicker", ""), prog(t, 0.1, 0.7)), F("mono", 34), T["accent"], 1, "mm", shadow=6)
+    p = ease(clamp((t - 0.4) / 2.0)); v = sc["value"] * p
+    text_a(img, (W / 2, 450), f"{v:.2f} {sc.get('unit', '')}", F("anton", 200), WHITE, clamp((t - 0.4) / 0.3), "mm", shadow=14)
+    text_a(img, (W / 2, 600), sc.get("label", ""), F("disp", 54, "Black"), T["accent2"], clamp((t - 0.9) / 0.4), "mm", shadow=6)
+    for i, (big, small) in enumerate(sc.get("items", [])):
+        st = sc.get("items_at", [D * 0.35, D * 0.65])[i]; q = clamp((t - st) / 0.35); dy = (1 - back((t - st) / 0.5)) * 60
+        x = W / 2 - 700 + i * 720
+        rect_a(img, (x, 700 + dy, x + 680, 880 + dy), (10, 10, 8), 0.85 * q, 22, T["accent"], 3)
+        text_a(img, (x + 40, 720 + dy), big, F("anton", 76), T["accent"], q, shadow=4)
+        text_a(img, (x + 40, 820 + dy), small, F("inter", 34, "SemiBold"), WHITE, q)
+    credit(img, sc["img"], a)
+    chrome(img, tg, a)
+
+def sc_growth(img, sc, t, D, tg, k):
+    """Ten-year counter (1.78 crore -> 24,162 crore a year, x13,000) and UPI vs Visa daily bars."""
+    a = ease(clamp(t / 0.5)); ga = sc.get("grow_at", 0.8); va = sc.get("visa_at", D * 0.7)
+    text_a(img, (120, 230), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 32), T["accent"], 1, shadow=4)
+    p = ease(clamp((t - ga) / 2.5)); v0, v1 = sc["v0"], sc["v1"]; v = v0 * (v1 / v0) ** p
+    text_a(img, (120, 300), sc.get("y0", ""), F("disp", 40, "Black"), MUTED, a)
+    text_a(img, (110, 340), f"{v0}", F("anton", 120), (200, 196, 180), a, shadow=6)
+    text_a(img, (120, 520), sc.get("y1", ""), F("disp", 40, "Black"), MUTED, clamp((t - ga) / 0.3))
+    text_a(img, (110, 560), f"{v:,.0f}" if v > 100 else f"{v:,.2f}", F("anton", 190), WHITE, clamp((t - ga) / 0.3), shadow=10)
+    text_a(img, (120, 790), sc.get("unit", ""), F("disp", 42, "Black"), T["accent2"], clamp((t - ga) / 0.3))
+    if p >= 1:
+        q = back(clamp((t - ga - 2.5) / 0.5)); f = F("anton", int(90 * clamp(q, 0.1, 1.2)))
+        rect_a(img, (820, 600, 1180, 740), T["alert"], clamp((t - ga - 2.5) / 0.2), 26); text_a(img, (1000, 670), "×13,000", f, WHITE, 1, "mm")
+    if t >= va:
+        q = clamp((t - va) / 0.3); rows = sc.get("duel", []); mx = max(r[1] for r in rows)
+        rect_a(img, (1240, 260, 1840, 760), (8, 8, 6), 0.85 * q, 24)
+        text_a(img, (1540, 310), sc.get("duel_label", ""), fit_font("disp", 30, sc.get("duel_label", ""), 560, "Black"), MUTED, q, "mm")
+        for i, (lab, val) in enumerate(rows):
+            qq = ease(clamp((t - va - 0.3 - i * 0.4) / 0.8)); h = 270 * val / mx * qq; x = 1340 + i * 250
+            rect_a(img, (x, 700 - h, x + 160, 700), T["accent"] if i == 0 else (150, 150, 160), q, 12)
+            text_a(img, (x + 80, 700 - h - 36), f"{val * qq:.0f}", F("anton", 54), WHITE, q, "mm")
+            text_a(img, (x + 80, 735), lab, F("disp", 34, "Black"), WHITE, q, "mm")
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"duel": sc_duel, "stall": sc_stall, "paynet": sc_paynet, "jio": sc_jio, "qrtown": sc_qrtown,
+                   "walletpipe": sc_walletpipe, "soundbox": sc_soundbox, "festive": sc_festive, "growth": sc_growth})
 
 if __name__ == "__main__":
     R.main()
