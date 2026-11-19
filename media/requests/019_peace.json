@@ -1,0 +1,64 @@
+{
+ "items": [
+  {
+   "id": "bluehelmet",
+   "search": "UN peacekeepers blue helmets patrol",
+   "n": 4
+  },
+  {
+   "id": "india_monusco",
+   "search": "Indian peacekeepers MONUSCO",
+   "n": 4
+  },
+  {
+   "id": "india_unmiss",
+   "search": "Indian peacekeepers UNMISS South Sudan",
+   "n": 4
+  },
+  {
+   "id": "india_women",
+   "search": "Indian female formed police unit Liberia UNMIL",
+   "n": 4
+  },
+  {
+   "id": "nepal",
+   "search": "Nepalese peacekeepers UN",
+   "n": 4
+  },
+  {
+   "id": "rwanda",
+   "search": "Rwandan peacekeepers UN",
+   "n": 4
+  },
+  {
+   "id": "bangladesh",
+   "search": "Bangladeshi peacekeepers UN",
+   "n": 4
+  },
+  {
+   "id": "pakistan",
+   "search": "Pakistani peacekeepers UN mission",
+   "n": 3
+  },
+  {
+   "id": "unifil",
+   "search": "UNIFIL peacekeepers Lebanon patrol",
+   "n": 3
+  },
+  {
+   "id": "korea_ambulance",
+   "search": "60th Indian Parachute Field Ambulance Korea",
+   "n": 3
+  },
+  {
+   "id": "congo1961",
+   "search": "ONUC Congo 1961 Indian troops",
+   "n": 3
+  },
+  {
+   "id": "uncamp",
+   "search": "UN peacekeeping base camp white vehicles",
+   "n": 3
+  }
+ ]
+}

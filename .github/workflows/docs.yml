@@ -1,0 +1,45 @@
+name: Fetch docs (official public data)
+
+# Push docs/requests/<name>.json = {"urls": ["https://..."]} -> downloads each into docs/<name>/ (PDFs also as .txt), commits.
+on:
+  push:
+    branches: [master]
+    paths: ["docs/requests/**.json"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+      - name: Fetch
+        run: |
+          sudo apt-get install -y -qq poppler-utils >/dev/null
+          for req in docs/requests/*.json; do
+            name=$(basename "$req" .json); out="docs/$name"; [ -d "$out" ] && continue; mkdir -p "$out"
+            python3 -c "import json,sys;[print(u) for u in json.load(open(sys.argv[1]))['urls']]" "$req" | while read -r u; do
+              f="$out/$(basename "${u%%\?*}")"
+              code=$(curl -sSL -A "Mozilla/5.0 (research; unknown-uncovered)" -o "$f" -w "%{http_code}" --max-time 60 "$u" || echo 000)
+              echo "$code $u" >> "$out/status.txt"
+              if [ "$code" != "200" ]; then rm -f "$f"; continue; fi
+              case "$f" in *.pdf) pdftotext -layout "$f" "${f%.pdf}.txt" || true;; esac
+            done
+          done
+      - name: Commit
+        run: |
+          git config user.name "uu-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Docs fetched [skip ci]"
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done
