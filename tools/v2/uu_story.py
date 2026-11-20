@@ -1150,5 +1150,61 @@ def sc_medal(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"airlift": sc_airlift, "medal": sc_medal})
 
+
+# ---------------------------------------------------------------- reel 020: who pays, who serves
+def sc_split(img, sc, t, D, tg, k):
+    """Two tall columns compared: each {flags, label, value, frac, color: accent|alert|gold, sub}. Bars grow, numbers count up."""
+    chrome(img, tg)
+    text_a(img, (W / 2, 300), sc.get("title", ""), fit_font("disp", 78, sc.get("title", ""), W - 120, "Black"), WHITE, clamp(t / 0.3), "mm", shadow=8)
+    text_a(img, (W / 2, 384), typed(sc.get("kicker", ""), prog(t, 0.2, 0.8)), F("mono", 30), T["accent2"], 1, "mm")
+    cols = sc["cols"]; ats = sc.get("col_at", [0.6 + i * 1.6 for i in range(len(cols))])
+    base, top = 1500, 640; cw = 330
+    for i, c in enumerate(cols):
+        cx = W / 2 + (i - (len(cols) - 1) / 2) * 460; a = clamp((t - ats[i]) / 0.3); g = ease(clamp((t - ats[i] - 0.2) / 1.2))
+        if a <= 0: continue
+        col = {"accent": T["accent"], "alert": T["alert"], "gold": T["accent2"]}.get(c.get("color", "accent"), T["accent"])
+        rect_a(img, (cx - cw / 2, top, cx + cw / 2, base), (10, 16, 26), 0.85 * a, 22, col, 2)
+        h = (base - top - 40) * c["frac"] * g
+        rect_a(img, (cx - cw / 2 + 20, base - 20 - max(8, h), cx + cw / 2 - 20, base - 20), col, 0.9 * a, 14)
+        val = c["value"]
+        try:
+            num = float(val.replace(",", "").replace("%", "")); dec = len(val.replace("%", "").split(".")[1]) if "." in val else 0
+            shown = f"{num * g:,.{dec}f}" + ("%" if val.endswith("%") else "")
+        except ValueError:
+            shown = val
+        vy = max(top + 90, min(base - 90, base - 20 - h - 70))
+        text_a(img, (cx, vy), shown, fit_font("anton", 110, val + "0", cw + 60), WHITE, a, "mm", shadow=10)
+        text_a(img, (cx, base + 60), c["label"], fit_font("disp", 50, c["label"], cw + 100, "Black"), col, a, "mm")
+        if c.get("sub"): text_a(img, (cx, base + 120), c["sub"], fit_font("inter", 34, c["sub"], cw + 110, "SemiBold"), MUTED, a, "mm")
+        fl = c.get("flags", [])
+        if fl:
+            fw = min(96, int((cw + 80) / len(fl)) - 10); x0 = cx - (len(fl) * (fw + 10) - 10) / 2
+            for j, code in enumerate(fl): paste_a(img, R.flag(code, fw), (x0 + j * (fw + 10), top - fw * 0.7 - 30), a)
+    if sc.get("note"):
+        na = sc.get("note_at", D * 0.75); text_a(img, (W / 2, 1730), sc["note"], fit_font("disp", 52, sc["note"], W - 120, "Black"), T["accent2"], clamp((t - na) / 0.4), "mm", shadow=8)
+
+def sc_ledger(img, sc, t, D, tg, k):
+    """Rows: [code, name, pay_label, pay_frac, men_label, men_frac] with two bars each: share of the bill vs soldiers sent."""
+    chrome(img, tg)
+    text_a(img, (80, 300), sc.get("title", ""), fit_font("disp", 76, sc.get("title", ""), W - 160, "Black"), WHITE, clamp(t / 0.3), shadow=6)
+    text_a(img, (84, 392), typed(sc.get("kicker", ""), prog(t, 0.2, 0.8)), F("mono", 28), T["accent2"], 1)
+    hx = [560, 840]; text_a(img, (hx[0], 470), "PAYS", F("mono", 30), T["accent2"], clamp(t / 0.4), "lm"); text_a(img, (hx[1], 470), "SOLDIERS", F("mono", 30), T["accent"], clamp(t / 0.4), "lm")
+    rows = sc["rows"]; ats = sc.get("row_at", [0.5 + i * (D * 0.55) / len(rows) for i in range(len(rows))])
+    for i, (code, name, pl, pf, ml, mf) in enumerate(rows):
+        a = clamp((t - ats[i]) / 0.3); g = ease(clamp((t - ats[i] - 0.1) / 0.9)); y = 520 + i * 230
+        if a <= 0: continue
+        hl = i in sc.get("hl", [])
+        rect_a(img, (50, y, W - 50, y + 200), (8, 13, 22), 0.85 * a, 20, T["alert"] if hl else None, 3)
+        paste_a(img, R.flag(code, 110), (80, y + 30), a)
+        text_a(img, (80, y + 160), name, fit_font("inter", 34, name, 400, "SemiBold"), WHITE, a, "lm")
+        text_a(img, (hx[0], y + 60), pl, F("anton", 64), T["accent2"], a, "lm")
+        rect_a(img, (hx[0], y + 120, hx[0] + max(6, 240 * pf * g), y + 150), T["accent2"], a, 6)
+        text_a(img, (hx[1], y + 60), ml, F("anton", 64), WHITE, a, "lm")
+        rect_a(img, (hx[1], y + 120, hx[1] + max(6, 180 * mf * g), y + 150), T["accent"], a, 6)
+    if sc.get("note"):
+        na = sc.get("note_at", D * 0.8); text_a(img, (W / 2, 520 + len(rows) * 230 + 40), sc["note"], fit_font("disp", 50, sc["note"], W - 120, "Black"), T["alert"], clamp((t - na) / 0.4), "mm", shadow=8)
+
+R.SCENE_FN.update({"split": sc_split, "ledger": sc_ledger})
+
 if __name__ == "__main__":
     R.main()
