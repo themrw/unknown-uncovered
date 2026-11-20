@@ -1,0 +1,48 @@
+import json, os
+CTA = "ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+spec = {
+ "theme": "pharma", "tts": "parler", "speed": 1.14, "lead": 0.2, "tail": 0.35, "voice_job": "021_main",
+ "header": "HOW AN INDIAN COMPANY BEAT BIG PHARMA",
+ "source": "Sources: MSF 2001 & 2010 · Nature 2001 · J Int AIDS Soc 2010 · UNAIDS 2026",
+ "ticker": "  7 FEB 2001: AIDS TRIPLE THERAPY FOR $350 A YEAR   ///   96.6% CHEAPER THAN THE US PRICE   ///   2008: 87% OF DONOR-FUNDED AIDS MEDICINES MADE IN INDIA   ///   32.1 MILLION PEOPLE ON HIV TREATMENT (2025)   ///",
+ "scenes": [
+  {"type": "l_hook", "min": 5.0, "hit_at": 3.2, "title": [["ONE INDIAN", "WHITE"], ["COMPANY vs", "WHITE"], ["BIG PHARMA?", "accent2"]], "title_at": 0.5,
+   "vo": "एक भारतीय कंपनी ने दुनिया की सबसे बड़ी दवा कंपनियों को कैसे हरा दिया? ये कहानी है, एक छोटी सी गोली की।"},
+  {"type": "l_pricetag", "price": "$10,000+", "per": "PER PATIENT · PER YEAR", "kicker": "AIDS MEDICINE · YEAR 2000",
+   "lines": ["AIDS had already killed", "about 17 million Africans"],
+   "vo": "सन दो हज़ार में, एड्स की दवा का एक साल का ख़र्च था दस से पंद्रह हज़ार डॉलर। अफ़्रीका में एड्स क़रीब एक करोड़ सत्तर लाख लोगों की जान ले चुका था, पर ये दवा वहाँ लगभग किसी के बस की नहीं थी।"},
+  {"type": "l_pills", "merge_at": 2.6, "kicker": "CIPLA · MUMBAI", "lines": ["3 medicines.", "1 pill."],
+   "vo": "तभी मुंबई की कंपनी सिप्ला ने, तीन अलग-अलग दवाओं को मिलाकर एक ही गोली में बना दिया।"},
+  {"type": "l_slash", "kicker": "7 FEBRUARY 2001", "old_label": "SAME TREATMENT IN THE USA", "old": "$10,400", "new_label": "CIPLA'S OFFER", "new": "$350",
+   "stamp": "−96.6%", "chip": "LESS THAN $1 A DAY", "lines": ["per patient, per year,", "offered to Doctors Without Borders"],
+   "vo": "सात फ़रवरी दो हज़ार एक को सिप्ला ने ऐलान किया: यही इलाज, सिर्फ़ तीन सौ पचास डॉलर में। यानी एक डॉलर रोज़ से भी कम, और अमेरिका से छियानवे प्रतिशत सस्ता।"},
+  {"type": "l_law", "cards": [["MOST RICH COUNTRIES", ["the medicine itself is patented:", "no one else may make it"], True, [214, 48, 60]],
+                              ["INDIA, 1970 TO 2005", ["only the METHOD could be patented:", "new method, same medicine, legal"], False, [0, 140, 130]]],
+   "stamp": "“PIRATE?”", "stamp_sub": "what critics called Cipla's chairman",
+   "vo": "ये मुमकिन कैसे हुआ? भारत के क़ानून में दवा पर नहीं, सिर्फ़ उसे बनाने के तरीक़े पर पेटेंट मिलता था। नया तरीक़ा, वही दवा, पूरी तरह क़ानूनी। फिर भी सिप्ला के चेयरमैन को समुद्री डाकू तक कहा गया।"},
+  {"type": "l_court", "title": "39 DRUG COMPANIES", "kicker": "> sued to stop cheap AIDS medicines", "vs": "vs SOUTH AFRICA", "result": "CASE DROPPED", "date": "19 APRIL 2001",
+   "vo": "उधर उनतालीस बड़ी दवा कंपनियों ने, सस्ती दवाएँ मँगाने के ख़िलाफ़ दक्षिण अफ़्रीका पर मुक़दमा ठोक रखा था। पर दुनिया भर के दबाव में, उन्नीस अप्रैल दो हज़ार एक को उन्हें केस वापस लेना पड़ा।"},
+  {"type": "l_chart", "title": "AIDS TREATMENT: PRICE PER YEAR", "kicker": "> per patient, first-line", "bars": [["2000", 10000, "$10,000+"], ["2001", 350, "$350"], ["2005", 140, "$140"]],
+   "note": "−98.6% in five years",
+   "vo": "फिर दाम गिरते ही चले गए। दो हज़ार पाँच तक, एक साल का इलाज सिर्फ़ एक सौ चालीस डॉलर का रह गया।"},
+  {"type": "l_donut", "share": 0.87, "kicker": "2008 · AIDS MEDICINES BOUGHT FOR POOR COUNTRIES", "lines": ["were made in India:", "“pharmacy of the developing world”"],
+   "vo": "और दो हज़ार आठ तक, ग़रीब देशों के लिए ख़रीदी गई एड्स की हर सौ में से सत्तासी गोलियाँ भारत में बनी थीं। दुनिया ने भारत को नाम दिया: विकासशील दुनिया की फ़ार्मेसी।"},
+  {"type": "l_people", "from": 7.6, "to": 32.1, "grow_at": 1.0, "lines": ["people on HIV treatment today", "(7.6 million in 2010 · UNAIDS)"],
+   "vo": "आज तीन करोड़ से ज़्यादा लोग एचआईवी का इलाज ले रहे हैं। और इस बदलाव में सबसे बड़ा हाथ है, भारत की सस्ती दवाओं का।"},
+  {"type": "outro", "min": 7.0, "highlight": ["IN"], "lines": [["Made in India.", "WHITE"], ["Saving lives", "WHITE"], ["worldwide.", "accent"]],
+   "vo": "कभी-कभी दुनिया बदलने के लिए, एक सस्ती गोली ही काफ़ी होती है। " + CTA},
+ ],
+ "thumb": {"hook": ["भारत की एक गोली ने", "दवा कंपनियों को हरा दिया!"], "number": "$1", "number_label": "A DAY vs $10,000 A YEAR",
+           "sticker": "कौन सी कंपनी?", "highlight": ["IN"], "view": [10, 40], "mystery": []},
+}
+json.dump(spec, open("spec.json", "w"), ensure_ascii=False, indent=1)
+os.makedirs("ig", exist_ok=True)
+ig = {k: v for k, v in spec.items() if k not in ("scenes", "thumb")}; ig["voice_job"] = "021_ig"
+ig["scenes"] = [
+ dict(spec["scenes"][0], min=3.5, hit_at=2.2, vo="एक भारतीय कंपनी ने दुनिया की सबसे बड़ी दवा कंपनियों को कैसे हरा दिया?"),
+ dict(spec["scenes"][3], vo="जिस एड्स इलाज का दाम अमेरिका में दस हज़ार डॉलर था, मुंबई की सिप्ला ने वही सिर्फ़ तीन सौ पचास डॉलर में दे दिया।", slash_at=0.8, new_at=1.3, stamp_at=3.0, chip_at=4.0),
+ {"type": "outro", "card": "youtube", "min": 4.0, "highlight": ["IN"], "lines": [["Full story", "WHITE"], ["on YouTube", "accent"]],
+  "vo": "और फिर पूरी दुनिया बदल गई। पूरी वीडियो, यूट्यूब पर देखें।"},
+]
+json.dump(ig, open("ig/spec.json", "w"), ensure_ascii=False, indent=1)
+for s in (spec, ig): print(sum(len(x["vo"]) for x in s["scenes"]), "chars")

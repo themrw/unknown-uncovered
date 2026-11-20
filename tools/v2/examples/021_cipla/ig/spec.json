@@ -1,0 +1,72 @@
+{
+ "theme": "pharma",
+ "tts": "parler",
+ "speed": 1.14,
+ "lead": 0.2,
+ "tail": 0.35,
+ "voice_job": "021_ig",
+ "header": "HOW AN INDIAN COMPANY BEAT BIG PHARMA",
+ "source": "Sources: MSF 2001 & 2010 · Nature 2001 · J Int AIDS Soc 2010 · UNAIDS 2026",
+ "ticker": "  7 FEB 2001: AIDS TRIPLE THERAPY FOR $350 A YEAR   ///   96.6% CHEAPER THAN THE US PRICE   ///   2008: 87% OF DONOR-FUNDED AIDS MEDICINES MADE IN INDIA   ///   32.1 MILLION PEOPLE ON HIV TREATMENT (2025)   ///",
+ "scenes": [
+  {
+   "type": "l_hook",
+   "min": 3.5,
+   "hit_at": 2.2,
+   "title": [
+    [
+     "ONE INDIAN",
+     "WHITE"
+    ],
+    [
+     "COMPANY vs",
+     "WHITE"
+    ],
+    [
+     "BIG PHARMA?",
+     "accent2"
+    ]
+   ],
+   "title_at": 0.5,
+   "vo": "एक भारतीय कंपनी ने दुनिया की सबसे बड़ी दवा कंपनियों को कैसे हरा दिया?"
+  },
+  {
+   "type": "l_slash",
+   "kicker": "7 FEBRUARY 2001",
+   "old_label": "SAME TREATMENT IN THE USA",
+   "old": "$10,400",
+   "new_label": "CIPLA'S OFFER",
+   "new": "$350",
+   "stamp": "−96.6%",
+   "chip": "LESS THAN $1 A DAY",
+   "lines": [
+    "per patient, per year,",
+    "offered to Doctors Without Borders"
+   ],
+   "vo": "जिस एड्स इलाज का दाम अमेरिका में दस हज़ार डॉलर था, मुंबई की सिप्ला ने वही सिर्फ़ तीन सौ पचास डॉलर में दे दिया।",
+   "slash_at": 0.8,
+   "new_at": 1.3,
+   "stamp_at": 3.0,
+   "chip_at": 4.0
+  },
+  {
+   "type": "outro",
+   "card": "youtube",
+   "min": 4.0,
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "Full story",
+     "WHITE"
+    ],
+    [
+     "on YouTube",
+     "accent"
+    ]
+   ],
+   "vo": "और फिर पूरी दुनिया बदल गई। पूरी वीडियो, यूट्यूब पर देखें।"
+  }
+ ]
+}
