@@ -102,7 +102,7 @@ if film:   # proud period-film score: tanpura drone, sitar-like phrases, brass s
         if st == "measure":
             for at in sc.get("panel_at", []): add(music, boom(0.4, 90, 8, 0.8), ST[i] + at, 0.4)
 # heartbeat, faster as the countdown approaches #1
-bt = 0.6 if not film else T
+bt = 0.6 if not (film or theme == "pharma") else T
 while bt < t_end_beats - 0.5:
     k = sum(1 for i in ranks if ST[i] <= bt)
     bpm = 66 + 6 * k
@@ -155,6 +155,18 @@ if theme == "desert":   # desert wind: band-passed noise with slow gusts
 if theme == "oil":   # refinery: low industrial drone + slow steam hiss swells
     music += (np.sin(2 * np.pi * 49 * t) + 0.5 * np.sin(2 * np.pi * 98.3 * t)) * 0.02 * (0.7 + 0.3 * np.sin(2 * np.pi * t * 0.11))
     music += hp(rng.standard_normal(n), 3000) * 0.012 * np.clip(np.sin(2 * np.pi * t / 9.0), 0, 1) ** 3
+if theme == "pharma":   # bright, hopeful: soft major pad + marimba arpeggios instead of the dark drone and heartbeat
+    music *= 0.15
+    for f in (261.63, 329.63, 392.0, 523.25):
+        music += np.sin(2 * np.pi * f * t) * 0.004 * (0.6 + 0.4 * np.sin(2 * np.pi * t * 0.07 + f))
+    def mar(f, L=0.7):
+        tt = np.arange(int(L * SR)) / SR
+        return (np.sin(2 * np.pi * f * tt) + 0.35 * np.sin(2 * np.pi * f * 4 * tt) * np.exp(-tt * 30)) * np.exp(-tt * 7) * np.minimum(1, tt / 0.003)
+    prog_ = [[261.63, 329.63, 392.0, 523.25], [220.0, 261.63, 329.63, 440.0], [174.61, 220.0, 261.63, 349.23], [196.0, 246.94, 293.66, 392.0]]
+    bt = 60 / 104; tt = 0.0; j = 0
+    while tt < T - 1:
+        ch = prog_[(j // 8) % 4]; f = ch[[0, 1, 2, 3, 2, 1, 2, 3][j % 8]]
+        add(music, mar(f), tt, 0.045 if j % 2 == 0 else 0.03); tt += bt / 2; j += 1
 if theme == "peace":   # warm, hopeful: major pad swell + a soft parade snare roll under the countdown
     for f in (130.81, 164.81, 196.0, 261.63):
         music += np.sin(2 * np.pi * f * t) * 0.006 * (0.6 + 0.4 * np.sin(2 * np.pi * t * 0.05 + f))

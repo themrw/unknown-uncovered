@@ -41,6 +41,8 @@ THEMES = {
                     land=(48, 38, 26), land_edge=(120, 95, 60), ocean=(20, 15, 10), part=(240, 210, 160), motif="parchment"),
     "forensic": dict(bg=(5, 10, 14), glow=(12, 58, 66), accent=(90, 228, 220), accent2=(255, 196, 96), alert=(240, 62, 72),
                      land=(20, 36, 42), land_edge=(60, 130, 135), ocean=(6, 12, 16), part=(160, 240, 235), motif="fingerprint"),
+    "pharma": dict(bg=(246, 248, 245), glow=(0, 0, 0), accent=(0, 140, 130), accent2=(240, 120, 20), alert=(214, 48, 60),
+                   land=(206, 224, 216), land_edge=(120, 160, 150), ocean=(228, 238, 244), part=(205, 228, 220), motif="pill", light=True),
     "peace": dict(bg=(4, 9, 16), glow=(18, 56, 100), accent=(100, 185, 255), accent2=(255, 214, 120), alert=(255, 120, 60),
                   land=(22, 34, 48), land_edge=(80, 130, 180), ocean=(6, 14, 26), part=(150, 210, 255), motif="laurel"),
     "oil": dict(bg=(7, 6, 6), glow=(88, 34, 8), accent=(255, 150, 40), accent2=(120, 200, 215), alert=(240, 60, 50),
@@ -48,6 +50,8 @@ THEMES = {
 }
 T = THEMES[SPEC.get("theme", "war")]
 WHITE = (242, 242, 238); MUTED = (150, 156, 150); BLACK = (0, 0, 0)
+LIGHT = bool(T.get("light"))
+if LIGHT: WHITE = (22, 30, 40); MUTED = (92, 102, 112)     # "WHITE" is the main text ink; on light themes it is dark
 
 def clamp(x, a=0.0, b=1.0): return max(a, min(b, x))
 def ease(x): x = clamp(x); return 1 - (1 - x) ** 3
@@ -87,7 +91,8 @@ def text_a(img, xy, s, f, fill, alpha=1.0, anchor="la", stroke=0, shadow=0):
     lay = Image.new("RGBA", (max(1, r - l), max(1, b - t)), (0, 0, 0, 0)); ld = ImageDraw.Draw(lay)
     A = int(255 * clamp(alpha))
     if shadow:
-        ld.text((xy[0] - l, xy[1] - t + shadow), s, font=f, fill=(0, 0, 0, int(A * 0.75)), anchor=anchor, stroke_width=stroke, stroke_fill=(0, 0, 0, A))
+        sc_ = (255, 255, 255, int(A * 0.85)) if LIGHT and sum(fill[:3]) < 400 else (0, 0, 0, int(A * 0.75))
+        ld.text((xy[0] - l, xy[1] - t + shadow), s, font=f, fill=sc_, anchor=anchor, stroke_width=stroke, stroke_fill=sc_)
     ld.text((xy[0] - l, xy[1] - t), s, font=f, fill=fill + (A,), anchor=anchor, stroke_width=stroke, stroke_fill=(0, 0, 0, A))
     cl, ct = -min(l, 0), -min(t, 0)
     if cl or ct: lay = lay.crop((cl, ct, lay.width, lay.height))
@@ -149,7 +154,7 @@ class Globe:
         shade = np.clip(1 - rr, 0, 1) ** 0.5
         ocean[..., :3] = base + hi * shade[..., None] * 0.6
         ocean[..., 3] = (rr <= 1) * 255
-        self.ocean = Image.fromarray(ocean.astype(np.uint8), "RGBA")
+        self.ocean = Image.fromarray(np.clip(ocean, 0, 255).astype(np.uint8), "RGBA")
         atm = np.clip(1 - np.abs(rr - 1.0) / 0.09, 0, 1) ** 2 * (rr > 0.96)
         a = np.zeros((S, S, 4), np.uint8); a[..., :3] = T["accent2"]; a[..., 3] = (atm * 120).astype(np.uint8)
         self.atmo = Image.fromarray(a, "RGBA").filter(ImageFilter.GaussianBlur(6))
@@ -224,7 +229,19 @@ def make_bg():
     vig = 1 - 0.65 * np.clip(((x - BW / 2) / (BW * 0.72)) ** 2 + ((y - BH / 2) / (BH * 0.66)) ** 2, 0, 1)
     img *= vig[..., None]
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).convert("RGBA")
-BG = make_bg()
+def make_bg_light():
+    y, x = np.mgrid[0:BH, 0:BW].astype(np.float32)
+    img = np.zeros((BH, BW, 3), np.float32) + np.array(T["bg"], np.float32)
+    for (cx, cy, r, col) in ((0.15, 0.18, 520, (196, 234, 222)), (0.9, 0.35, 560, (210, 226, 248)), (0.3, 0.85, 600, (255, 228, 200)), (0.85, 0.9, 420, (214, 240, 230))):
+        g = np.exp(-(((x - BW * cx) / r) ** 2 + ((y - BH * cy) / r) ** 2))[..., None]
+        img = img * (1 - 0.75 * g) + np.array(col, np.float32) * 0.75 * g
+    f = (np.sin(x / 230) + np.sin(y / 280 + 1.3) + np.sin((x + y) / 350) + 0.6 * np.sin((x - 1.7 * y) / 160 + 2))
+    band = np.abs((f * 3.0) % 1 - 0.5) < 0.022
+    img[band] = img[band] * 0.94
+    dots = ((x.astype(int) % 48) < 3) & ((y.astype(int) % 48) < 3)
+    img[dots] = img[dots] * 0.93
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).convert("RGBA")
+BG = make_bg_light() if LIGHT else make_bg()
 
 rng = np.random.default_rng(11)
 PART = [(rng.uniform(0, W), rng.uniform(0, H), rng.uniform(12, 50), rng.uniform(1.2, 3.6), rng.uniform(.25, .9), rng.uniform(0, 6.28)) for _ in range(90)]
@@ -284,6 +301,13 @@ def motif_img(R):
         d.ellipse([c + R * 0.42, base - R * 0.5, c + R * 0.95, base], outline=col, width=lw)
         d.line([c + R * 0.88, base, c + R * 0.88, c - R * 0.9], fill=col, width=lw)
         d.polygon([(c + R * 0.88, c - R * 1.15), (c + R * 0.8, c - R * 0.92), (c + R * 0.96, c - R * 0.92)], fill=T["alert"] + (255,))
+    elif T["motif"] == "pill":
+        lw = max(3, R // 22)
+        for ang in (-30, 30):
+            lay = Image.new("RGBA", im.size, (0, 0, 0, 0)); ld = ImageDraw.Draw(lay)
+            ld.rounded_rectangle([c - R * 0.75, c - R * 0.26, c + R * 0.75, c + R * 0.26], radius=int(R * 0.26), outline=col, width=lw)
+            ld.line([c, c - R * 0.26, c, c + R * 0.26], fill=col, width=lw)
+            im.alpha_composite(lay.rotate(ang, center=(c, c), resample=Image.BICUBIC))
     elif T["motif"] == "laurel":   # two olive branches around a globe, outline (peacekeeping)
         lw = max(3, R // 22); r0 = R * 0.52
         d.ellipse([c - r0, c - r0, c + r0, c + r0], outline=col, width=lw)
@@ -566,18 +590,18 @@ def sc_outro(img, sc, t, D, tg, k):
         text_a(img, (80, 1010 + i * 92), typed(s, prog(t, st, 0.8)), F("disp", 70, "Black"), T[col] if col in T else WHITE, 1, shadow=6)
     st = sc.get("card_at", max(1.5, D - 4.0))
     a = clamp((t - st) / 0.35); p = back((t - st) / 0.5)
-    rect_a(img, (60, 1350, W - 60, 1610), (14, 6, 26), a * 0.95, 30, T["accent"], 3)
+    rect_a(img, (60, 1350, W - 60, 1610), (255, 255, 255) if LIGHT else (14, 6, 26), a * 0.95, 30, T["accent"], 3)
     big = LOGO.resize((150, 150), Image.LANCZOS)
     paste_a(img, big, (95, 1415), a)
     text_a(img, (275, 1420), "UNKNOWN UNCOVERED", F("unb", 40, 800), WHITE, a)
     if sc.get("card") == "youtube":
         rect_a(img, (275, 1478, 275 + int(640 * clamp(p, 0, 1.08)), 1548), (230, 30, 40), a, 36)
-        text_a(img, (300, 1513), "▶  FULL VIDEO ON YOUTUBE", F("disp", 38, "Black"), WHITE, clamp((t - st - 0.25) / 0.2), "lm")
+        text_a(img, (300, 1513), "▶  FULL VIDEO ON YOUTUBE", F("disp", 38, "Black"), (255, 255, 255), clamp((t - st - 0.25) / 0.2), "lm")
         text_a(img, (279, 1560), "@Unknown_Uncovered_2026", F("inter", 30, "SemiBold"), T["accent"], clamp((t - st - 0.4) / 0.3))
         return
     rw = int(330 * clamp(p, 0, 1.15))
     rect_a(img, (275, 1490, 275 + rw, 1570), (230, 30, 40), a, 40)
-    text_a(img, (300, 1530), "SUBSCRIBE", F("disp", 38, "Black"), WHITE, clamp((t - st - 0.25) / 0.2), "lm")
+    text_a(img, (300, 1530), "SUBSCRIBE", F("disp", 38, "Black"), (255, 255, 255), clamp((t - st - 0.25) / 0.2), "lm")
     rect_a(img, (625, 1490, 625 + int(330 * clamp(back((t - st - 0.3) / 0.5), 0, 1.15)), 1570), None, clamp((t - st - 0.3) / 0.3), 40, WHITE, 3)
     text_a(img, (655, 1530), "FOLLOW", F("disp", 38, "Black"), WHITE, clamp((t - st - 0.5) / 0.2), "lm")
 
@@ -605,7 +629,7 @@ def frame(k, t, t0):
     SCENE_FN[sc["type"]](img, sc, t, D, tg, k)
     arr = np.asarray(img.convert("RGB")).astype(np.int16)
     gr = np.asarray(GRAIN[int(tg * FPS) % len(GRAIN)]).astype(np.int16) - 128
-    arr += (gr * SPEC.get("grain", 0.18)).astype(np.int16)[..., None]
+    arr += (gr * SPEC.get("grain", 0.06 if LIGHT else 0.18)).astype(np.int16)[..., None]
     if LOOK == "cinematic":
         L = arr.mean(axis=2, keepdims=True) / 255.0
         arr = arr + np.concatenate([(L - 0.5) * 26, (L - 0.5) * 6, (0.5 - L) * 22], axis=2).astype(np.int16)
@@ -623,7 +647,7 @@ def frame(k, t, t0):
             arr[y:y + h] = np.roll(arr[y:y + h], sh, axis=1)
         arr[..., 0] = np.roll(arr[..., 0], int(12 * g), axis=1); arr[..., 2] = np.roll(arr[..., 2], -int(12 * g), axis=1)
         if t < 2 / FPS: arr = arr + 90
-    if k == 0 and t < 0.6: arr = arr * (t / 0.6)
+    if k == 0 and t < 0.6: arr = (255 - (255 - arr) * (t / 0.6)) if LIGHT else arr * (t / 0.6)
     if k == len(SCENES) - 1 and D - t < 0.5: arr = arr * ((D - t) / 0.5)
     return np.clip(arr, 0, 255).astype(np.uint8)
 

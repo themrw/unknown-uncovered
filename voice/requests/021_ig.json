@@ -1,0 +1,18 @@
+{
+ "description": "Aman speaks with a confident, expressive and engaging tone at a moderate pace, like a documentary narrator. The recording is very high quality, with the voice sounding clear and very close up, with no background noise.",
+ "seed": 7,
+ "items": [
+  {
+   "name": "00",
+   "text": "एक भारतीय कंपनी ने दुनिया की सबसे बड़ी दवा कंपनियों को कैसे हरा दिया?"
+  },
+  {
+   "name": "01",
+   "text": "जिस एड्स इलाज का दाम अमेरिका में दस हज़ार डॉलर था, मुंबई की सिप्ला ने वही सिर्फ़ तीन सौ पचास डॉलर में दे दिया।"
+  },
+  {
+   "name": "02",
+   "text": "और फिर पूरी दुनिया बदल गई। पूरी वीडियो, यूट्यूब पर देखें।"
+  }
+ ]
+}

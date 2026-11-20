@@ -101,7 +101,7 @@ def caption(img, sc, t, D, y0=1110):
             rise_line(img, ln, W / 2, ly + i * 70, fit_font("disp", 54, ln, W - 120, "Bold"), t - st)
         else:
             text_a(img, (W / 2, ly + i * 70), typed(ln, prog(t, st, 0.7)), fit_font("disp", 54, ln, W - 120, "Bold"),
-                   (238, 236, 228), 1, "mm", shadow=8)
+                   R.MUTED if R.LIGHT else (238, 236, 228), 1, "mm", shadow=8)
 
 def sc_photo(img, sc, t, D, tg, k):
     kenburns(img, sc["img"], t, D, k)
@@ -1205,6 +1205,241 @@ def sc_ledger(img, sc, t, D, tg, k):
         na = sc.get("note_at", D * 0.8); text_a(img, (W / 2, 520 + len(rows) * 230 + 40), sc["note"], fit_font("disp", 50, sc["note"], W - 120, "Black"), T["alert"], clamp((t - na) / 0.4), "mm", shadow=8)
 
 R.SCENE_FN.update({"split": sc_split, "ledger": sc_ledger})
+
+
+# ---------------------------------------------------------------- reel 020: Cipla (light "pharma" theme)
+INKD = (22, 30, 40); TEAL = (0, 140, 130); SAFF = (240, 120, 20); GRN = (19, 136, 8); REDC = (214, 48, 60)
+
+def card(img, box, a=1.0, r=28, fill=(255, 255, 255), outline=None):
+    """White card with a soft drop shadow (light themes)."""
+    if a <= 0: return
+    x0, y0, x1, y1 = [int(v) for v in box]
+    sh = Image.new("RGBA", (x1 - x0 + 80, y1 - y0 + 80), (0, 0, 0, 0))
+    ImageDraw.Draw(sh).rounded_rectangle([40, 52, x1 - x0 + 40, y1 - y0 + 52], r, fill=(30, 50, 60, int(60 * a)))
+    img.alpha_composite(sh.filter(ImageFilter.GaussianBlur(18)), (x0 - 40, y0 - 40))
+    rect_a(img, (x0, y0, x1, y1), fill, a, r, outline or (220, 228, 230), 2)
+
+def pill(w, h, c1, c2, band=None, label=None):
+    """Horizontal capsule image."""
+    K = 2; im = Image.new("RGBA", (w * K, h * K), (0, 0, 0, 0)); d = ImageDraw.Draw(im); r = h * K // 2
+    d.rounded_rectangle([0, 0, w * K - 1, h * K - 1], r, fill=c1 + (255,))
+    half = Image.new("RGBA", im.size, (0, 0, 0, 0)); ImageDraw.Draw(half).rounded_rectangle([0, 0, w * K - 1, h * K - 1], r, fill=c2 + (255,))
+    mask = Image.new("L", im.size, 0); ImageDraw.Draw(mask).rectangle([w * K // 2, 0, w * K, h * K], fill=255)
+    im.paste(half, (0, 0), mask)
+    if band: d.rectangle([w * K // 2 - 8 * K, 0, w * K // 2 + 8 * K, h * K], fill=band + (255,))
+    d.rounded_rectangle([0, 0, w * K - 1, h * K - 1], r, outline=(255, 255, 255, 200), width=3 * K)
+    d.rounded_rectangle([r * 0.6, h * K * 0.16, w * K * 0.42, h * K * 0.3], h * K // 10, fill=(255, 255, 255, 120))
+    im = im.resize((w, h), Image.LANCZOS)
+    if label:
+        d = ImageDraw.Draw(im); f = fit_font("disp", int(h * 0.36), label, w - h, "Black")
+        d.text((w / 2, h / 2), label, font=f, fill=(255, 255, 255, 255), anchor="mm")
+    return im
+
+def sc_l_hook(img, sc, t, D, tg, k):
+    """David vs Goliath: a small India-coloured capsule faces five 'Big Pharma' towers, then knocks them off balance."""
+    base = 1520; hit = sc.get("hit_at", 2.4)
+    shake = 0
+    if t > hit: shake = 14 * math.exp(-(t - hit) * 2.5) * math.sin((t - hit) * 40)
+    lean = clamp((t - hit) / 1.2) * 4
+    for i in range(5):
+        x = 470 + i * 112; h = 560 + (i * 137) % 220; a = clamp((t - 0.1 * i) / 0.4)
+        lay = Image.new("RGBA", (130, h + 20), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+        d.rectangle([5, 10, 120, h + 19], fill=(84, 98, 118, 255)); d.rectangle([5, 10, 120, 40], fill=(62, 74, 92, 255))
+        for r_ in range(int((h - 60) / 54)):
+            for c in range(3): d.rectangle([20 + c * 34, 60 + r_ * 54, 40 + c * 34, 90 + r_ * 54], fill=(200, 216, 232, 255) if (r_ + c + i) % 4 else (255, 214, 120, 255))
+        lay = lay.rotate(-lean * (1 + i * 0.2), center=(65, h + 20), resample=Image.BICUBIC, expand=False)
+        paste_a(img, lay, (x + shake, base - h - 20), a)
+    rect_a(img, (470, base - 4, 1040, base + 8), (62, 74, 92), clamp(t / 0.4))
+    ba = clamp((t - 0.6) / 0.4)
+    rect_a(img, (520, 1110, 1000, 1190), (40, 50, 64), ba * 0.95, 16)
+    text_a(img, (760, 1150), "BIG PHARMA", F("anton", 64), (255, 255, 255), ba, "mm")
+    p = pill(300, 120, SAFF, GRN, band=(255, 255, 255))
+    if t < hit - 0.9:
+        x, y, ang = 250, base - 70 + 6 * math.sin(tg * 3), 0
+    else:
+        q = clamp((t - (hit - 0.9)) / 0.9); x = 250 + 200 * ease(q); y = base - 70 - 260 * math.sin(q * math.pi) * (1 - q * 0.3); ang = -360 * ease(q)
+        if t > hit: x, y, ang = 450 - 30 * clamp((t - hit) / 0.5), base - 70, 0
+    pr = p.rotate(ang, expand=True, resample=Image.BICUBIC)
+    paste_a(img, pr, (x - pr.width / 2, y - pr.height / 2), clamp(t / 0.3))
+    text_a(img, (250, base + 70), "1 INDIAN COMPANY", F("disp", 34, "Black"), SAFF, clamp((t - 0.8) / 0.4), "mm")
+    for i, (s, col) in enumerate(sc.get("title", [])):
+        ta = sc.get("title_at", 0.6) + i * 0.35; q = back(clamp((t - ta) / 0.45))
+        text_a(img, (80, 330 + i * 140), s, F("anton", int(130 * clamp(q, 0.3, 1.1))), T.get(col, INKD) if col != "WHITE" else INKD, clamp((t - ta) / 0.25), shadow=6)
+    chrome(img, tg)
+
+def sc_l_pricetag(img, sc, t, D, tg, k):
+    """A swinging paper price tag with the year-2000 price."""
+    q = back(clamp((t - 0.2) / 0.7)); a = clamp((t - 0.2) / 0.3)
+    ang = 10 * math.sin(t * 2.4) * math.exp(-t * 0.5)
+    w, h = 760, 430; lay = Image.new("RGBA", (w + 200, h + 300), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    ox, oy = 100, 160
+    d.line([ox + w / 2 - 260, 0, ox + 70, oy + h / 2], fill=(150, 120, 80, 255), width=6)
+    d.polygon([(ox, oy + h / 2), (ox + 120, oy), (ox + w, oy), (ox + w, oy + h), (ox + 120, oy + h)], fill=(255, 236, 200, 255), outline=(200, 160, 100, 255))
+    d.ellipse([ox + 50, oy + h / 2 - 22, ox + 94, oy + h / 2 + 22], fill=(246, 248, 245, 255), outline=(200, 160, 100, 255), width=4)
+    f = fit_font("anton", 170, sc["price"], w - 220); d.text((ox + 160, oy + 160), sc["price"], font=f, fill=REDC + (255,), anchor="lm")
+    d.text((ox + 165, oy + 320), sc.get("per", "PER PATIENT · PER YEAR"), font=F("disp", 40, "Black"), fill=INKD + (255,), anchor="lm")
+    lay = lay.rotate(ang, center=(ox + w / 2 - 260, 0), resample=Image.BICUBIC)
+    s = clamp(q, 0.4, 1.1); lay = lay.resize((int(lay.width * s), int(lay.height * s)), Image.LANCZOS)
+    paste_a(img, lay, (W / 2 - lay.width / 2 + 100 * s, 430), a)
+    caption(img, sc, t, D, 1150)
+    chrome(img, tg)
+
+def sc_l_pills(img, sc, t, D, tg, k):
+    """Three separate medicines slide together into one pill."""
+    names = sc.get("names", ["STAVUDINE", "LAMIVUDINE", "NEVIRAPINE"]); cols = [((90, 140, 220), (60, 110, 200)), ((240, 170, 40), (226, 140, 20)), ((120, 190, 120), (80, 160, 90))]
+    ma = sc.get("merge_at", 2.5); m = ease(clamp((t - ma) / 0.9))
+    for i in range(3):
+        a = clamp((t - 0.3 - i * 0.35) / 0.3)
+        y0 = 520 + i * 230; y = y0 + (750 - y0) * m
+        x = W / 2 + (i - 1) * 40 * (1 - m)
+        p = pill(420, 150, *cols[i], label=names[i])
+        paste_a(img, p, (x - 210, y - 75), a * (1 - clamp((t - ma - 0.7) / 0.3)))
+    if t > ma + 0.6:
+        q = back(clamp((t - ma - 0.6) / 0.6)); s = clamp(q, 0.3, 1.15)
+        p = pill(int(560 * s), int(200 * s), TEAL, (0, 110, 104), label="3-IN-1")
+        glow = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(glow).ellipse([W / 2 - 380, 520, W / 2 + 380, 980], fill=TEAL + (int(70 * clamp(q, 0, 1)),))
+        img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(60)))
+        paste_a(img, p, (W / 2 - p.width / 2, 750 - p.height / 2), 1)
+    caption(img, sc, t, D, 1150)
+    chrome(img, tg)
+
+def sc_l_slash(img, sc, t, D, tg, k):
+    """Old price struck through, new price counts down, then the discount stamp and the 'less than $1 a day' chip."""
+    card(img, (90, 330, W - 90, 1060), clamp(t / 0.3))
+    text_a(img, (W / 2, 400), sc.get("kicker", ""), F("mono", 32), TEAL, clamp(t / 0.3), "mm")
+    text_a(img, (W / 2, 520), sc.get("old_label", "USA PRICE"), F("disp", 36, "Bold"), R.MUTED, clamp(t / 0.3), "mm")
+    text_a(img, (W / 2, 620), sc["old"], F("anton", 130), (150, 158, 166), clamp(t / 0.3), "mm")
+    sa = sc.get("slash_at", 1.0); q = ease(clamp((t - sa) / 0.4))
+    if q > 0:
+        d = ImageDraw.Draw(img); d.line([W / 2 - 300, 650, W / 2 - 300 + 600 * q, 590], fill=REDC + (255,), width=14)
+    na = sc.get("new_at", 1.6); g = ease(clamp((t - na) / 1.2))
+    if t > na:
+        o, n = float(sc["old"].replace("$", "").replace(",", "")), float(sc["new"].replace("$", "").replace(",", ""))
+        v = o + (n - o) * g
+        text_a(img, (W / 2, 760), sc.get("new_label", "CIPLA OFFER"), F("disp", 36, "Bold"), TEAL, clamp((t - na) / 0.3), "mm")
+        text_a(img, (W / 2, 890), f"${v:,.0f}", F("anton", 190), TEAL, clamp((t - na) / 0.3), "mm", shadow=6)
+    st = sc.get("stamp_at", 3.2)
+    if t > st:
+        q = back(clamp((t - st) / 0.4)); s = clamp(q, 0.3, 1.2)
+        lay = Image.new("RGBA", (520, 190), (0, 0, 0, 0)); ld = ImageDraw.Draw(lay)
+        ld.rounded_rectangle([6, 6, 514, 184], 26, outline=REDC + (255,), width=10); ld.text((260, 95), sc.get("stamp", "−96.6%"), font=F("anton", 110), fill=REDC + (255,), anchor="mm")
+        lay = lay.rotate(-8, expand=True, resample=Image.BICUBIC); lay = lay.resize((int(lay.width * s), int(lay.height * s)), Image.LANCZOS)
+        paste_a(img, lay, (W - 120 - lay.width, 1000 - lay.height / 2), clamp((t - st) / 0.15))
+    ca = sc.get("chip_at", 4.2)
+    if t > ca:
+        q = clamp((t - ca) / 0.4); s = sc.get("chip", "LESS THAN $1 A DAY"); f = F("disp", 56, "Black")
+        w = ImageDraw.Draw(img).textlength(s, font=f)
+        rect_a(img, (W / 2 - w / 2 - 40, 1150, W / 2 + w / 2 + 40, 1250), SAFF, q, 50)
+        text_a(img, (W / 2, 1200), s, f, (255, 255, 255), q, "mm")
+    for i, ln in enumerate(sc.get("lines", [])):
+        text_a(img, (W / 2, 1340 + i * 70), typed(ln, prog(t, 1.0 + i * 0.6, 0.7)), fit_font("disp", 50, ln, W - 140, "Bold"), INKD, 1, "mm")
+    chrome(img, tg)
+
+def lock(d, x, y, s, closed, col):
+    d.rounded_rectangle([x - 50 * s, y, x + 50 * s, y + 80 * s], 12 * s, fill=col + (255,))
+    if closed: d.arc([x - 34 * s, y - 60 * s, x + 34 * s, y + 20 * s], 180, 360, fill=col + (255,), width=int(14 * s))
+    else: d.arc([x - 34 * s + 40 * s, y - 70 * s, x + 34 * s + 40 * s, y + 10 * s], 180, 330, fill=col + (255,), width=int(14 * s))
+    d.ellipse([x - 10 * s, y + 25 * s, x + 10 * s, y + 45 * s], fill=(255, 255, 255, 255))
+
+def sc_l_law(img, sc, t, D, tg, k):
+    """India's patent law: the medicine itself could not be patented, only the method. Then the 'PIRATE?' stamp."""
+    for i, (title, sub, closed, col) in enumerate(sc["cards"]):
+        col = tuple(col)
+        ca = sc.get("card_at", [0.4, 1.8])[i]; a = clamp((t - ca) / 0.4); y0 = 340 + i * 420
+        if a <= 0: continue
+        card(img, (90, y0, W - 90, y0 + 370), a)
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); lock(ImageDraw.Draw(lay), 220, y0 + 130, 1.2, closed, col); img.alpha_composite(lay)
+        text_a(img, (340, y0 + 110), title, fit_font("disp", 56, title, W - 480, "Black"), INKD, a)
+        for j, ln in enumerate(sub): text_a(img, (342, y0 + 200 + j * 56), ln, fit_font("inter", 40, ln, W - 480, "SemiBold"), col, a)
+    pa = sc.get("pirate_at", D * 0.65)
+    if t > pa:
+        q = back(clamp((t - pa) / 0.4)); s = clamp(q, 0.3, 1.2)
+        lay = Image.new("RGBA", (640, 200), (0, 0, 0, 0)); ld = ImageDraw.Draw(lay)
+        ld.rounded_rectangle([6, 6, 634, 194], 26, outline=REDC + (255,), width=10); ld.text((320, 100), sc.get("stamp", "“PIRATE?”"), font=F("anton", 110), fill=REDC + (255,), anchor="mm")
+        lay = lay.rotate(6, expand=True, resample=Image.BICUBIC); lay = lay.resize((int(lay.width * s), int(lay.height * s)), Image.LANCZOS)
+        paste_a(img, lay, (W / 2 - lay.width / 2, 1250 - lay.height / 2), clamp((t - pa) / 0.15))
+        if sc.get("stamp_sub"): text_a(img, (W / 2, 1420), sc["stamp_sub"], fit_font("inter", 38, sc["stamp_sub"], W - 160, "SemiBold"), R.MUTED, clamp((t - pa - 0.4) / 0.4), "mm")
+    chrome(img, tg)
+
+def sc_l_court(img, sc, t, D, tg, k):
+    """39 company blocks line up against one country; on drop_at they topple and fade."""
+    text_a(img, (W / 2, 340), sc.get("title", ""), fit_font("disp", 62, sc.get("title", ""), W - 140, "Black"), INKD, clamp(t / 0.3), "mm")
+    text_a(img, (W / 2, 420), typed(sc.get("kicker", ""), prog(t, 0.2, 0.7)), F("mono", 30), TEAL, 1, "mm")
+    da = sc.get("drop_at", D * 0.6); n = sc.get("n", 39)
+    for i in range(n):
+        r_, c = divmod(i, 8); x = 150 + c * 105; y = 520 + r_ * 110
+        a = clamp((t - 0.4 - i * 0.03) / 0.2)
+        if t > da:
+            q = clamp((t - da - (i % 8) * 0.05) / 0.6); y += 500 * q * q; a *= 1 - q
+        if a <= 0: continue
+        rect_a(img, (x, y, x + 86, y + 90), (84, 98, 118), a, 10)
+        for wy in range(2):
+            for wx in range(3): rect_a(img, (x + 12 + wx * 24, y + 16 + wy * 30, x + 26 + wx * 24, y + 36 + wy * 30), (200, 216, 232), a, 2)
+    if t > 0.8:
+        a = clamp((t - 0.8) / 0.4); card(img, (300, 1100, 780, 1240), a)
+        text_a(img, (540, 1170), sc.get("vs", "vs SOUTH AFRICA"), F("disp", 48, "Black"), INKD, a, "mm")
+    if t > da + 0.5:
+        q = back(clamp((t - da - 0.5) / 0.5)); a = clamp((t - da - 0.5) / 0.3)
+        text_a(img, (W / 2, 1350), sc.get("result", "CASE DROPPED"), F("anton", int(130 * clamp(q, 0.3, 1.1))), TEAL, a, "mm", shadow=6)
+        text_a(img, (W / 2, 1460), sc.get("date", ""), F("mono", 36), R.MUTED, a, "mm")
+    chrome(img, tg)
+
+def sc_l_chart(img, sc, t, D, tg, k):
+    """Price per patient per year falling: bars with labels."""
+    text_a(img, (W / 2, 340), sc.get("title", ""), fit_font("disp", 60, sc.get("title", ""), W - 140, "Black"), INKD, clamp(t / 0.3), "mm")
+    text_a(img, (W / 2, 420), typed(sc.get("kicker", ""), prog(t, 0.2, 0.7)), F("mono", 30), TEAL, 1, "mm")
+    card(img, (90, 480, W - 90, 1420), clamp(t / 0.3))
+    bars = sc["bars"]; mx = max(b[1] for b in bars); ats = sc.get("bar_at", [0.6 + i * 1.2 for i in range(len(bars))])
+    base = 1280; top = 600; bw = 200
+    for i, (lab, v, vs) in enumerate(bars):
+        x = 200 + i * 270; g = ease(clamp((t - ats[i]) / 0.9)); a = clamp((t - ats[i]) / 0.3)
+        if a <= 0: continue
+        h = max(10, (base - top) * v / mx * g)
+        rect_a(img, (x, base - h, x + bw, base), REDC if i == 0 else TEAL, a, 14)
+        text_a(img, (x + bw / 2, base - h - 50), vs, F("anton", 70), REDC if i == 0 else TEAL, a, "mm")
+        text_a(img, (x + bw / 2, base + 60), lab, F("disp", 46, "Black"), INKD, a, "mm")
+    if sc.get("note"):
+        na = sc.get("note_at", D * 0.75); text_a(img, (W / 2, 1520), sc["note"], fit_font("disp", 52, sc["note"], W - 140, "Black"), SAFF, clamp((t - na) / 0.4), "mm")
+    chrome(img, tg)
+
+def sc_l_donut(img, sc, t, D, tg, k):
+    """Donut share with the India flag at the centre."""
+    cx, cy, r = W / 2, 760, 330; g = ease(clamp((t - 0.6) / 1.6)); a = clamp(t / 0.3)
+    card(img, (90, 330, W - 90, 1190), a)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(226, 232, 236, int(255 * a)))
+    d.pieslice([cx - r, cy - r, cx + r, cy + r], -90, -90 + 360 * sc["share"] * g, fill=SAFF + (int(255 * a),))
+    d.ellipse([cx - r * 0.62, cy - r * 0.62, cx + r * 0.62, cy + r * 0.62], fill=(255, 255, 255, int(255 * a)))
+    img.alpha_composite(lay)
+    paste_a(img, R.flag("IN", 150), (cx - 75, cy - 150), a)
+    text_a(img, (cx, cy + 70), f"{round(sc['share'] * 100 * g)}%", F("anton", 120), SAFF, a, "mm")
+    caption(img, sc, t, D, 1290)
+    chrome(img, tg)
+
+def person_icon(d, x, y, s, col):
+    d.ellipse([x - 14 * s, y, x + 14 * s, y + 28 * s], fill=col + (255,))
+    d.rounded_rectangle([x - 22 * s, y + 32 * s, x + 22 * s, y + 80 * s], 14 * s, fill=col + (255,))
+
+def sc_l_people(img, sc, t, D, tg, k):
+    """People on treatment: a grid of figures that light up from the old number to the new one, with a counter."""
+    a = clamp(t / 0.3); card(img, (90, 330, W - 90, 1130), a)
+    n0, n1 = sc["from"], sc["to"]; g = ease(clamp((t - sc.get("grow_at", 1.0)) / 2.2)); v = n0 + (n1 - n0) * g
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    total = int(round(n1)); lit = v
+    for i in range(total + 3):
+        r_, c = divmod(i, 7); x = 210 + c * 110; y = 380 + r_ * 140
+        if y > 1050: break
+        col = TEAL if i < int(lit) else (214, 222, 226)
+        if i < int(round(n0)): col = (0, 110, 104)
+        person_icon(d, x, y, 1.0, col)
+    paste_a(img, lay, (0, 0), a)
+    text_a(img, (W / 2, 1230), f"{v:.1f} MILLION", F("anton", 140), TEAL, clamp((t - 0.6) / 0.3), "mm", shadow=6)
+    for i, ln in enumerate(sc.get("lines", [])):
+        text_a(img, (W / 2, 1360 + i * 66), typed(ln, prog(t, 1.2 + i * 0.6, 0.7)), fit_font("disp", 48, ln, W - 140, "Bold"), INKD, 1, "mm")
+    chrome(img, tg)
+
+R.SCENE_FN.update({"l_hook": sc_l_hook, "l_pricetag": sc_l_pricetag, "l_pills": sc_l_pills, "l_slash": sc_l_slash, "l_law": sc_l_law,
+                   "l_court": sc_l_court, "l_chart": sc_l_chart, "l_donut": sc_l_donut, "l_people": sc_l_people})
 
 if __name__ == "__main__":
     R.main()
