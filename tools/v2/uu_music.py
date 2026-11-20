@@ -36,7 +36,7 @@ def riser(L):
 
 music = np.zeros(n)
 # drone bed
-drone = (saw(55, T + 1, 8) + saw(55.35, T + 1, 8) * 0.8 + saw(82.4, T + 1, 6) * 0.35)[:n]
+drone = (saw(55, T + 2, 8) + saw(55.35, T + 2, 8) * 0.8 + saw(82.4, T + 2, 6) * 0.35)[:n]
 drone = lp(drone, 260) * (0.6 + 0.4 * np.sin(2 * np.pi * t / 9) ** 2)
 music += drone * 0.05
 pad = (np.sin(2 * np.pi * 880 * t) * 0.4 + np.sin(2 * np.pi * 1318.5 * t) * 0.25) * (0.5 + 0.5 * np.sin(2 * np.pi * 0.23 * t))
