@@ -94,7 +94,7 @@ def ll_stat(img, sc, t, D, tg, k):
 
 def kenburns(path, w, h, t, D):
     p = os.path.join(ROOT, path)
-    if not os.path.exists(p): return None
+    if not path or not os.path.isfile(p): return None
     im = Image.open(p).convert("RGB"); s = max(w / im.width, h / im.height) * (1.06 + 0.06 * t / max(D, 1))
     im = im.resize((int(im.width * s) + 1, int(im.height * s) + 1), Image.LANCZOS)
     ox = (im.width - w) * (0.5 + 0.3 * (t / max(D, 1) - 0.5)); oy = (im.height - h) / 2
@@ -118,6 +118,16 @@ def ll_photo(img, sc, t, D, tg, k):
         paste_a(img, ph, (x0, y0), a)
         cr = credit_for(sc["img"])
         if cr: text_a(img, (x1 - 10, y1 + 34), "Photo: " + cr, F("inter", 18), MUT, a, "rm")
+    else:   # no photo: an illustrated India-made pill with a glowing approval seal
+        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(g).ellipse([cx - 330, cy - 250, cx + 330, cy + 250], fill=SAFF + (int(60 * a),)); img.alpha_composite(g.filter(ImageFilter.GaussianBlur(60)))
+        p = pill(560, 220, SAFF, GRN, band=(255, 255, 255)).rotate(-15 + 4 * math.sin(tg), expand=True, resample=Image.BICUBIC)
+        paste_a(img, p, (cx - p.width / 2 - 40, cy - p.height / 2 + 40), a)
+        q = back(clamp((t - 1.2) / 0.5)); r = 95 * clamp(q, 0.3, 1.1)
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+        d.ellipse([cx + 150 - r, cy - 190 - r, cx + 150 + r, cy - 190 + r], fill=TEAL + (255,), outline=(255, 255, 255, 255), width=6)
+        d.line([cx + 110, cy - 190, cx + 140, cy - 160, cx + 195, cy - 225], fill=(255, 255, 255, 255), width=14, joint="curve")
+        paste_a(img, lay, (0, 0), clamp((t - 1.2) / 0.2))
     left_text(img, sc, t, w=780); fin(img, sc, t, tg)
 
 def ll_date(img, sc, t, D, tg, k):
@@ -222,7 +232,14 @@ def ll_court(img, sc, t, D, tg, k):
     fin(img, sc, t, tg)
 
 def ll_doc(img, sc, t, D, tg, k):
-    a = clamp((t - 0.2) / 0.4); x0, y0 = 560, 200
+    a = clamp((t - 0.2) / 0.4); x0, y0 = 860, 200
+    ph = kenburns(sc.get("img", ""), 720, 520, t, D)
+    if ph is not None:
+        m = Image.new("L", ph.size, 0); ImageDraw.Draw(m).rounded_rectangle([0, 0, ph.width - 1, ph.height - 1], 22, fill=255); ph.putalpha(m)
+        card(img, (96, 286, 836, 826), a, 30); paste_a(img, ph, (106, 296), a)
+        rect_a(img, (126, 726, 446, 796), (22, 30, 40), 0.8 * a, 14); text_a(img, (286, 761), "DOHA, QATAR", F("anton", 44), (255, 255, 255), a, "mm", shadow=0)
+        cr = credit_for(sc["img"])
+        if cr: text_a(img, (826, 850), "Photo: " + cr, F("inter", 18), MUT, a, "rm")
     card(img, (x0, y0, x0 + 800, y0 + 760), a, 12, fill=(255, 252, 240))
     text_a(img, (x0 + 400, y0 + 80), "WORLD TRADE ORGANIZATION", F("mono", 28), MUT, a, "mm")
     text_a(img, (x0 + 400, y0 + 160), sc.get("title", ""), F("anton", 76), INK, a, "mm")
@@ -230,6 +247,7 @@ def ll_doc(img, sc, t, D, tg, k):
     d = ImageDraw.Draw(img)
     for j in range(8): d.rounded_rectangle([x0 + 80, y0 + 310 + j * 44, x0 + 720 - (j % 3) * 60, y0 + 324 + j * 44], 7, fill=(220, 224, 214, int(255 * a)))
     ha = sc.get("hl_at", D * 0.45); q = ease(clamp((t - ha) / 0.6))
+    if ph is None: pass
     if q > 0:
         rect_a(img, (x0 + 60, y0 + 560, x0 + 60 + 680 * q, y0 + 690), (255, 226, 120), 0.85, 8)
         ln = sc.get("line", ""); parts = [ln[:len(ln) // 2].rsplit(" ", 1)[0], ""]; parts[1] = ln[len(parts[0]):].strip()
