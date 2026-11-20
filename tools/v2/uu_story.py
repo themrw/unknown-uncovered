@@ -1441,5 +1441,86 @@ def sc_l_people(img, sc, t, D, tg, k):
 R.SCENE_FN.update({"l_hook": sc_l_hook, "l_pricetag": sc_l_pricetag, "l_pills": sc_l_pills, "l_slash": sc_l_slash, "l_law": sc_l_law,
                    "l_court": sc_l_court, "l_chart": sc_l_chart, "l_donut": sc_l_donut, "l_people": sc_l_people})
 
+
+# ---------------------------------------------------------------- reel 022: weapon material left over (punch format)
+def atom(img, cx, cy, r, tg, a, col):
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for j in range(3):
+        e = Image.new("RGBA", (int(r * 2.4), int(r * 2.4)), (0, 0, 0, 0)); ImageDraw.Draw(e).ellipse([r * 0.2, r * 0.85, r * 2.2, r * 1.55], outline=col + (230,), width=max(4, r // 30))
+        e = e.rotate(j * 60 + tg * 12, resample=Image.BICUBIC); lay.alpha_composite(e, (int(cx - r * 1.2), int(cy - r * 1.2)))
+        ang = tg * (2.2 + j * 0.7) + j * 2.1; ex, ey = r * math.cos(ang), r * 0.35 * math.sin(ang)
+        rot = math.radians(-(j * 60 + tg * 12)); px, py = cx + ex * math.cos(rot) - ey * math.sin(rot), cy + ex * math.sin(rot) + ey * math.cos(rot)
+        d.ellipse([px - r * 0.07, py - r * 0.07, px + r * 0.07, py + r * 0.07], fill=(255, 255, 255, 255))
+    g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(g).ellipse([cx - r * 0.5, cy - r * 0.5, cx + r * 0.5, cy + r * 0.5], fill=col + (200,))
+    img.alpha_composite(g.filter(ImageFilter.GaussianBlur(r // 4))); d.ellipse([cx - r * 0.18, cy - r * 0.18, cx + r * 0.18, cy + r * 0.18], fill=col + (255,))
+    paste_a(img, lay, (0, 0), a)
+
+def sc_n_hook(img, sc, t, D, tg, k):
+    """Frame one is already loud: crossed-out bombs number, then the 'material left' reveal."""
+    atom(img, W / 2, 1060, 230, tg, 1.0, T["accent"])
+    text_a(img, (W / 2, 330), sc.get("top", ""), fit_font("anton", 150, sc.get("top", ""), W - 120), WHITE, 1, "mm", shadow=10)
+    q = ease(clamp((t - 0.25) / 0.35)); d = ImageDraw.Draw(img)
+    if q > 0: d.line([150, 370, 150 + (W - 300) * q, 290], fill=T["alert"] + (255,), width=18)
+    text_a(img, (W / 2, 450), sc.get("top_sub", ""), F("hindi", 64), MUTED, 1, "mm", shadow=6)
+    ra = sc.get("reveal_at", 2.0)
+    if t > ra:
+        q = back(clamp((t - ra) / 0.5))
+        text_a(img, (W / 2, 620), sc.get("big", ""), fit_font("anton", int(190 * clamp(q, 0.3, 1.1)), sc.get("big", ""), W - 100), T["accent"], clamp((t - ra) / 0.2), "mm", shadow=12)
+        text_a(img, (W / 2, 760), sc.get("big_sub", ""), F("hindi", 66), WHITE, clamp((t - ra - 0.2) / 0.3), "mm", shadow=8)
+    chrome(img, tg)
+
+def cylinder(img, x, y0, y1, w, frac, col, a, label, val):
+    rect_a(img, (x - w / 2, y0, x + w / 2, y1), (20, 24, 26), 0.85 * a, 30, col, 3)
+    h = (y1 - y0 - 16) * frac
+    rect_a(img, (x - w / 2 + 8, y1 - 8 - h, x + w / 2 - 8, y1 - 8), col, 0.85 * a, 24)
+    text_a(img, (x, y1 - 8 - h - 60), val, F("anton", 84), WHITE, a, "mm", shadow=8)
+    text_a(img, (x, y1 + 56), label, fit_font("disp", 44, label, w + 140, "Black"), col, a, "mm")
+
+def sc_n_stock(img, sc, t, D, tg, k):
+    text_a(img, (W / 2, 330), sc.get("kicker", ""), F("mono", 34), T["accent2"], clamp(t / 0.2), "mm")
+    g = ease(clamp((t - 0.2) / 1.4)); tot = sc["total"]
+    text_a(img, (W / 2, 460), f"{tot * g:,.0f} TONNES", F("anton", 140), WHITE, 1, "mm", shadow=10)
+    for i, (lab, v, col) in enumerate(sc["parts"]):
+        a = clamp((t - 0.6 - i * 0.4) / 0.3); cylinder(img, W / 2 + (i - 0.5) * 420, 640, 1210, 300, v / tot * g, T[col], a, lab, f"{v * g:,.0f} t")
+    chrome(img, tg)
+
+def bomb_icon(d, x, y, s, col):
+    d.ellipse([x - 22 * s, y - 22 * s, x + 22 * s, y + 22 * s], fill=col + (255,)); d.rectangle([x - 6 * s, y - 34 * s, x + 6 * s, y - 20 * s], fill=col + (255,))
+    d.line([x, y - 34 * s, x + 10 * s, y - 44 * s], fill=(255, 200, 80, 255), width=max(2, int(3 * s)))
+
+def sc_n_math(img, sc, t, D, tg, k):
+    """8 kg = 1 bomb, then a field of bombs and a counter racing past today's arsenal."""
+    a = clamp(t / 0.2)
+    rect_a(img, (90, 290, W - 90, 520), (16, 20, 22), 0.85 * a, 26, T["accent"], 2)
+    text_a(img, (W / 2, 360), sc.get("eq1", ""), F("anton", 80), WHITE, a, "mm"); text_a(img, (W / 2, 460), sc.get("eq2", ""), F("anton", 60), MUTED, a, "mm")
+    ca = sc.get("count_at", 2.5); g = ease(clamp((t - ca) / 2.0))
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    n = int(100 * g)
+    for i in range(100):
+        r_, c = divmod(i, 10); col = T["alert"] if i < 10 else T["accent"]
+        if i < n: bomb_icon(d, 150 + c * 87, 610 + r_ * 56, 0.85, col)
+    paste_a(img, lay, (0, 0), 1)
+    if t > ca:
+        v = sc["count"] * g
+        text_a(img, (W / 2, 1280), f"≈ {v:,.0f}", F("anton", 120), T["accent"], clamp((t - ca) / 0.3), "mm", shadow=10)
+    if t > ca + 2.3:
+        text_a(img, (W / 2, 1180), sc.get("vs", ""), F("disp", 40, "Black"), T["alert"], clamp((t - ca - 2.3) / 0.4), "mm")
+    chrome(img, tg)
+
+def sc_n_flagstat(img, sc, t, D, tg, k):
+    a = clamp(t / 0.2); q = back(clamp(t / 0.5))
+    paste_a(img, R.flag(sc["code"], int(300 * clamp(q, 0.3, 1.1))), (W / 2 - 150 * clamp(q, 0.3, 1.1), 330), a)
+    text_a(img, (W / 2, 640), sc.get("big", ""), fit_font("anton", 170, sc.get("big", ""), W - 120), WHITE, a, "mm", shadow=10)
+    text_a(img, (W / 2, 770), sc.get("sub", ""), fit_font("disp", 50, sc.get("sub", ""), W - 140, "Black"), MUTED, clamp((t - 0.4) / 0.3), "mm")
+    ra = sc.get("reveal_at", 1.8)
+    if t > ra:
+        q2 = back(clamp((t - ra) / 0.5)); s = sc.get("reveal", "")
+        rect_a(img, (110, 880, W - 110, 1180), (16, 20, 22), 0.9 * clamp((t - ra) / 0.2), 30, T["alert"], 4)
+        text_a(img, (W / 2, 990), s, fit_font("anton", int(130 * clamp(q2, 0.3, 1.1)), s, W - 280), T["alert"], clamp((t - ra) / 0.2), "mm", shadow=8)
+        text_a(img, (W / 2, 1110), sc.get("reveal_sub", ""), fit_font("disp", 44, sc.get("reveal_sub", ""), W - 280, "Black"), WHITE, clamp((t - ra - 0.3) / 0.3), "mm")
+    chrome(img, tg)
+
+R.SCENE_FN.update({"n_hook": sc_n_hook, "n_stock": sc_n_stock, "n_math": sc_n_math, "n_flagstat": sc_n_flagstat})
+
 if __name__ == "__main__":
     R.main()

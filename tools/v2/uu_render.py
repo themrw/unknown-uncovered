@@ -51,6 +51,7 @@ THEMES = {
 T = THEMES[SPEC.get("theme", "war")]
 WHITE = (242, 242, 238); MUTED = (150, 156, 150); BLACK = (0, 0, 0)
 LIGHT = bool(T.get("light"))
+PUNCH = bool(SPEC.get("punch"))   # Shorts v2: instant first frame, clean chrome, burned-in Hindi captions
 if LIGHT: WHITE = (22, 30, 40); MUTED = (92, 102, 112)     # "WHITE" is the main text ink; on light themes it is dark
 
 def clamp(x, a=0.0, b=1.0): return max(a, min(b, x))
@@ -363,6 +364,9 @@ def chrome(img, tg, a=1.0, header=True):
         paste_a(img, LOGO.resize((72, 72), Image.LANCZOS), (W - 56 - 72, 30), a * 0.92)
         brackets(img, (24, 20, W - 24, H - 58), T["accent2"], 0.22 * a, 40, 3)
         return
+    if PUNCH:   # clean Shorts look: no ticker, no header/source lines
+        paste_a(img, LOGO.resize((80, 80), Image.LANCZOS), (W - 60 - 80, 150), a * 0.92)
+        return
     paste_a(img, TICK_IM.crop((off, 0, off + W, 44)), (0, 118), a)
     if header:
         rect_a(img, (70, 190, 80, 228), T["alert"], a)
@@ -621,12 +625,45 @@ _yy, _xx = np.mgrid[0:H, 0:W]
 VIGNETTE = (1 - 0.5 * np.clip(((_xx - W / 2) / (W * 0.62)) ** 2 + ((_yy - H * 0.47) / (H * 0.6)) ** 2, 0, 1) ** 1.4)[..., None] if LOOK == "cinematic" else None
 del _yy, _xx
 
+_cap = {}
+def caption_chunks(vo, maxc=20):
+    """Split narration into short phrases (by words, ~maxc chars), breaking at punctuation."""
+    out, cur = [], ""
+    for w in vo.replace("—", " ").split():
+        if cur and (len(cur) + 1 + len(w) > maxc): out.append(cur); cur = w
+        else: cur = (cur + " " + w).strip()
+        if cur and cur[-1] in "।,?!:;": out.append(cur); cur = ""
+    if cur: out.append(cur)
+    return out
+
+def draw_caption(img, sc, t, D):
+    """Big Hindi caption for the phrase being spoken now (timed by character share of the narration)."""
+    vo = sc.get("caption", sc.get("vo", ""))
+    if not vo or sc.get("type") == "outro": return
+    key = id(sc)
+    if key not in _cap:
+        ch = caption_chunks(vo); tot = sum(len(c) for c in ch); lead = SPEC.get("lead", 0.3)
+        i = SPEC["scenes"].index(sc) if sc in SPEC["scenes"] else -1
+        vd = DURS[i] if 0 <= i < len(DURS) else max(0.5, D - lead - SPEC.get("tail", 0.4)); acc = 0; times = []
+        for c in ch: times.append((lead + acc / tot * vd, lead + (acc + len(c)) / tot * vd, c)); acc += len(c)
+        _cap[key] = times
+    for t0, t1, c in _cap[key]:
+        if t0 <= t < t1 + 0.12:
+            q = clamp((t - t0) / 0.12); y = SPEC.get("caption_y", 1440)
+            s_ = c.rstrip("।,;:"); f = fit_font("hindi", 84, s_, W - 140)
+            w = ImageDraw.Draw(img).textlength(s_, font=f)
+            rect_a(img, (W / 2 - w / 2 - 36, y - 70, W / 2 + w / 2 + 36, y + 62), (0, 0, 0) if not LIGHT else (255, 255, 255), 0.62 * q, 26)
+            text_a(img, (W / 2, y - 8 + 10 * (1 - q)), s_, f, (255, 232, 90) if not LIGHT else INK_CAP, q, "mm", shadow=6)
+            break
+INK_CAP = (22, 30, 40)
+
 def frame(k, t, t0):
     sc, D = SCENES[k]; tg = t0 + t
     ox = 60 + 50 * math.sin(tg * 0.09); oy = 60 + 50 * math.cos(tg * 0.07)
     img = BG.crop((int(ox), int(oy), int(ox) + W, int(oy) + H))
     particles(img, tg)
     SCENE_FN[sc["type"]](img, sc, t, D, tg, k)
+    if SPEC.get("captions"): draw_caption(img, sc, t, D)
     arr = np.asarray(img.convert("RGB")).astype(np.int16)
     gr = np.asarray(GRAIN[int(tg * FPS) % len(GRAIN)]).astype(np.int16) - 128
     arr += (gr * SPEC.get("grain", 0.06 if LIGHT else 0.18)).astype(np.int16)[..., None]
@@ -647,7 +684,7 @@ def frame(k, t, t0):
             arr[y:y + h] = np.roll(arr[y:y + h], sh, axis=1)
         arr[..., 0] = np.roll(arr[..., 0], int(12 * g), axis=1); arr[..., 2] = np.roll(arr[..., 2], -int(12 * g), axis=1)
         if t < 2 / FPS: arr = arr + 90
-    if k == 0 and t < 0.6: arr = (255 - (255 - arr) * (t / 0.6)) if LIGHT else arr * (t / 0.6)
+    if k == 0 and t < 0.6 and not PUNCH: arr = (255 - (255 - arr) * (t / 0.6)) if LIGHT else arr * (t / 0.6)
     if k == len(SCENES) - 1 and D - t < 0.5: arr = arr * ((D - t) / 0.5)
     return np.clip(arr, 0, 255).astype(np.uint8)
 
