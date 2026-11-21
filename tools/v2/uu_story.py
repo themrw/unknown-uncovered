@@ -93,7 +93,7 @@ def caption(img, sc, t, D, y0=1110):
     if sc.get("big"):
         g = back(clamp((t - 0.5) / 0.5)); s = sc["big"]
         f = fit_font("anton", int(230 * (0.85 + 0.15 * clamp(g, 0, 1.2))), s, W - 120)
-        text_a(img, (W / 2, y0 + 170), s, f, WHITE, clamp((t - 0.5) / 0.25), "mm", shadow=12)
+        text_a(img, (W / 2, y0 + 170), s, f, (250, 250, 246) if (R.LIGHT and sc.get("type") == "photo") else WHITE, clamp((t - 0.5) / 0.25), "mm", shadow=12)
     ly = y0 + (330 if sc.get("big") else 110)
     for i, ln in enumerate(sc.get("lines", [])):
         st = 1.0 + i * 0.7
@@ -101,7 +101,7 @@ def caption(img, sc, t, D, y0=1110):
             rise_line(img, ln, W / 2, ly + i * 70, fit_font("disp", 54, ln, W - 120, "Bold"), t - st)
         else:
             text_a(img, (W / 2, ly + i * 70), typed(ln, prog(t, st, 0.7)), fit_font("disp", 54, ln, W - 120, "Bold"),
-                   R.MUTED if R.LIGHT else (238, 236, 228), 1, "mm", shadow=8)
+                   R.MUTED if (R.LIGHT and sc.get("type") != "photo") else (238, 236, 228), 1, "mm", shadow=8)
 
 def sc_photo(img, sc, t, D, tg, k):
     kenburns(img, sc["img"], t, D, k)
@@ -2006,6 +2006,33 @@ def sc_rc_score(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"rc_hook": sc_rc_hook, "rc_claim": sc_rc_claim, "rc_growth": sc_rc_growth, "rc_jobs": sc_rc_jobs,
                    "rc_picture": sc_rc_picture, "rc_score": sc_rc_score})
+
+
+# ---------------------------------------------------------------- reel 026: ORS (light theme)
+def sc_o_compare(img, sc, t, D, tg, k):
+    """Two big horizontal bars on white cards (e.g. 30% vs 3.6% deaths), then an ironic stamp."""
+    a = clamp(t / 0.3)
+    text_a(img, (W / 2, 330), sc.get("kicker", ""), fit_font("anton", 70, sc.get("kicker", ""), W - 140), T["accent"], a, "mm")
+    ats = sc.get("row_at", [0.6, 3.0]); mx = max(r[1] for r in sc["rows"])
+    for i, (lab, v, vs, col) in enumerate(sc["rows"]):
+        y = 560 + i * 330; b = clamp((t - ats[i] + 0.3) / 0.3); g = ease(clamp((t - ats[i]) / 0.9)); c = T.get(col, T["accent"]) if isinstance(col, str) else tuple(col)
+        card(img, (80, y - 120, W - 80, y + 150), b, 26)
+        text_a(img, (120, y - 70), lab, fit_font("disp", 42, lab, W - 260, "Bold"), WHITE, b, "lm")
+        rect_a(img, (120, y + 10, W - 120, y + 90), (232, 238, 236), b, 16)
+        if g > 0: rect_a(img, (120, y + 10, 120 + (W - 240) * max(0.04, v / mx) * g, y + 90), c, b, 16)
+        text_a(img, (W - 130, y - 70), vs, F("anton", 96), c, clamp((t - ats[i] - 0.4) / 0.3), "rm")
+    text_a(img, (W / 2, 1250), sc.get("src", ""), fit_font("mono", 24, sc.get("src", ""), W - 140), MUTED, a, "mm")
+    sa = sc.get("stamp_at")
+    if sa is not None and t > sa:
+        sp = clamp((t - sa) / 0.18); s_ = 1.8 - 0.8 * ease(sp)
+        f = F("anton", 72); lab = sc.get("stamp", ""); tw = ImageDraw.Draw(Image.new("L", (1, 1))).textlength(lab, font=f)
+        st = Image.new("RGBA", (int(tw) + 70, 120), (0, 0, 0, 0)); sd = ImageDraw.Draw(st)
+        sd.rounded_rectangle([5, 5, st.width - 5, 115], 12, outline=T["alert"] + (235,), width=8); sd.text((st.width / 2, 60), lab, font=f, fill=T["alert"] + (235,), anchor="mm")
+        st = st.rotate(-7, expand=True, resample=Image.BICUBIC); st = st.resize((int(st.width * s_), int(st.height * s_)), Image.LANCZOS)
+        paste_a(img, st, (W / 2 - st.width / 2, 1110 - st.height / 2), clamp(sp * 1.5))
+    chrome(img, tg)
+
+R.SCENE_FN.update({"o_compare": sc_o_compare})
 
 if __name__ == "__main__":
     R.main()

@@ -1,0 +1,36 @@
+import json
+CTA = "ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+M = "media/026_ors/"
+SAYMAP = {"ओ-आर-एस": "ORS", "डब्ल्यू-एच-ओ": "WHO"}
+spec = {
+ "format": "story", "theme": "pharma", "tts": "parler", "speed": 1.08, "lead": 0.2, "tail": 0.35, "voice_job": "026_main",
+ "punch": True, "captions": True, "caption_y": 1520,
+ "header": "ORS: THE INDIAN STORY", "source": "The Lancet 1953 & 1978 · Johns Hopkins Med J 1973 · WHO Bulletin · Our World in Data", "ticker": "",
+ "credits_from": [M + "credits.json"],
+ "scenes": [
+  {"type": "photo", "img": M + "packet_1.jpg", "cap_y": 860, "cap_lead": 1.0, "dark": 0.5, "kicker": "ONE SMALL PACKET", "big": "~70 MILLION", "lines": ["lives saved (estimate)", "and its story ran through Kolkata, 3 times"],
+   "vo": "इस छोटे से पैकेट ने, दुनिया में लगभग सात करोड़ ज़िंदगियाँ बचाई हैं। और इसकी कहानी, तीन बार कोलकाता से होकर गुज़री। इसके पहले हीरो को तो, दुनिया लगभग भूल ही चुकी है।"},
+  {"type": "photo", "img": M + "cholera2_1.jpg", "dark": 0.35, "cap_y": 860, "kicker": "BEFORE ORS", "big": "ONLY IV DRIPS", "lines": ["glass bottles, needles, trained staff", "few villages had any of it"],
+   "vo": "ओ-आर-एस से पहले, हैज़े का इलाज, सिर्फ़ नस में ड्रिप से होता था। शीशे की बोतलें, सुइयाँ, और ट्रेंड स्टाफ़। गाँवों में, ये सब कहाँ से आता?"},
+  {"type": "dossier", "file": "THE LANCET · NOV 1953", "ref": "CALCUTTA", "stamp": "IGNORED",
+   "rows": [["DOCTOR", "HEMENDRA NATH CHATTERJEE"], ["CITY", "CALCUTTA, INDIA"], ["PATIENTS", "186 (MILD-MODERATE CHOLERA)"], ["GIVEN", "SALT + GLUCOSE BY MOUTH"], ["RESULT", "ALL RECOVERED"]],
+   "vo": "उन्नीस सौ तिरेपन में, कलकत्ता के डॉक्टर हेमेंद्र नाथ चटर्जी ने, नमक और ग्लूकोज़ का घोल पिलाकर, हैज़े के एक सौ छियासी हल्के-मध्यम मरीज़ों का इलाज किया। सभी ठीक हुए। उन्होंने ये नतीजे, मशहूर जर्नल द लैंसेट में छापे। पर दुनिया ने, इस पर ध्यान ही नहीं दिया।"},
+  {"type": "photo", "img": M + "refugees_2.jpg", "dark": 0.35, "cap_y": 860, "kicker": "1971 · REFUGEE CAMPS, WEST BENGAL", "big": "IV RAN OUT", "lines": ["cholera in the refugee camps", "Dr Dilip Mahalanabis: give it by mouth"],
+   "vo": "फिर आया उन्नीस सौ इकहत्तर। बांग्लादेश युद्ध के बीच, लाखों शरणार्थी बंगाल के कैंपों में थे, और हैज़ा फैल गया। बनगाँव कैंप में, डॉक्टर दिलीप महालनोबिस के पास, ड्रिप ख़त्म हो चुकी थी। तो उन्होंने, सबको यही घोल पिलाना शुरू किया।"},
+  {"type": "o_compare", "kicker": "CHOLERA DEATHS · 1971 CAMPS", "rows": [["IV-ONLY CAMPS", 30, "20–30%", "alert"], ["MAHALANABIS'S CAMP (ORS)", 3.6, "3.6%", "accent"]],
+   "src": "SOURCE: MAHALANABIS ET AL., JOHNS HOPKINS MED J 1973 · WHO BULLETIN 2001", "stamp": "REJECTED BY JOURNALS",
+   "vo": "नतीजा चौंकाने वाला था। दूसरे कैंपों में, हैज़े के बीस से तीस प्रतिशत मरीज़ों की मौत हो रही थी। उनके कैंप में, सिर्फ़ तीन दशमलव छह प्रतिशत। फिर भी, कई जर्नलों ने, उनके पेपर पर भरोसा ही नहीं किया।"},
+  {"type": "photo", "img": M + "who_0.jpg", "cap_y": 860, "kicker": "1978 · WORLD HEALTH ORGANIZATION", "big": "DHIMAN BARUA", "lines": ["ex-Kolkata professor at WHO", "pushed ORS to the whole world"],
+   "vo": "तीसरे बंगाली डॉक्टर थे, धीमान बरुआ। कोलकाता के प्रोफ़ेसर रहे बरुआ, डब्ल्यू-एच-ओ में थे, और उनकी लगातार कोशिशों से, उन्नीस सौ अठहत्तर में, दस्त की बीमारियों से लड़ने का विश्व कार्यक्रम शुरू हुआ। उसी साल, द लैंसेट ने इसे, इस सदी की शायद सबसे बड़ी मेडिकल खोज कहा।"},
+  {"type": "photo", "img": M + "who_1.jpg", "cap_y": 860, "kicker": "TODAY", "big": "~70 MILLION", "lines": ["lives saved by oral rehydration", "with research in Dhaka, Kolkata & beyond"],
+   "vo": "ढाका और कोलकाता में, कई देशों के वैज्ञानिकों की रिसर्च के साथ मिलकर, आज अनुमान है कि इस घोल ने, लगभग सात करोड़ ज़िंदगियाँ बचाई हैं।"},
+  {"type": "outro", "min": 7.5, "highlight": ["IN"], "lines": [["3 Indian doctors.", "WHITE"], ["70 million lives.", "alert"]],
+   "vo": "तो अगली बार, जब आप ओ-आर-एस पिएँ, तो याद रखिए, इसकी कहानी में तीन भारतीय डॉक्टरों का बड़ा हाथ है। इनमें से आप किसका नाम पहले से जानते थे? कमेंट में बताइए। " + CTA},
+ ],
+}
+for sc in spec["scenes"]:
+    c = sc["vo"]
+    for a, b in SAYMAP.items(): c = c.replace(a, b)
+    sc["caption"] = c
+json.dump(spec, open("spec.json", "w"), ensure_ascii=False, indent=1)
+n = sum(len(x["vo"]) for x in spec["scenes"]); print(n, "chars ≈", round(n / 15.5 + len(spec["scenes"]) * 0.55), "s")
