@@ -107,7 +107,7 @@ def sc_photo(img, sc, t, D, tg, k):
     kenburns(img, sc["img"], t, D, k)
     img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(255 * sc.get("dark", 0.22)))))
     shade(img)
-    caption(img, sc, t, D, sc.get("cap_y", 1110))
+    caption(img, sc, t + sc.get("cap_lead", 0.0), D, sc.get("cap_y", 1110))
     credit(img, sc["img"], clamp(t / 0.6))
     chrome(img, tg)
 
@@ -730,7 +730,7 @@ def draw_fingerprint(img, sc, t, xl, xr, y0):
 def sc_fingerprint(img, sc, t, D, tg, k):
     """Evidence print on an old almanac page is scanned; a record card search flickers until it MATCHES."""
     a = draw_fingerprint(img, sc, t, 56, W - 56 - 460, sc.get("y", 370))
-    caption(img, sc, t, D, sc.get("cap_y", 1110))
+    caption(img, sc, t + sc.get("cap_lead", 0.0), D, sc.get("cap_y", 1110))
     chrome(img, tg, a)
 
 FVAL = [16, 16, 8, 8, 4, 4, 2, 2, 1, 1]

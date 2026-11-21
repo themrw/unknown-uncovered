@@ -1,29 +1,48 @@
 {
+ "format": "story",
  "theme": "nuclear",
  "tts": "parler",
- "lead": 0.15,
- "tail": 0.3,
- "voice_job": "024_v2",
- "speed": 1.1,
- "voice_desc": "Aman speaks with an urgent, intense and dramatic tone at a slightly fast pace, like a breaking-news documentary narrator revealing a dangerous secret. The recording is very high quality, with the voice sounding clear and very close up, with no background noise.",
+ "speed": 1.08,
+ "lead": 0.2,
+ "tail": 0.35,
+ "voice_job": "024_v3",
  "punch": true,
  "captions": true,
  "caption_y": 1500,
  "header": "AMERICA RESTARTS BOMB-CORE PRODUCTION",
  "source": "NNSA · GAO · Arms Control Assn · Bulletin of the Atomic Scientists · FAS",
  "ticker": "",
+ "credits_from": [
+  "media/024_pits/credits.json",
+  "media/024_pits_b/credits.json"
+ ],
  "scenes": [
   {
-   "type": "p_hook",
-   "min": 6.0,
-   "top": "AMERICA IS MAKING",
-   "top2": "BOMB 'HEARTS' AGAIN",
-   "num": "180",
-   "num_sub": "PER YEAR · 2050 TARGET",
-   "stamp": "NO TREATY LIMITS",
-   "reveal_at": 3.08,
-   "stamp_at": 5.05,
-   "vo": "अमेरिका फिर से, परमाणु बमों का 'दिल' बनाने लगा है! लक्ष्य? हर साल एक सौ अस्सी! और अमेरिका-रूस के परमाणु हथियारों पर, अब कोई सीमा नहीं। ये 'दिल' है क्या, और ये कहानी शुरू कहाँ से हुई?"
+   "type": "photo",
+   "img": "media/024_pits/rv_1.jpg",
+   "cap_y": 860,
+   "dark": 0.3,
+   "kicker": "2026 · UNITED STATES",
+   "big": "180 / YEAR",
+   "lines": [
+    "new nuclear bomb cores",
+    "the U.S. target by 2050"
+   ],
+   "vo": "अमेरिका ने चुपचाप एक ऐसा काम फिर से शुरू कर दिया है, जो सैंतीस साल से लगभग बंद पड़ा था। परमाणु बमों का 'दिल' बनाना। और लक्ष्य है, हर साल एक सौ अस्सी।",
+   "cap_lead": 1.0
+  },
+  {
+   "type": "photo",
+   "img": "media/024_pits_b/pubutton_1.jpg",
+   "cap_y": 860,
+   "kicker": "THE 'HEART' OF A NUCLEAR BOMB",
+   "big": "THE PIT",
+   "lines": [
+    "a ball of plutonium metal",
+    "about the size of a bowling ball",
+    "(photo: plutonium metal)"
+   ],
+   "vo": "ये 'दिल' है प्लूटोनियम का एक गोला, लगभग बॉलिंग बॉल जितना, जिसे कहते हैं 'पिट'। हर परमाणु बम के बीच में, यही होता है।"
   },
   {
    "type": "p_pit",
@@ -32,22 +51,27 @@
    "he": "HIGH EXPLOSIVE",
    "boom1": "ONE BLAST",
    "boom2": "A WHOLE CITY GONE",
-   "squeeze_at": 8.68,
-   "vo": "हर परमाणु बम के बीच में होता है, बॉलिंग बॉल जितना प्लूटोनियम का एक गोला, जिसे कहते हैं 'पिट'। चारों तरफ़ का विस्फोटक इसे एक पल में दबाता है, और फिर, ऐसा धमाका, जो पूरा शहर मिटा सकता है।"
+   "vo": "चारों तरफ़ लगा विस्फोटक, इसे एक पल में दबाता है। और फिर, ऐसा धमाका, जो पूरा शहर मिटा सकता है।",
+   "squeeze_at": 3.01
   },
   {
-   "type": "p_factory",
-   "place": "ROCKY FLATS, COLORADO",
-   "years": "1952 – 1989",
-   "big": "1,000 – 2,000",
-   "big_sub": "PITS EVERY YEAR",
-   "vo": "शीत युद्ध में, कोलोराडो का रॉकी फ़्लैट्स प्लांट, हर साल एक से दो हज़ार ऐसे पिट बनाता था।"
+   "type": "photo",
+   "img": "media/024_pits/rockyflats_0.jpg",
+   "cap_y": 860,
+   "kicker": "ROCKY FLATS, COLORADO · 1952–1989",
+   "big": "1,000–2,000",
+   "lines": [
+    "pits made every year",
+    "during the Cold War"
+   ],
+   "vo": "शीत युद्ध में ये पिट बनते थे, कोलोराडो के रॉकी फ़्लैट्स प्लांट में। हर साल, एक से दो हज़ार।"
   },
   {
    "type": "dossier",
    "file": "FBI + EPA // RAID",
    "ref": "ROCKY FLATS",
    "stamp": "PRODUCTION HALTED",
+   "img": "media/024_pits/rockyflats_1.jpg",
    "rows": [
     [
      "DATE",
@@ -70,19 +94,20 @@
      "NEVER RESTARTED"
     ]
    ],
-   "vo": "फिर छह जून उन्नीस सौ नवासी को, FBI ने अपनी ही सरकार के इस प्लांट पर छापा मारा। और यहाँ बम के पिट बनना हमेशा के लिए बंद हो गया।",
-   "stamp_at": 4.81
+   "vo": "फिर छह जून उन्नीस सौ नवासी को, FBI ने अपनी ही सरकार के इस प्लांट पर छापा मारा। पर्यावरण अपराधों की जाँच शुरू हुई, और यहाँ पिट बनना हमेशा के लिए बंद हो गया।",
+   "stamp_at": 7.59
   },
   {
-   "type": "p_years",
-   "from": 1989,
-   "to": 2024,
-   "flat": "ONLY A FEW PITS MADE",
-   "date": "1 OCT 2024",
-   "what": "FIRST W87-1 WARHEAD PIT",
-   "where": "LOS ALAMOS, NEW MEXICO",
-   "vo": "उसके बाद दशकों तक, बस गिने-चुने पिट ही बने। फिर एक अक्टूबर दो हज़ार चौबीस को, लॉस अलामोस लैब में, एक नए परमाणु वॉरहेड का पहला पिट तैयार हो गया।",
-   "date_at": 2.67
+   "type": "photo",
+   "img": "media/024_pits/losalamos_0.jpg",
+   "cap_y": 860,
+   "kicker": "LOS ALAMOS, NEW MEXICO · 1 OCT 2024",
+   "big": "FIRST NEW PIT",
+   "lines": [
+    "for the new W87-1 warhead",
+    "after decades of only a few"
+   ],
+   "vo": "इसके बाद दशकों तक, बस गिने-चुने पिट बने। फिर एक अक्टूबर दो हज़ार चौबीस को, लॉस अलामोस लैब में, एक नए वॉरहेड का पहला पिट तैयार हुआ। और यहीं से, रफ़्तार बढ़ने लगी।"
   },
   {
    "type": "p_ramp",
@@ -104,26 +129,24 @@
      "NEW DEFENCE ACT"
     ]
    ],
-   "vo": "और अब रफ़्तार देखिए। दो हज़ार अट्ठाईस तक, हर साल साठ पिट का लक्ष्य। क़ानून कहता है, दो हज़ार तीस तक अस्सी। और नया रक्षा क़ानून, दो हज़ार पचास तक, हर साल एक सौ अस्सी पिट!",
+   "vo": "दो हज़ार अट्ठाईस तक, हर साल साठ पिट का लक्ष्य। क़ानून कहता है, दो हज़ार तीस तक अस्सी। और नया रक्षा क़ानून, दो हज़ार पचास तक, हर साल एक सौ अस्सी।",
    "bar_at": [
-    1.2,
-    4.21,
-    6.74
+    0.2,
+    3.35,
+    6.15
    ]
   },
   {
-   "type": "p_mox",
-   "place": "SAVANNAH RIVER SITE · SOUTH CAROLINA",
-   "was": "BUILT TO TURN BOMB PLUTONIUM",
-   "was2": "INTO POWER-PLANT FUEL",
-   "now": "NOW: BOMB-CORE FACTORY",
-   "stamp": "CONSTRUCTION APPROVED · OCT 2026",
-   "cost": "$22 BILLION+",
-   "cost_sub": "GAO ESTIMATE",
-   "vo": "पर असली मोड़ यहाँ है। साउथ कैरोलिना की एक अधूरी इमारत, जो बम के प्लूटोनियम को बिजलीघर के ईंधन में बदलने के लिए बन रही थी, अब उसी में बम के पिट बनेंगे। पिछले ही महीने, इसका पूरा निर्माण मंज़ूर हुआ। और इस पर ख़र्च होंगे, बाईस अरब डॉलर से भी ज़्यादा!",
-   "now_at": 7.16,
-   "stamp_at": 8.91,
-   "cost_at": 12.9
+   "type": "photo",
+   "img": "media/024_pits_b/srsaerial_1.jpg",
+   "cap_y": 860,
+   "kicker": "THE TWIST · SAVANNAH RIVER, SOUTH CAROLINA",
+   "big": "$22 BILLION+",
+   "lines": [
+    "built to turn bomb plutonium into fuel",
+    "now becoming a bomb-core factory"
+   ],
+   "vo": "लेकिन इस कहानी का सबसे अजीब मोड़, साउथ कैरोलिना में है। ये इमारत बन रही थी, बमों के प्लूटोनियम को बिजलीघर के ईंधन में बदलने के लिए। अब इसी में, बमों के नए पिट बनेंगे। पिछले ही महीने इसका पूरा निर्माण मंज़ूर हुआ, और इस पर ख़र्च होंगे, बाईस अरब डॉलर से भी ज़्यादा।"
   },
   {
    "type": "p_debate",
@@ -139,24 +162,23 @@
    ],
    "note": "(It also said new pits may be useful as a future option)",
    "vo": "अमेरिका कहता है, पुराने पिट बूढ़े हो रहे हैं, इन्हें बदलना ज़रूरी है। पर अमेरिका के ही वैज्ञानिक सलाहकार पैनल JASON ने कहा, प्लूटोनियम धीरे-धीरे बूढ़ा हो रहा है, कोई तुरंत ख़तरा नहीं।",
-   "right_at": 4.1
+   "right_at": 4.3
   },
   {
-   "type": "p_treaty",
-   "title": "NEW START",
-   "years": "2011 – 2026",
-   "sub": "LAST U.S.–RUSSIA NUCLEAR TREATY",
-   "stamp": "EXPIRED · 5 FEB 2026",
+   "type": "photo",
+   "img": "media/024_pits/mmlaunch_0.jpg",
+   "cap_y": 860,
+   "kicker": "NEW START TREATY · EXPIRED 5 FEB 2026",
    "big": "NO LIMITS",
-   "big_sub": "FIRST TIME SINCE 1972",
-   "vo": "और ये सब तब, जब फ़रवरी दो हज़ार छब्बीस में, अमेरिका और रूस की आख़िरी परमाणु संधि ख़त्म हो चुकी है। उन्नीस सौ बहत्तर के बाद पहली बार, कोई सीमा नहीं।",
-   "tear_at": 3.42,
-   "stamp_at": 4.72,
-   "big_at": 5.66
+   "lines": [
+    "on U.S. and Russian nuclear arms",
+    "first time since 1972"
+   ],
+   "vo": "और ये सब ऐसे वक़्त में, जब फ़रवरी दो हज़ार छब्बीस में, अमेरिका और रूस की आख़िरी परमाणु संधि ख़त्म हो चुकी है। उन्नीस सौ बहत्तर के बाद पहली बार, उनके हथियारों पर कोई सीमा नहीं।"
   },
   {
    "type": "outro",
-   "min": 7.0,
+   "min": 7.5,
    "highlight": [
     "US",
     "RU",
@@ -164,15 +186,15 @@
    ],
    "lines": [
     [
-     "Factory: ON.",
+     "The bomb's heart",
      "WHITE"
     ],
     [
-     "Limits: OFF.",
+     "is beating again.",
      "alert"
     ]
    ],
-   "vo": "फ़ैक्ट्री फिर जाग चुकी है, और हथियारों पर कोई सीमा नहीं बची। ये पुराने बमों की मरम्मत है, या नई होड़ की शुरुआत? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+   "vo": "बम का दिल फिर से धड़कने लगा है। ये पुराने बमों की मरम्मत है, या नई होड़ की शुरुआत? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
   }
  ],
  "thumb": {
