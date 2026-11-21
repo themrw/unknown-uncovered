@@ -1576,25 +1576,21 @@ def slam(img, st, cx, cy, t0, t, max_w=None):
     paste_a(img, im, (cx - im.width / 2 + sh * math.sin(t * 90), cy - im.height / 2), clamp(sp * 1.5))
 
 def sc_p_hook(img, sc, t, D, tg, k):
-    """Frame one: the question + a beating plutonium heart under a siren; 1989 SHUT -> 2026 RUNNING AGAIN."""
-    alarm(img, tg, 0.6)
-    text_a(img, (W / 2, 330), sc.get("top", ""), fit_font("anton", 104, sc.get("top", ""), W - 140), WHITE, 1, "mm", shadow=10)
-    text_a(img, (W / 2, 455), sc.get("top2", ""), fit_font("anton", 118, sc.get("top2", ""), W - 110), T["alert"], 1, "mm", shadow=10)
-    draw_pit(img, W / 2, 860, 190 + 8 * max(0, math.sin(tg * 6.3)) ** 6, tg)
-    ra = sc.get("reveal_at", 3.5)
-    y = 1210
-    a0 = 1 - 0.55 * clamp((t - ra) / 0.3)
-    rect_a(img, (90, y - 95, W / 2 - 20, y + 95), (18, 20, 18), 0.88 * a0, 22, (120, 120, 110), 3)
-    text_a(img, (W / 4 + 35, y - 30), sc.get("y0", ""), F("anton", 96), (200, 200, 190), a0, "mm")
-    text_a(img, (W / 4 + 35, y + 50), sc.get("y0_sub", ""), fit_font("disp", 32, sc.get("y0_sub", ""), 400, "Black"), MUTED, a0, "mm")
-    q = clamp((t - 0.4) / 0.3)
-    if q > 0: ImageDraw.Draw(img).line([120, y + 70, 120 + (W / 2 - 170) * q, y - 70], fill=T["alert"] + (255,), width=10)
+    """Frame one is already loud: red headline + beating plutonium heart under a siren; then 180/YEAR slams, then a NO LIMITS stamp."""
+    beat = max(0.0, math.sin(tg * 6.3)) ** 6
+    alarm(img, tg, 0.85)
+    sh = 7 * beat
+    text_a(img, (W / 2 + sh, 320), sc.get("top", ""), fit_font("anton", 112, sc.get("top", ""), W - 130), WHITE, 1, "mm", shadow=10)
+    text_a(img, (W / 2 - sh, 450), sc.get("top2", ""), fit_font("anton", 132, sc.get("top2", ""), W - 90), T["alert"], 1, "mm", shadow=12)
+    ra, sa = sc.get("reveal_at", 3.0), sc.get("stamp_at", 6.0)
+    py = 850 - 140 * ease(clamp((t - ra) / 0.5))
+    draw_pit(img, W / 2, py, int(200 + 12 * beat - 60 * ease(clamp((t - ra) / 0.5))), tg)
     if t > ra:
-        g = back(clamp((t - ra) / 0.45)); s_ = clamp(g, 0.3, 1.1); x0, x1 = W / 2 + 20, W - 90
-        cx = (x0 + x1) / 2; hw = (x1 - x0) / 2 * s_
-        rect_a(img, (cx - hw, y - 95 * s_, cx + hw, y + 95 * s_), (60, 8, 8), 0.95, 22, T["alert"], 5)
-        text_a(img, (cx, y - 30), sc.get("y1", ""), F("anton", int(96 * s_)), (255, 255, 255), clamp((t - ra) / 0.15), "mm", shadow=6)
-        text_a(img, (cx, y + 50), sc.get("y1_sub", ""), fit_font("disp", 34, sc.get("y1_sub", ""), 400, "Black"), T["accent"], clamp((t - ra - 0.15) / 0.2), "mm")
+        g = back(clamp((t - ra) / 0.45)); s_ = clamp(g, 0.3, 1.12)
+        text_a(img, (W / 2, 1010), sc.get("num", ""), F("anton", int(250 * s_)), T["accent"], clamp((t - ra) / 0.12), "mm", shadow=14)
+        text_a(img, (W / 2, 1165), sc.get("num_sub", ""), F("disp", 50, "Black"), WHITE, clamp((t - ra - 0.2) / 0.2), "mm", shadow=6)
+        if t < ra + 0.15: img.alpha_composite(Image.new("RGBA", (W, H), (255, 240, 200, int(140 * (1 - (t - ra) / 0.15)))))
+    if t > sa: slam(img, stamp_img(sc.get("stamp", ""), 86, rot=-9), W / 2, 1310, sa, t, max_w=W - 100)
     chrome(img, tg)
 
 def sc_p_pit(img, sc, t, D, tg, k):
@@ -1631,8 +1627,8 @@ def sc_p_pit(img, sc, t, D, tg, k):
         if t > sq + 0.3:
             fl = max(0, 1 - (t - sq - 0.3) / 0.7); img.alpha_composite(Image.new("RGBA", (W, H), (255, 250, 235, int(255 * fl))))
         if t > sq + 0.9:
-            text_a(img, (W / 2, 330), "NUCLEAR", F("anton", 140), T["alert"], clamp((t - sq - 0.9) / 0.2), "mm", shadow=12)
-            text_a(img, (W / 2, 470), "EXPLOSION", F("anton", 140), WHITE, clamp((t - sq - 1.0) / 0.2), "mm", shadow=12)
+            text_a(img, (W / 2, 330), sc.get("boom1", "NUCLEAR"), F("anton", 140), T["alert"], clamp((t - sq - 0.9) / 0.2), "mm", shadow=12)
+            text_a(img, (W / 2, 470), sc.get("boom2", "EXPLOSION"), fit_font("anton", 140, sc.get("boom2", "EXPLOSION"), W - 100), WHITE, clamp((t - sq - 1.0) / 0.2), "mm", shadow=12)
     chrome(img, tg)
 
 def factory_icon(d, x, y, w, h, tg, lit=(255, 200, 80)):

@@ -240,8 +240,9 @@ def siren(L, f0=620, f1=920, rate=0.55):
 for i, sc in enumerate(spec["scenes"]):   # bomb-core reel (024) scene sounds
     ty = sc["type"]
     if ty == "p_hook":
-        add(music, siren(D[i]), ST[i], 0.10)
-        ra = sc.get("reveal_at", 3.5); add(music, riser(1.0), ST[i] + ra - 1.0, 0.3); add(music, boom(1.2, 60, 2.5, 3), ST[i] + ra, 0.9)
+        add(music, siren(D[i] + 0.6), ST[i] - 0.3, 0.16)
+        ra = sc.get("reveal_at", 3.5); add(music, riser(1.0), ST[i] + ra - 1.0, 0.3); add(music, boom(1.4, 55, 2.2, 3), ST[i] + ra, 1.0)
+        if sc.get("stamp_at") is not None: add(music, boom(0.9, 60, 6, 1.5), ST[i] + sc["stamp_at"] + 0.16, 0.9)
     if ty == "p_pit":
         sq = sc.get("squeeze_at", 5.0); add(music, riser(1.5), ST[i] + sq - 1.5, 0.45); add(music, boom(2.5, 45, 1.2, 4), ST[i] + sq + 0.3, 1.0)
     if ty == "p_factory":   # press stamping rhythm

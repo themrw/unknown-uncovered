@@ -1,17 +1,18 @@
 import json
 CTA = "ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
 spec = {
- "theme": "nuclear", "tts": "parler", "speed": 1.08, "lead": 0.15, "tail": 0.3, "voice_job": "024_main",
+ "theme": "nuclear", "tts": "parler", "lead": 0.15, "tail": 0.3, "voice_job": "024_v2", "speed": 1.1,
+ "voice_desc": "Aman speaks with an urgent, intense and dramatic tone at a slightly fast pace, like a breaking-news documentary narrator revealing a dangerous secret. The recording is very high quality, with the voice sounding clear and very close up, with no background noise.",
  "punch": True, "captions": True, "caption_y": 1500,
  "header": "AMERICA RESTARTS BOMB-CORE PRODUCTION",
  "source": "NNSA · GAO · Arms Control Assn · Bulletin of the Atomic Scientists · FAS",
  "ticker": "",
  "scenes": [
-  {"type": "p_hook", "min": 6.0, "top": "THE FACTORY THAT", "top2": "MAKES A BOMB'S HEART", "y0": "1989", "y0_sub": "SHUT BY AN FBI RAID",
-   "y1": "2026", "y1_sub": "RUNNING AGAIN", "reveal_at": 4.0,
-   "vo": "सैंतीस साल पहले, FBI के एक छापे के बाद, अमेरिका की एक फ़ैक्ट्री बंद हो गई थी। वो बनाती थी, परमाणु बम का 'दिल'। और अब, अमेरिका ये दिल फिर से बनाने लगा है!"},
-  {"type": "p_pit", "label": "PLUTONIUM PIT", "label_sub": "≈ BOWLING-BALL SIZE", "he": "HIGH EXPLOSIVE", "squeeze_at": 6.0,
-   "vo": "हर परमाणु बम के बीच में होता है, बॉलिंग बॉल जितना प्लूटोनियम का एक गोला, जिसे कहते हैं 'पिट'। चारों तरफ़ का विस्फोटक इसे एक पल में दबाता है, और फिर, परमाणु धमाका।"},
+  {"type": "p_hook", "min": 6.0, "top": "AMERICA IS MAKING", "top2": "BOMB 'HEARTS' AGAIN", "num": "180", "num_sub": "PER YEAR · 2050 TARGET",
+   "stamp": "NO TREATY LIMITS", "reveal_at": 3.0, "stamp_at": 6.0,
+   "vo": "अमेरिका फिर से, परमाणु बमों का 'दिल' बनाने लगा है! लक्ष्य? हर साल एक सौ अस्सी! और अमेरिका-रूस के परमाणु हथियारों पर, अब कोई सीमा नहीं। ये 'दिल' है क्या, और ये कहानी शुरू कहाँ से हुई?"},
+  {"type": "p_pit", "label": "PLUTONIUM PIT", "label_sub": "≈ BOWLING-BALL SIZE", "he": "HIGH EXPLOSIVE", "boom1": "ONE BLAST", "boom2": "A WHOLE CITY GONE", "squeeze_at": 6.0,
+   "vo": "हर परमाणु बम के बीच में होता है, बॉलिंग बॉल जितना प्लूटोनियम का एक गोला, जिसे कहते हैं 'पिट'। चारों तरफ़ का विस्फोटक इसे एक पल में दबाता है, और फिर, ऐसा धमाका, जो पूरा शहर मिटा सकता है।"},
   {"type": "p_factory", "place": "ROCKY FLATS, COLORADO", "years": "1952 – 1989", "big": "1,000 – 2,000", "big_sub": "PITS EVERY YEAR",
    "vo": "शीत युद्ध में, कोलोराडो का रॉकी फ़्लैट्स प्लांट, हर साल एक से दो हज़ार ऐसे पिट बनाता था।"},
   {"type": "dossier", "file": "FBI + EPA // RAID", "ref": "ROCKY FLATS", "stamp": "PRODUCTION HALTED",
@@ -32,7 +33,7 @@ spec = {
    "big_sub": "FIRST TIME SINCE 1972",
    "vo": "और ये सब तब, जब फ़रवरी दो हज़ार छब्बीस में, अमेरिका और रूस की आख़िरी परमाणु संधि ख़त्म हो चुकी है। उन्नीस सौ बहत्तर के बाद पहली बार, कोई सीमा नहीं।"},
   {"type": "outro", "min": 7.0, "highlight": ["US", "RU", "CN"], "lines": [["Factory: ON.", "WHITE"], ["Limits: OFF.", "alert"]],
-   "vo": "फ़ैक्ट्री फिर जाग चुकी है। ये पुराने बमों की मरम्मत है, या नई होड़ की शुरुआत? कमेंट में बताइए। " + CTA},
+   "vo": "फ़ैक्ट्री फिर जाग चुकी है, और हथियारों पर कोई सीमा नहीं बची। ये पुराने बमों की मरम्मत है, या नई होड़ की शुरुआत? कमेंट में बताइए। " + CTA},
  ],
  "thumb": {"hook": ["बम का 'दिल'", "फिर बनने लगा!"], "number": "180", "number_label": "BOMB CORES/YEAR BY 2050: U.S. TARGET",
            "sticker": "37 साल बाद", "highlight": ["US"], "view": [35, -95], "mystery": []},

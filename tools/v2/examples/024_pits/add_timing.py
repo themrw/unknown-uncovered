@@ -3,8 +3,8 @@ spec = json.load(open("spec.json")); durs = json.load(open("vo/durs.json")); lea
 def at(i, sub, off=0.0):
     vo = S[i]["vo"]; k = vo.find(sub); assert k >= 0, (i, sub)
     return round(max(0.2, lead + k / len(vo) * durs[i] + off), 2)
-S[0]["reveal_at"] = at(0, "और अब", -0.1)
-S[1]["squeeze_at"] = at(1, "चारों तरफ़", 1.0)
+S[0]["reveal_at"] = at(0, "लक्ष्य?", -0.1); S[0]["stamp_at"] = at(0, "और अमेरिका-रूस", 0.2)
+S[1]["squeeze_at"] = at(1, "ऐसा धमाका", -0.9)
 S[3]["stamp_at"] = at(3, "और यहाँ", 0.0)
 S[4]["date_at"] = at(4, "फिर एक अक्टूबर", -0.1)
 S[5]["bar_at"] = [at(5, "दो हज़ार अट्ठाईस", -0.2), at(5, "क़ानून कहता", 0.0), at(5, "और नया रक्षा", 0.2)]
