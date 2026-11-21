@@ -1,0 +1,13 @@
+{"items": [
+ {"id": "rv", "search": "Peacekeeper missile reentry vehicles Kwajalein test", "n": 3},
+ {"id": "puring", "search": "plutonium ring weapons-grade", "n": 2},
+ {"id": "core", "search": "demon core plutonium sphere recreation", "n": 2},
+ {"id": "rockyflats", "search": "Rocky Flats Plant aerial", "n": 3},
+ {"id": "rfbuilding", "search": "Rocky Flats plutonium building 771", "n": 2},
+ {"id": "losalamos", "search": "Los Alamos National Laboratory aerial", "n": 3},
+ {"id": "glovebox", "search": "plutonium glovebox Los Alamos", "n": 3},
+ {"id": "mox", "search": "MOX Fuel Fabrication Facility Savannah River Site", "n": 3},
+ {"id": "srs", "search": "Savannah River Site aerial", "n": 2},
+ {"id": "mmlaunch", "search": "Minuteman III launch Vandenberg", "n": 3},
+ {"id": "pantexw", "search": "Pantex plant warhead", "n": 2}
+]}

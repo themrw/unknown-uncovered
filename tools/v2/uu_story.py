@@ -107,7 +107,7 @@ def sc_photo(img, sc, t, D, tg, k):
     kenburns(img, sc["img"], t, D, k)
     img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(255 * sc.get("dark", 0.22)))))
     shade(img)
-    caption(img, sc, t, D)
+    caption(img, sc, t, D, sc.get("cap_y", 1110))
     credit(img, sc["img"], clamp(t / 0.6))
     chrome(img, tg)
 
