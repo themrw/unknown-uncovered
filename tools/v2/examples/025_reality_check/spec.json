@@ -1,0 +1,232 @@
+{
+ "format": "story",
+ "theme": "news",
+ "tts": "parler",
+ "speed": 1.05,
+ "lead": 0.2,
+ "tail": 0.35,
+ "voice_job": "025_main",
+ "voice_desc": "Aman speaks in a calm, clear and authoritative tone at a moderate pace, like a trusted television news anchor presenting a careful fact check. The recording is very high quality, with the voice sounding clear and very close up, with no background noise.",
+ "punch": true,
+ "captions": true,
+ "caption_y": 1520,
+ "header": "REALITY CHECK: INDIA'S ECONOMY",
+ "source": "MoSPI · IMF WEO Oct 2026 · PLFS · RBI/PTI",
+ "ticker": "",
+ "scenes": [
+  {
+   "type": "rc_hook",
+   "min": 6.0,
+   "claims": [
+    [
+     "“DEAD ECONOMY”",
+     "alert"
+    ],
+    [
+     "“ECONOMIC DISASTER”",
+     "amber"
+    ],
+    [
+     "“HERCULEAN FEAT”",
+     "green"
+    ]
+   ],
+   "q": "WHAT DO THE NUMBERS SAY?",
+   "vo": "एक ने कहा, भारत की अर्थव्यवस्था 'मरी हुई' है। दूसरे ने कहा, 'आर्थिक आपदा'। तीसरे ने कहा, 'असाधारण उपलब्धि'। सच क्या है? आज, सिर्फ़ आँकड़ों से जाँचते हैं।",
+   "claim_at": [
+    0.0,
+    3.31,
+    5.34
+   ],
+   "q_at": 7.64
+  },
+  {
+   "type": "rc_claim",
+   "n": "CLAIM 1 OF 3",
+   "quote": "“…they can take their dead economies down together”",
+   "who": "DONALD TRUMP",
+   "role": "PRESIDENT, UNITED STATES",
+   "when": "JULY 2025 · WHILE ANNOUNCING TARIFFS ON INDIA",
+   "col": "alert",
+   "vo": "पहला दावा, अमेरिकी राष्ट्रपति डोनाल्ड ट्रंप का, जुलाई दो हज़ार पच्चीस में: भारत और रूस, 'डेड इकॉनमी' हैं।"
+  },
+  {
+   "type": "rc_growth",
+   "big": 7.8,
+   "big_lbl": "GDP GROWTH · APR–JUN 2026",
+   "big_src": "SOURCE: MoSPI · 31 AUG 2026",
+   "bars": [
+    [
+     "INDIA",
+     7.0,
+     "IN"
+    ],
+    [
+     "CHINA",
+     4.0,
+     "CN"
+    ],
+    [
+     "WORLD",
+     3.1,
+     ""
+    ]
+   ],
+   "bars_lbl": "IMF GROWTH FORECAST 2026 (%)",
+   "bars_src": "SOURCE: IMF WORLD ECONOMIC OUTLOOK · OCT 2026",
+   "verdict": "FALSE",
+   "vcol": "alert",
+   "vsub": "CLAIM 1: “DEAD ECONOMY”",
+   "vo": "पर अप्रैल से जून दो हज़ार छब्बीस में, भारत की GDP, सात दशमलव आठ प्रतिशत बढ़ी। और IMF के मुताबिक़, इस साल भारत, सबसे तेज़ बढ़ती बड़ी अर्थव्यवस्था है, चीन और दुनिया से कहीं आगे। ये दावा, ग़लत है।",
+   "bars_at": 5.78,
+   "verdict_at": 13.15
+  },
+  {
+   "type": "rc_claim",
+   "n": "CLAIM 2 OF 3",
+   "quote": "“India is sitting on an economic disaster”",
+   "who": "RAHUL GANDHI",
+   "role": "LEADER OF OPPOSITION, LOK SABHA",
+   "when": "17 NOV 2026 · COLUMBIA UNIVERSITY, NEW YORK",
+   "col": "amber",
+   "vo": "दूसरा दावा, इसी महीने, अमेरिका की कोलंबिया यूनिवर्सिटी में, विपक्ष के नेता राहुल गांधी का: भारत 'आर्थिक आपदा' पर बैठा है, और बेरोज़गारी बहुत बड़ी समस्या है।"
+  },
+  {
+   "type": "rc_jobs",
+   "left": [
+    "7.8%",
+    "GDP GROWTH",
+    "no sign of a 'disaster'",
+    "green"
+   ],
+   "big": 15.9,
+   "big_from": 14.6,
+   "big_lbl": "YOUTH UNEMPLOYMENT (15–29) · APR–JUN 2026",
+   "big_sub": "up from 14.6% a year earlier",
+   "big_src": "SOURCE: PLFS QUARTERLY BULLETIN, MoSPI",
+   "urban": "19%",
+   "urban_lbl": "URBAN YOUTH · SEPT 2026 (PLFS)",
+   "verdict": "OVERSTATED",
+   "vcol": "amber",
+   "vsub": "BUT THE JOBS WORRY IS REAL",
+   "vo": "ग्रोथ, 'आपदा' नहीं दिखाती। पर नौकरियों पर, उनकी बात में दम है। सरकार के अपने सर्वे में, युवाओं की बेरोज़गारी लगभग सोलह प्रतिशत है, पिछले साल से ज़्यादा। शहरों में, उन्नीस प्रतिशत। यानी, 'आपदा' बढ़ा-चढ़ाकर कहा गया, पर नौकरियों की चिंता सच है।",
+   "jobs_at": 4.37,
+   "urban_at": 10.7,
+   "verdict_at": 12.57
+  },
+  {
+   "type": "rc_claim",
+   "n": "CLAIM 3 OF 3",
+   "quote": "“India’s exemplary GDP growth of 7.8%… is a Herculean feat”",
+   "who": "NARENDRA MODI",
+   "role": "PRIME MINISTER OF INDIA",
+   "when": "31 AUG 2026 · ON THE Q1 GDP DATA",
+   "col": "green",
+   "vo": "तीसरा दावा, प्रधानमंत्री नरेंद्र मोदी का, अगस्त में: सात दशमलव आठ प्रतिशत की ग्रोथ, एक 'असाधारण उपलब्धि' है।"
+  },
+  {
+   "type": "rc_picture",
+   "rupee": [
+    [
+     0,
+     84.6,
+     "2024 AVG"
+    ],
+    [
+     1,
+     88.5,
+     "2025 AVG"
+    ],
+    [
+     2,
+     96.97,
+     "MAY '26 RECORD"
+    ],
+    [
+     3,
+     93.4,
+     "19 NOV '26"
+    ]
+   ],
+   "rupee_lbl": "RUPEE PER US DOLLAR",
+   "rank": [
+    [
+     "2025",
+     4,
+     "GOVT EST."
+    ],
+    [
+     "2026",
+     6,
+     "IMF"
+    ],
+    [
+     "2027",
+     4,
+     "IMF PROJ."
+    ]
+   ],
+   "rank_lbl": "INDIA'S RANK · GDP IN US $ (IMF)",
+   "rank_note": "*IMF projection",
+   "pc": "~140th",
+   "pc_lbl": "INCOME PER PERSON · RANK OF 189 COUNTRIES (IMF, FY26)",
+   "verdict": "TRUE, BUT INCOMPLETE",
+   "vcol": "green",
+   "vsub": "CLAIM 3: “HERCULEAN FEAT”",
+   "vo": "ग्रोथ सही है, पर तस्वीर अधूरी। रुपया मई में, रिकॉर्ड सत्तानवे प्रति डॉलर के क़रीब गिरा। डॉलर में मापने पर, IMF की सूची में भारत चौथे से छठे नंबर पर खिसका, हालाँकि अगले साल फिर चौथे पर लौट सकता है। और प्रति व्यक्ति आय में, भारत अब भी, लगभग एक सौ चालीसवें नंबर पर है। यानी, सच, पर अधूरा।",
+   "rupee_at": 2.23,
+   "rank_at": 6.42,
+   "pc_at": 14.25,
+   "verdict_at": 19.2
+  },
+  {
+   "type": "rc_score",
+   "rows": [
+    [
+     "“DEAD ECONOMY”",
+     "TRUMP",
+     "FALSE",
+     "alert"
+    ],
+    [
+     "“ECONOMIC DISASTER”",
+     "RAHUL GANDHI",
+     "OVERSTATED · JOBS WORRY REAL",
+     "amber"
+    ],
+    [
+     "“HERCULEAN FEAT”",
+     "PM MODI",
+     "TRUE, BUT INCOMPLETE",
+     "green"
+    ]
+   ],
+   "line": "Growing fast. Jobs are the challenge.",
+   "vo": "नतीजा: भारत की अर्थव्यवस्था, न मरी है, न आपदा में। ये सबसे तेज़ बढ़ रही है, पर युवाओं के लिए नौकरियाँ, सबसे बड़ी चुनौती हैं।",
+   "row_at": [
+    0.3,
+    0.9,
+    1.5
+   ],
+   "line_at": 3.5
+  },
+  {
+   "type": "outro",
+   "min": 7.0,
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "Facts don't belong",
+     "WHITE"
+    ],
+    [
+     "to any party.",
+     "alert"
+    ]
+   ],
+   "vo": "आँकड़े किसी पार्टी के नहीं होते। आपको सबसे ज़्यादा किस आँकड़े ने चौंकाया? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ]
+}

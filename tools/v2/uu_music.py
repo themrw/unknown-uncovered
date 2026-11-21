@@ -102,7 +102,7 @@ if film:   # proud period-film score: tanpura drone, sitar-like phrases, brass s
         if st == "measure":
             for at in sc.get("panel_at", []): add(music, boom(0.4, 90, 8, 0.8), ST[i] + at, 0.4)
 # heartbeat, faster as the countdown approaches #1
-bt = 0.6 if not (film or theme == "pharma") else T
+bt = 0.6 if not (film or theme in ("pharma", "news")) else T
 while bt < t_end_beats - 0.5:
     k = sum(1 for i in ranks if ST[i] <= bt)
     bpm = 66 + 6 * k
@@ -167,6 +167,18 @@ if theme == "pharma":   # bright, hopeful: soft major pad + marimba arpeggios in
     while tt < T - 1:
         ch = prog_[(j // 8) % 4]; f = ch[[0, 1, 2, 3, 2, 1, 2, 3][j % 8]]
         add(music, mar(f), tt, 0.045 if j % 2 == 0 else 0.03); tt += bt / 2; j += 1
+if theme == "news":   # newsroom: low, neutral pad + a soft clock tick; a firm stamp on every verdict
+    music *= 0.12
+    for f in (110.0, 164.81, 220.0, 261.63):
+        music += np.sin(2 * np.pi * f * t) * 0.005 * (0.6 + 0.4 * np.sin(2 * np.pi * t * 0.05 + f))
+    L = int(0.03 * SR); tp = np.arange(L) / SR; tick = np.sin(2 * np.pi * 2600 * tp) * np.exp(-tp * 120)
+    for j in range(int(T)): add(music, tick, j + 0.25, 0.035 if j % 2 else 0.05)
+    for i, sc in enumerate(spec["scenes"]):
+        for key in ("verdict_at",):
+            if sc.get(key) is not None: add(music, boom(0.6, 70, 7, 1.4), ST[i] + sc[key], 0.75); add(music, chime(1.5, 880.0), ST[i] + sc[key] + 0.05, 0.05)
+        for key in ("urban_at", "rank_at", "pc_at", "q_at", "jobs_at"):
+            if sc.get(key) is not None: add(music, boom(0.35, 95, 10, 0.8), ST[i] + sc[key], 0.35)
+        for at in sc.get("claim_at", [])[1:] + sc.get("row_at", []): add(music, boom(0.35, 95, 10, 0.8), ST[i] + at, 0.35)
 if theme == "peace":   # warm, hopeful: major pad swell + a soft parade snare roll under the countdown
     for f in (130.81, 164.81, 196.0, 261.63):
         music += np.sin(2 * np.pi * f * t) * 0.006 * (0.6 + 0.4 * np.sin(2 * np.pi * t * 0.05 + f))

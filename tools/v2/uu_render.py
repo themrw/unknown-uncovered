@@ -45,6 +45,9 @@ THEMES = {
                    land=(206, 224, 216), land_edge=(120, 160, 150), ocean=(228, 238, 244), part=(205, 228, 220), motif="pill", light=True),
     "peace": dict(bg=(4, 9, 16), glow=(18, 56, 100), accent=(100, 185, 255), accent2=(255, 214, 120), alert=(255, 120, 60),
                   land=(22, 34, 48), land_edge=(80, 130, 180), ocean=(6, 14, 26), part=(150, 210, 255), motif="laurel"),
+    "news": dict(bg=(243, 244, 247), glow=(0, 0, 0), accent=(16, 40, 92), accent2=(196, 28, 44), alert=(200, 30, 45), green=(14, 132, 78), amber=(206, 132, 0),
+                 land=(206, 213, 228), land_edge=(120, 135, 170), ocean=(229, 234, 243), part=(200, 210, 230), motif="none", light=True,
+                 blobs=((0.15, 0.18, 520, (226, 232, 244)), (0.9, 0.35, 560, (236, 238, 246)), (0.3, 0.85, 600, (230, 236, 246)), (0.85, 0.9, 420, (238, 240, 246)))),
     "oil": dict(bg=(7, 6, 6), glow=(88, 34, 8), accent=(255, 150, 40), accent2=(120, 200, 215), alert=(240, 60, 50),
                 land=(34, 26, 20), land_edge=(130, 90, 55), ocean=(10, 9, 10), part=(255, 170, 90), motif="refinery"),
 }
@@ -233,7 +236,7 @@ def make_bg():
 def make_bg_light():
     y, x = np.mgrid[0:BH, 0:BW].astype(np.float32)
     img = np.zeros((BH, BW, 3), np.float32) + np.array(T["bg"], np.float32)
-    for (cx, cy, r, col) in ((0.15, 0.18, 520, (196, 234, 222)), (0.9, 0.35, 560, (210, 226, 248)), (0.3, 0.85, 600, (255, 228, 200)), (0.85, 0.9, 420, (214, 240, 230))):
+    for (cx, cy, r, col) in T.get("blobs", ((0.15, 0.18, 520, (196, 234, 222)), (0.9, 0.35, 560, (210, 226, 248)), (0.3, 0.85, 600, (255, 228, 200)), (0.85, 0.9, 420, (214, 240, 230)))):
         g = np.exp(-(((x - BW * cx) / r) ** 2 + ((y - BH * cy) / r) ** 2))[..., None]
         img = img * (1 - 0.75 * g) + np.array(col, np.float32) * 0.75 * g
     f = (np.sin(x / 230) + np.sin(y / 280 + 1.3) + np.sin((x + y) / 350) + 0.6 * np.sin((x - 1.7 * y) / 160 + 2))

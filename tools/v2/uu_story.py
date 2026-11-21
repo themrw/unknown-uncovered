@@ -1816,5 +1816,196 @@ def sc_p_treaty(img, sc, t, D, tg, k):
 R.SCENE_FN.update({"p_hook": sc_p_hook, "p_pit": sc_p_pit, "p_factory": sc_p_factory, "p_years": sc_p_years, "p_ramp": sc_p_ramp,
                    "p_mox": sc_p_mox, "p_debate": sc_p_debate, "p_treaty": sc_p_treaty})
 
+
+# ---------------------------------------------------------------- reel 025: newsroom "Reality Check" (light theme "news")
+def rcol(name):
+    if isinstance(name, (list, tuple)): return tuple(name)
+    return {"alert": T["alert"], "amber": T.get("amber", (206, 132, 0)), "green": T.get("green", (14, 132, 78)),
+            "navy": T["accent"], "WHITE": WHITE}.get(name, T["accent"])
+
+def rc_chrome(img, tg):
+    """Newsroom furniture: red REALITY CHECK badge with a live dot, hairline rule."""
+    f = F("anton", 44); w = ImageDraw.Draw(Image.new("L", (1, 1))).textlength("REALITY CHECK", font=f)
+    rect_a(img, (60, 118, 60 + w + 86, 190), T["alert"], 1, 10)
+    p = 0.5 + 0.5 * math.sin(tg * 5)
+    d = ImageDraw.Draw(img); d.ellipse([82, 142, 104, 164], fill=(255, 255, 255, int(120 + 135 * p)))
+    text_a(img, (120, 154), "REALITY CHECK", f, (255, 255, 255), 1, "lm")
+    text_a(img, (60, 218), "DATA · SOURCES · NO SIDES", F("mono", 24), MUTED, 1, "lm")
+    rect_a(img, (60, 244, W - 60, 247), T["accent"], 0.9)
+
+def verdict_banner(img, t, at, label, col, sub="", y=1265):
+    if at is None or t < at: return
+    g = back(clamp((t - at) / 0.4)); s_ = clamp(g, 0.2, 1.06); col = rcol(col)
+    cx = W / 2; hw = (W - 120) / 2 * s_; hh = 75 * s_
+    card(img, (cx - hw, y - hh, cx + hw, y + hh), clamp((t - at) / 0.15), 18, (255, 255, 255), col)
+    rect_a(img, (cx - hw, y - hh, cx - hw + 230 * s_, y + hh), col, clamp((t - at) / 0.15), 18)
+    text_a(img, (cx - hw + 115 * s_, y), "VERDICT", F("anton", int(46 * s_) or 1), (255, 255, 255), clamp((t - at) / 0.15), "mm")
+    tx0 = cx - hw + 260 * s_; tw = 2 * hw - 290 * s_
+    text_a(img, (tx0, y - (22 if sub else 0) * s_), label, fit_font("anton", int(70 * s_) or 1, label, max(10, tw)), col, clamp((t - at - 0.1) / 0.2), "lm")
+    if sub: text_a(img, (tx0, y + 40 * s_), sub, fit_font("disp", int(30 * s_) or 1, sub, max(10, tw), "Bold"), MUTED, clamp((t - at - 0.2) / 0.2), "lm")
+
+def wrap_lines(s, f, maxw):
+    words = s.split(); lines = []; cur = ""
+    meas = ImageDraw.Draw(Image.new("L", (1, 1)))
+    for w_ in words:
+        tryl = (cur + " " + w_).strip()
+        if meas.textlength(tryl, font=f) <= maxw: cur = tryl
+        else: lines.append(cur); cur = w_
+    if cur: lines.append(cur)
+    return lines
+
+def sc_rc_hook(img, sc, t, D, tg, k):
+    rc_chrome(img, tg)
+    ats = sc.get("claim_at", [0.0, 1.5, 3.0]); qa = sc.get("q_at", 4.5)
+    for i, (lab, col) in enumerate(sc["claims"]):
+        a = 1.0 if i == 0 else clamp((t - ats[i]) / 0.3); dx = (1 - ease(a)) * 200
+        y = 420 + i * 210; c = rcol(col)
+        card(img, (80 + dx, y - 80, W - 80 + dx, y + 80), a, 20)
+        rect_a(img, (80 + dx, y - 80, 96 + dx, y + 80), c, a, 4)
+        text_a(img, (130 + dx, y), lab, fit_font("anton", 84, lab, W - 300), c, a, "lm")
+        text_a(img, (W - 120 + dx, y), "?", F("anton", 90), (190, 196, 210), a, "rm")
+    if t > qa:
+        a = clamp((t - qa) / 0.35)
+        text_a(img, (W / 2, 1110), sc.get("q", ""), fit_font("anton", 92, sc.get("q", ""), W - 120), T["accent"], a, "mm")
+        rect_a(img, (W / 2 - 160 * ease(a), 1190, W / 2 + 160 * ease(a), 1196), T["alert"], a)
+        text_a(img, (W / 2, 1250), "OFFICIAL DATA · IMF · GOVT SURVEYS", F("mono", 28), MUTED, clamp((t - qa - 0.3) / 0.3), "mm")
+    chrome(img, tg)
+
+def sc_rc_claim(img, sc, t, D, tg, k):
+    rc_chrome(img, tg)
+    c = rcol(sc.get("col", "navy")); a = clamp(t / 0.35); dy = (1 - ease(a)) * 60
+    x0, x1, y0, y1 = 80, W - 80, 320 + dy, 1240 + dy
+    card(img, (x0, y0, x1, y1), a, 26); rect_a(img, (x0, y0, x0 + 18, y1), c, a, 6)
+    text_a(img, (x0 + 70, y0 + 80), sc.get("n", ""), F("mono", 32), c, a, "lm")
+    text_a(img, (x0 + 60, y0 + 190), "“", F("anton", 220), c, 0.25 * a, "lm")
+    f = F("disp", 66, "Bold"); lines = wrap_lines(sc["quote"], f, x1 - x0 - 140)
+    nwords = len(sc["quote"].split()); shown = int(nwords * clamp((t - 0.3) / 1.6)) + 1; cnt = 0
+    for j, ln in enumerate(lines):
+        ws = ln.split(); vis = " ".join(ws[:max(0, shown - cnt)]); cnt += len(ws)
+        if vis: text_a(img, (x0 + 70, y0 + 300 + j * 86), vis, f, (22, 30, 44), a, "lm")
+    yb = y0 + 300 + len(lines) * 86 + 40
+    q = clamp((t - 1.2) / 0.4)
+    rect_a(img, (x0 + 70, yb, x0 + 70 + 220 * ease(q), yb + 4), c, q)
+    text_a(img, (x0 + 70, yb + 70), sc.get("who", ""), fit_font("anton", 70, sc.get("who", ""), x1 - x0 - 140), T["accent"], q, "lm")
+    text_a(img, (x0 + 70, yb + 135), sc.get("role", ""), fit_font("disp", 36, sc.get("role", ""), x1 - x0 - 140, "Bold"), MUTED, q, "lm")
+    text_a(img, (x0 + 70, yb + 190), sc.get("when", ""), fit_font("mono", 28, sc.get("when", ""), x1 - x0 - 140), MUTED, clamp((t - 1.5) / 0.4), "lm")
+    chrome(img, tg)
+
+def bars_h(img, rows, x0, y0, t, at, maxv, w=560, hl=0):
+    for i, (name, v, code) in enumerate(rows):
+        y = y0 + i * 112; g = ease(clamp((t - at - i * 0.25) / 0.7)); a = clamp((t - at - i * 0.25) / 0.3)
+        if code: paste_a(img, R.flag(code, 64), (x0, y - 30), a)
+        text_a(img, (x0 + 84, y), name, F("anton", 46), (40, 48, 64), a, "lm")
+        bx = x0 + 300; rect_a(img, (bx, y - 26, bx + w, y + 26), (226, 230, 238), a, 10)
+        col = rcol("green") if i == hl else (150, 158, 176)
+        if g > 0: rect_a(img, (bx, y - 26, bx + w * v / maxv * g, y + 26), col, a, 10)
+        text_a(img, (bx + w * v / maxv * g + 18, y), f"{v * g:.1f}%", F("anton", 48), col, a, "lm")
+
+def sc_rc_growth(img, sc, t, D, tg, k):
+    rc_chrome(img, tg)
+    a = clamp(t / 0.3); g = ease(clamp((t - 0.2) / 1.4))
+    card(img, (80, 300, W - 80, 660), a, 24)
+    text_a(img, (W / 2, 450), f"{sc['big'] * g:.1f}%", F("anton", 210), rcol("green"), a, "mm")
+    text_a(img, (W / 2, 575), sc.get("big_lbl", ""), fit_font("disp", 40, sc.get("big_lbl", ""), W - 220, "Bold"), (40, 48, 64), a, "mm")
+    text_a(img, (W / 2, 625), sc.get("big_src", ""), F("mono", 24), MUTED, a, "mm")
+    ba = sc.get("bars_at", 3.0); qa = clamp((t - ba + 0.3) / 0.3)
+    text_a(img, (90, 740), sc.get("bars_lbl", ""), fit_font("disp", 36, sc.get("bars_lbl", ""), W - 180, "Bold"), T["accent"], qa, "lm")
+    bars_h(img, sc["bars"], 90, 830, t, ba, max(b[1] for b in sc["bars"]) * 1.05, w=520)
+    text_a(img, (90, 1150), sc.get("bars_src", ""), fit_font("mono", 24, sc.get("bars_src", ""), W - 180), MUTED, qa, "lm")
+    verdict_banner(img, t, sc.get("verdict_at"), sc.get("verdict", ""), sc.get("vcol", "alert"), sc.get("vsub", ""))
+    chrome(img, tg)
+
+def sc_rc_jobs(img, sc, t, D, tg, k):
+    rc_chrome(img, tg)
+    L = sc["left"]; a = clamp(t / 0.3)
+    card(img, (80, 290, W - 80, 450), a, 22); rect_a(img, (80, 290, 96, 450), rcol(L[3]), a, 4)
+    text_a(img, (130, 370), L[0], F("anton", 96), rcol(L[3]), a, "lm")
+    text_a(img, (380, 345), L[1], F("anton", 44), (40, 48, 64), a, "lm")
+    text_a(img, (380, 400), L[2], F("disp", 34, "Bold"), MUTED, a, "lm")
+    ja = sc.get("jobs_at", 3.0)
+    if t > ja - 0.3:
+        b = clamp((t - ja + 0.3) / 0.3); g = ease(clamp((t - ja) / 1.4)); v = sc["big_from"] + (sc["big"] - sc["big_from"]) * g
+        card(img, (80, 500, W - 80, 960), b, 24); rect_a(img, (80, 500, 96, 960), rcol("amber"), b, 4)
+        text_a(img, (W / 2, 560), sc.get("big_lbl", ""), fit_font("disp", 36, sc.get("big_lbl", ""), W - 220, "Bold"), T["accent"], b, "mm")
+        text_a(img, (W / 2, 720), f"{v:.1f}%", F("anton", 220), rcol("amber"), b, "mm")
+        text_a(img, (W / 2, 860), sc.get("big_sub", ""), F("disp", 40, "Bold"), (40, 48, 64), b, "mm")
+        text_a(img, (W / 2, 915), sc.get("big_src", ""), F("mono", 24), MUTED, b, "mm")
+    ua = sc.get("urban_at", 6.0)
+    if t > ua:
+        u = back(clamp((t - ua) / 0.4)); s_ = clamp(u, 0.3, 1.08)
+        card(img, (W / 2 - 330 * s_, 1060 - 65 * s_, W / 2 + 330 * s_, 1060 + 65 * s_), clamp((t - ua) / 0.15), 20)
+        text_a(img, (W / 2 - 300 * s_, 1060), sc.get("urban", ""), F("anton", int(84 * s_)), T["alert"], clamp((t - ua) / 0.15), "lm")
+        text_a(img, (W / 2 - 110 * s_, 1060), sc.get("urban_lbl", ""), fit_font("disp", int(30 * s_), sc.get("urban_lbl", ""), int(420 * s_), "Bold"), (40, 48, 64), clamp((t - ua) / 0.2), "lm")
+    verdict_banner(img, t, sc.get("verdict_at"), sc.get("verdict", ""), sc.get("vcol", "amber"), sc.get("vsub", ""))
+    chrome(img, tg)
+
+def sc_rc_picture(img, sc, t, D, tg, k):
+    rc_chrome(img, tg)
+    ra, ka, pa = sc.get("rupee_at", 1.0), sc.get("rank_at", 4.0), sc.get("pc_at", 8.0)
+    # 1) rupee line
+    a = clamp((t - ra + 0.4) / 0.3)
+    card(img, (80, 280, W - 80, 640), a, 22)
+    text_a(img, (110, 320), sc.get("rupee_lbl", ""), F("disp", 34, "Bold"), T["accent"], a, "lm")
+    text_a(img, (W - 110, 320), "higher = weaker rupee", F("mono", 22), MUTED, a, "rm")
+    pts = sc["rupee"]; lo, hi = 82, 99; gx0, gx1, gy0, gy1 = 160, W - 180, 590, 380
+    P = [(gx0 + (gx1 - gx0) * p[0] / (len(pts) - 1), gy0 + (gy1 - gy0) * (p[1] - lo) / (hi - lo)) for p in pts]
+    g = clamp((t - ra) / 1.6); n = g * (len(P) - 1)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    seg = [P[0]]
+    for j in range(1, len(P)):
+        if n >= j: seg.append(P[j])
+        elif n > j - 1:
+            f_ = n - (j - 1); seg.append((P[j - 1][0] + (P[j][0] - P[j - 1][0]) * f_, P[j - 1][1] + (P[j][1] - P[j - 1][1]) * f_)); break
+    if len(seg) > 1: d.line(seg, fill=T["accent"] + (255,), width=8, joint="curve")
+    paste_a(img, lay, (0, 0), a)
+    for j, (x, y) in enumerate(P):
+        if n >= j - 0.05:
+            rec = abs(pts[j][1] - max(p[1] for p in pts)) < 1e-6; c = T["alert"] if rec else T["accent"]
+            ImageDraw.Draw(img).ellipse([x - 12, y - 12, x + 12, y + 12], fill=c + (255,))
+            text_a(img, (x, y - 40), f"{pts[j][1]:.2f}".rstrip("0").rstrip("."), F("anton", 40), c, 1, "mm")
+            text_a(img, (x, 615), pts[j][2], fit_font("mono", 20, pts[j][2], 230), MUTED, 1, "mm")
+    # 2) rank
+    b = clamp((t - ka) / 0.3)
+    if b > 0:
+        card(img, (80, 680, W - 80, 960), b, 22)
+        text_a(img, (110, 720), sc.get("rank_lbl", ""), F("disp", 34, "Bold"), T["accent"], b, "lm")
+        for j, (yr, rk, note) in enumerate(sc["rank"]):
+            q = back(clamp((t - ka - j * 0.5) / 0.4)); x = 260 + j * 280; c = T["alert"] if rk > 4 else rcol("green")
+            if q > 0:
+                rr = 62 * clamp(q, 0.3, 1.1)
+                ImageDraw.Draw(img).ellipse([x - rr, 830 - rr, x + rr, 830 + rr], fill=c + (255,))
+                text_a(img, (x, 830), f"#{rk}", F("anton", int(64 * clamp(q, 0.3, 1.1))), (255, 255, 255), 1, "mm")
+                text_a(img, (x, 920), f"{yr} · {note}", F("mono", 22), MUTED, clamp(q, 0, 1), "mm")
+            if j > 0 and q > 0:
+                ImageDraw.Draw(img).line([x - 210, 830, x - 80, 830], fill=(170, 176, 190, 255), width=5)
+    # 3) per capita
+    c_ = clamp((t - pa) / 0.3)
+    if c_ > 0:
+        card(img, (80, 1000, W - 80, 1150), c_, 22)
+        text_a(img, (120, 1075), sc.get("pc", ""), F("anton", 92), T["alert"], c_, "lm")
+        text_a(img, (430, 1075), sc.get("pc_lbl", ""), fit_font("disp", 32, sc.get("pc_lbl", ""), W - 560, "Bold"), (40, 48, 64), c_, "lm")
+    verdict_banner(img, t, sc.get("verdict_at"), sc.get("verdict", ""), sc.get("vcol", "green"), sc.get("vsub", ""))
+    chrome(img, tg)
+
+def sc_rc_score(img, sc, t, D, tg, k):
+    rc_chrome(img, tg)
+    text_a(img, (W / 2, 330), "THE VERDICT", F("anton", 110), T["accent"], clamp(t / 0.3), "mm")
+    ats = sc.get("row_at", [0.4, 1.0, 1.6])
+    for i, (claim, who, ver, col) in enumerate(sc["rows"]):
+        a = clamp((t - ats[i]) / 0.3); dx = (1 - ease(a)) * 160; y = 520 + i * 230; c = rcol(col)
+        card(img, (80 + dx, y - 95, W - 80 + dx, y + 95), a, 22); rect_a(img, (80 + dx, y - 95, 98 + dx, y + 95), c, a, 4)
+        text_a(img, (130 + dx, y - 38), claim, fit_font("anton", 58, claim, 560), (30, 38, 54), a, "lm")
+        text_a(img, (130 + dx, y + 30), who, F("mono", 28), MUTED, a, "lm")
+        f = fit_font("anton", 40, ver, 300); lines = ver.split(" · ")
+        for m, ln in enumerate(lines):
+            text_a(img, (W - 110 + dx, y + (m - (len(lines) - 1) / 2) * 50), ln, fit_font("anton", 44, ln, 330), c, a, "rm")
+    la = clamp((t - sc.get("line_at", 3.0)) / 0.4)
+    text_a(img, (W / 2, 1260), sc.get("line", ""), fit_font("disp", 54, sc.get("line", ""), W - 140, "Black"), T["accent"], la, "mm")
+    rect_a(img, (W / 2 - 200 * ease(la), 1310, W / 2 + 200 * ease(la), 1315), T["alert"], la)
+    chrome(img, tg)
+
+R.SCENE_FN.update({"rc_hook": sc_rc_hook, "rc_claim": sc_rc_claim, "rc_growth": sc_rc_growth, "rc_jobs": sc_rc_jobs,
+                   "rc_picture": sc_rc_picture, "rc_score": sc_rc_score})
+
 if __name__ == "__main__":
     R.main()
