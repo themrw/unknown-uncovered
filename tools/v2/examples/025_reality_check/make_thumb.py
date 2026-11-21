@@ -17,7 +17,7 @@ def stamp(txt, col, cx, cy, size=74, rot=-8):
     st = st.rotate(rot, expand=True, resample=Image.BICUBIC); img.alpha_composite(st, (int(cx - st.width / 2), int(cy - st.height / 2)))
 d = ImageDraw.Draw(img)
 d.rounded_rectangle([60, 250, 560, 350], 14, fill=RED); d.ellipse([88, 285, 118, 315], fill=(255, 255, 255)); d.text((140, 300), "REALITY CHECK", font=an(62), fill=(255, 255, 255), anchor="lm")
-d.text((60, 400), "DATA · SOURCES · NO SIDES", font=mono(30), fill=(92, 102, 112), anchor="lm"); d.rectangle([60, 430, W - 60, 436], fill=NAVY)
+d.text((60, 400), "OFFICIAL DATA · VERIFIED SOURCES", font=mono(30), fill=(92, 102, 112), anchor="lm"); d.rectangle([60, 430, W - 60, 436], fill=NAVY)
 d.text((W / 2, 545), "भारत की इकॉनमी", font=hi(124), fill=NAVY, anchor="mm")
 d.text((W / 2, 690), "सच क्या है?", font=hi(140), fill=RED, anchor="mm")
 rows = [("“DEAD ECONOMY”", "FALSE", RED), ("“ECONOMIC DISASTER”", "OVERSTATED", AMBER), ("“HERCULEAN FEAT”", "TRUE, BUT…", GREEN)]

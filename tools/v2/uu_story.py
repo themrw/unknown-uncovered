@@ -1830,7 +1830,7 @@ def rc_chrome(img, tg):
     p = 0.5 + 0.5 * math.sin(tg * 5)
     d = ImageDraw.Draw(img); d.ellipse([82, 142, 104, 164], fill=(255, 255, 255, int(120 + 135 * p)))
     text_a(img, (120, 154), "REALITY CHECK", f, (255, 255, 255), 1, "lm")
-    text_a(img, (60, 218), "DATA · SOURCES · NO SIDES", F("mono", 24), MUTED, 1, "lm")
+    text_a(img, (60, 218), "OFFICIAL DATA · VERIFIED SOURCES", F("mono", 24), MUTED, 1, "lm")
     rect_a(img, (60, 244, W - 60, 247), T["accent"], 0.9)
 
 def verdict_banner(img, t, at, label, col, sub="", y=1265):
