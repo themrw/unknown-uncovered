@@ -232,6 +232,42 @@ for i, sc in enumerate(spec["scenes"]):   # payments reel (015) scene sounds
     if sc["type"] == "share":
         add(music, boom(0.6, 70, 4, 1.5), ST[i] + sc.get("hl_at", 2.1), 0.5)
         add(music, boom(0.9, 60, 3, 2), ST[i] + sc.get("chip_at", 3.3), 0.7)
+def siren(L, f0=620, f1=920, rate=0.55):
+    """Distant air-raid style wail (rising/falling), softened."""
+    tt = np.arange(int(L * SR)) / SR; f = f0 + (f1 - f0) * (0.5 - 0.5 * np.cos(2 * np.pi * rate * tt))
+    ph = 2 * np.pi * np.cumsum(f) / SR; y = np.sin(ph) + 0.35 * np.sin(2 * ph) + 0.15 * np.sin(3 * ph)
+    return lp(y, 2200) * np.minimum(1, tt / 0.6) * np.minimum(1, (L - tt) / 0.8) * 0.5
+for i, sc in enumerate(spec["scenes"]):   # bomb-core reel (024) scene sounds
+    ty = sc["type"]
+    if ty == "p_hook":
+        add(music, siren(D[i]), ST[i], 0.10)
+        ra = sc.get("reveal_at", 3.5); add(music, riser(1.0), ST[i] + ra - 1.0, 0.3); add(music, boom(1.2, 60, 2.5, 3), ST[i] + ra, 0.9)
+    if ty == "p_pit":
+        sq = sc.get("squeeze_at", 5.0); add(music, riser(1.5), ST[i] + sq - 1.5, 0.45); add(music, boom(2.5, 45, 1.2, 4), ST[i] + sq + 0.3, 1.0)
+    if ty == "p_factory":   # press stamping rhythm
+        L = int(0.15 * SR); tp = np.arange(L) / SR; clank = bp(rng.standard_normal(L), 300, 3000) * np.exp(-tp * 30) + np.sin(2 * np.pi * 140 * tp) * np.exp(-tp * 25)
+        tq = 0.3
+        while tq < D[i] - 0.3: add(music, clank, ST[i] + tq, 0.18); tq += 0.5
+    if ty == "p_years":
+        L = int(0.02 * SR); tk = hp(rng.standard_normal(L), 2000) * np.hanning(L); da = sc.get("date_at", 4.0)
+        for j in range(35): add(music, tk, ST[i] + 0.3 + j * (da - 0.8) / 35, 0.25)
+        add(music, riser(0.8), ST[i] + da - 0.8, 0.3); add(music, boom(1.0, 70, 3, 2.5), ST[i] + da, 0.8); add(music, chime(2.0, 880.0), ST[i] + da + 0.05, 0.06)
+    if ty == "p_ramp":
+        ats = sc.get("bar_at", [1.0, 3.0, 5.0])
+        for j, at in enumerate(ats): add(music, boom(0.6 + 0.3 * j, 75 - 8 * j, 4 - j, 2), ST[i] + at, 0.6 + 0.15 * j)
+        add(music, siren(max(1.0, D[i] - ats[-1])), ST[i] + ats[-1], 0.09)
+    if ty == "p_mox":
+        for key, g in (("now_at", 0.9), ("stamp_at", 0.8), ("cost_at", 0.8)):
+            if sc.get(key) is not None:
+                if key == "now_at": add(music, riser(1.0), ST[i] + sc[key] - 1.0, 0.3)
+                add(music, boom(g, 60, 4, 2), ST[i] + sc[key], 0.8)
+    if ty == "p_debate":
+        add(music, boom(0.6, 80, 5, 1.5), ST[i] + sc.get("right_at", 4.0), 0.5)
+    if ty == "p_treaty":
+        ta = sc.get("tear_at", 2.0); L = int(0.7 * SR); tp = np.arange(L) / SR
+        add(music, bp(rng.standard_normal(L), 900, 6000) * np.abs(np.sin(2 * np.pi * 13 * tp)) * np.exp(-tp * 3), ST[i] + ta, 0.35)
+        add(music, boom(0.7, 60, 8, 1.2), ST[i] + sc.get("stamp_at", 2.6) + 0.16, 0.8)
+        ba = sc.get("big_at", 5.0); add(music, boom(1.5, 45, 1.6, 3.5), ST[i] + ba, 1.0); add(music, siren(max(1.0, D[i] - ba)), ST[i] + ba, 0.12)
 for s0 in ST[1:-1]:
     Lw = int(0.45 * SR); tw = np.arange(Lw) / SR
     add(music, bp(rng.standard_normal(Lw), 700, 5000) * np.sin(np.pi * tw / 0.45) ** 2, s0 - 0.3, 0.16)

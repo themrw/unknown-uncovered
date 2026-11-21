@@ -1,0 +1,41 @@
+import json
+CTA = "ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+spec = {
+ "theme": "nuclear", "tts": "parler", "speed": 1.08, "lead": 0.15, "tail": 0.3, "voice_job": "024_main",
+ "punch": True, "captions": True, "caption_y": 1500,
+ "header": "AMERICA RESTARTS BOMB-CORE PRODUCTION",
+ "source": "NNSA · GAO · Arms Control Assn · Bulletin of the Atomic Scientists · FAS",
+ "ticker": "",
+ "scenes": [
+  {"type": "p_hook", "min": 6.0, "top": "THE FACTORY THAT", "top2": "MAKES A BOMB'S HEART", "y0": "1989", "y0_sub": "SHUT BY AN FBI RAID",
+   "y1": "2026", "y1_sub": "RUNNING AGAIN", "reveal_at": 4.0,
+   "vo": "सैंतीस साल पहले, FBI के एक छापे के बाद, अमेरिका की एक फ़ैक्ट्री बंद हो गई थी। वो बनाती थी, परमाणु बम का 'दिल'। और अब, अमेरिका ये दिल फिर से बनाने लगा है!"},
+  {"type": "p_pit", "label": "PLUTONIUM PIT", "label_sub": "≈ BOWLING-BALL SIZE", "he": "HIGH EXPLOSIVE", "squeeze_at": 6.0,
+   "vo": "हर परमाणु बम के बीच में होता है, बॉलिंग बॉल जितना प्लूटोनियम का एक गोला, जिसे कहते हैं 'पिट'। चारों तरफ़ का विस्फोटक इसे एक पल में दबाता है, और फिर, परमाणु धमाका।"},
+  {"type": "p_factory", "place": "ROCKY FLATS, COLORADO", "years": "1952 – 1989", "big": "1,000 – 2,000", "big_sub": "PITS EVERY YEAR",
+   "vo": "शीत युद्ध में, कोलोराडो का रॉकी फ़्लैट्स प्लांट, हर साल एक से दो हज़ार ऐसे पिट बनाता था।"},
+  {"type": "dossier", "file": "FBI + EPA // RAID", "ref": "ROCKY FLATS", "stamp": "PRODUCTION HALTED",
+   "rows": [["DATE", "6 JUNE 1989"], ["RAID BY", "FBI + EPA AGENTS"], ["TARGET", "U.S. GOVT BOMB PLANT"], ["PROBE", "ENVIRONMENTAL CRIMES"], ["RESULT", "NEVER RESTARTED"]],
+   "vo": "फिर छह जून उन्नीस सौ नवासी को, FBI ने अपनी ही सरकार के इस प्लांट पर छापा मारा। और यहाँ बम के पिट बनना हमेशा के लिए बंद हो गया।"},
+  {"type": "p_years", "from": 1989, "to": 2024, "flat": "ONLY A FEW PITS MADE", "date": "1 OCT 2024", "what": "FIRST W87-1 WARHEAD PIT", "where": "LOS ALAMOS, NEW MEXICO",
+   "vo": "उसके बाद दशकों तक, बस गिने-चुने पिट ही बने। फिर एक अक्टूबर दो हज़ार चौबीस को, लॉस अलामोस लैब में, एक नए परमाणु वॉरहेड का पहला पिट तैयार हो गया।"},
+  {"type": "p_ramp", "kicker": "PITS PER YEAR · TARGETS",
+   "bars": [["2028", 60, "LOS ALAMOS GOAL"], ["2030", 80, "REQUIRED BY LAW"], ["2050", 180, "NEW DEFENCE ACT"]],
+   "vo": "और अब रफ़्तार देखिए। दो हज़ार अट्ठाईस तक, हर साल साठ पिट का लक्ष्य। क़ानून कहता है, दो हज़ार तीस तक अस्सी। और नया रक्षा क़ानून, दो हज़ार पचास तक, हर साल एक सौ अस्सी पिट!"},
+  {"type": "p_mox", "place": "SAVANNAH RIVER SITE · SOUTH CAROLINA", "was": "BUILT TO TURN BOMB PLUTONIUM", "was2": "INTO POWER-PLANT FUEL",
+   "now": "NOW: BOMB-CORE FACTORY", "stamp": "CONSTRUCTION APPROVED · OCT 2026", "cost": "$22 BILLION+", "cost_sub": "GAO ESTIMATE",
+   "vo": "पर असली मोड़ यहाँ है। साउथ कैरोलिना की एक अधूरी इमारत, जो बम के प्लूटोनियम को बिजलीघर के ईंधन में बदलने के लिए बन रही थी, अब उसी में बम के पिट बनेंगे। पिछले ही महीने, इसका पूरा निर्माण मंज़ूर हुआ। ख़र्च? बाईस अरब डॉलर से भी ज़्यादा!"},
+  {"type": "p_debate", "left": ["USA SAYS", "Old pits are ageing.", "They must be replaced."],
+   "right": ["JASON SCIENCE PANEL", "Plutonium is ageing slowly.", "No imminent risk."], "note": "(It also said new pits may be useful as a future option)",
+   "vo": "अमेरिका कहता है, पुराने पिट बूढ़े हो रहे हैं, इन्हें बदलना ज़रूरी है। पर अमेरिका के ही वैज्ञानिक सलाहकार पैनल JASON ने कहा, प्लूटोनियम धीरे-धीरे बूढ़ा हो रहा है, कोई तुरंत ख़तरा नहीं।"},
+  {"type": "p_treaty", "title": "NEW START", "years": "2011 – 2026", "sub": "LAST U.S.–RUSSIA NUCLEAR TREATY", "stamp": "EXPIRED · 5 FEB 2026", "big": "NO LIMITS",
+   "big_sub": "FIRST TIME SINCE 1972",
+   "vo": "और ये सब तब, जब फ़रवरी दो हज़ार छब्बीस में, अमेरिका और रूस की आख़िरी परमाणु संधि ख़त्म हो चुकी है। उन्नीस सौ बहत्तर के बाद पहली बार, कोई सीमा नहीं।"},
+  {"type": "outro", "min": 7.0, "highlight": ["US", "RU", "CN"], "lines": [["Factory: ON.", "WHITE"], ["Limits: OFF.", "alert"]],
+   "vo": "फ़ैक्ट्री फिर जाग चुकी है। ये पुराने बमों की मरम्मत है, या नई होड़ की शुरुआत? कमेंट में बताइए। " + CTA},
+ ],
+ "thumb": {"hook": ["बम का 'दिल'", "फिर बनने लगा!"], "number": "180", "number_label": "BOMB CORES/YEAR BY 2050: U.S. TARGET",
+           "sticker": "37 साल बाद", "highlight": ["US"], "view": [35, -95], "mystery": []},
+}
+json.dump(spec, open("spec.json", "w"), ensure_ascii=False, indent=1)
+n = sum(len(x["vo"]) for x in spec["scenes"]); print(n, "chars ≈", round(n / 16 + len(spec["scenes"]) * 0.45), "s")

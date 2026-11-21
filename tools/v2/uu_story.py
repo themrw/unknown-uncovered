@@ -1522,5 +1522,303 @@ def sc_n_flagstat(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"n_hook": sc_n_hook, "n_stock": sc_n_stock, "n_math": sc_n_math, "n_flagstat": sc_n_flagstat})
 
+
+# ---------------------------------------------------------------- reel 024: America restarts bomb-core (pit) production
+_sph = {}
+def pit_sphere(r):
+    """Metallic plutonium ball (cached RGBA, 2r x 2r) with a warm rim light."""
+    if r in _sph: return _sph[r]
+    yy, xx = np.mgrid[-r:r, -r:r].astype(np.float32) / r
+    rr = np.sqrt(xx ** 2 + yy ** 2); m = rr <= 1
+    z = np.sqrt(np.clip(1 - rr ** 2, 0, 1))
+    L = np.clip(-0.45 * xx - 0.55 * yy + 0.7 * z, 0, 1)
+    spec = np.clip(L, 0, 1) ** 18
+    base = np.stack([150 + 70 * L, 152 + 64 * L, 150 + 52 * L], -1)
+    rim = np.clip((rr - 0.72) / 0.28, 0, 1)[..., None] ** 2 * np.array([255, 120, 40])
+    col = np.clip(base * (0.35 + 0.65 * L[..., None]) + rim * 0.9 + spec[..., None] * 255, 0, 255)
+    a = (np.clip((1 - rr) * r / 1.5, 0, 1) * 255)
+    im = Image.fromarray(np.dstack([col, a]).astype(np.uint8), "RGBA"); _sph[r] = im; return im
+
+def draw_pit(img, cx, cy, r, tg, a=1.0, heat=1.0, beat=True):
+    p = 0.5 + 0.5 * math.sin(tg * 7.0) if beat else 0.5
+    p = max(0.0, math.sin(tg * 6.3)) ** 6 if beat else 0.3
+    g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); gr = r * (1.55 + 0.25 * p)
+    ImageDraw.Draw(g).ellipse([cx - gr, cy - gr, cx + gr, cy + gr], fill=(255, 90, 30, int((90 + 110 * p) * heat * a)))
+    img.alpha_composite(g.filter(ImageFilter.GaussianBlur(r * 0.45)))
+    s = pit_sphere(int(r)); paste_a(img, s, (cx - s.width / 2, cy - s.height / 2), a)
+
+def alarm(img, tg, s=1.0):
+    """Red siren wash pulsing in from the screen edges."""
+    if s <= 0: return
+    p = (0.5 + 0.5 * math.sin(tg * 2 * math.pi * 1.1)) ** 2 * s
+    if p < 0.02: return
+    global _alarm
+    try: _alarm
+    except NameError:
+        yy, xx = np.mgrid[0:H, 0:W]; e = np.clip(np.maximum(np.abs(xx - W / 2) / (W / 2), np.abs(yy - H / 2) / (H / 2)) - 0.55, 0, 1) / 0.45
+        _alarm = (e ** 1.6 * 255).astype(np.uint8)
+    lay = Image.new("RGBA", (W, H), (255, 30, 30, 0)); lay.putalpha(Image.fromarray((_alarm * (0.75 * p)).astype(np.uint8)))
+    img.alpha_composite(lay)
+
+def stamp_img(lab, size=84, col=(220, 40, 40), rot=-10):
+    f = F("anton", size); tw = ImageDraw.Draw(Image.new("L", (1, 1))).textlength(lab, font=f)
+    st = Image.new("RGBA", (int(tw) + 70, int(size * 1.6)), (0, 0, 0, 0)); sd = ImageDraw.Draw(st)
+    sd.rounded_rectangle([6, 6, st.width - 6, st.height - 6], 12, outline=col + (240,), width=8)
+    sd.text((st.width / 2, st.height / 2), lab, font=f, fill=col + (240,), anchor="mm")
+    return st.rotate(rot, expand=True, resample=Image.BICUBIC)
+
+def slam(img, st, cx, cy, t0, t, max_w=None):
+    sp = clamp((t - t0) / 0.18)
+    if sp <= 0: return
+    s = (2.0 - 1.0 * ease(sp)) * (min(1, max_w / st.width) if max_w else 1)
+    im = st.resize((int(st.width * s), int(st.height * s)), Image.LANCZOS)
+    sh = 10 * max(0, 1 - (t - t0) / 0.3)
+    paste_a(img, im, (cx - im.width / 2 + sh * math.sin(t * 90), cy - im.height / 2), clamp(sp * 1.5))
+
+def sc_p_hook(img, sc, t, D, tg, k):
+    """Frame one: the question + a beating plutonium heart under a siren; 1989 SHUT -> 2026 RUNNING AGAIN."""
+    alarm(img, tg, 0.6)
+    text_a(img, (W / 2, 330), sc.get("top", ""), fit_font("anton", 104, sc.get("top", ""), W - 140), WHITE, 1, "mm", shadow=10)
+    text_a(img, (W / 2, 455), sc.get("top2", ""), fit_font("anton", 118, sc.get("top2", ""), W - 110), T["alert"], 1, "mm", shadow=10)
+    draw_pit(img, W / 2, 860, 190 + 8 * max(0, math.sin(tg * 6.3)) ** 6, tg)
+    ra = sc.get("reveal_at", 3.5)
+    y = 1210
+    a0 = 1 - 0.55 * clamp((t - ra) / 0.3)
+    rect_a(img, (90, y - 95, W / 2 - 20, y + 95), (18, 20, 18), 0.88 * a0, 22, (120, 120, 110), 3)
+    text_a(img, (W / 4 + 35, y - 30), sc.get("y0", ""), F("anton", 96), (200, 200, 190), a0, "mm")
+    text_a(img, (W / 4 + 35, y + 50), sc.get("y0_sub", ""), fit_font("disp", 32, sc.get("y0_sub", ""), 400, "Black"), MUTED, a0, "mm")
+    q = clamp((t - 0.4) / 0.3)
+    if q > 0: ImageDraw.Draw(img).line([120, y + 70, 120 + (W / 2 - 170) * q, y - 70], fill=T["alert"] + (255,), width=10)
+    if t > ra:
+        g = back(clamp((t - ra) / 0.45)); s_ = clamp(g, 0.3, 1.1); x0, x1 = W / 2 + 20, W - 90
+        cx = (x0 + x1) / 2; hw = (x1 - x0) / 2 * s_
+        rect_a(img, (cx - hw, y - 95 * s_, cx + hw, y + 95 * s_), (60, 8, 8), 0.95, 22, T["alert"], 5)
+        text_a(img, (cx, y - 30), sc.get("y1", ""), F("anton", int(96 * s_)), (255, 255, 255), clamp((t - ra) / 0.15), "mm", shadow=6)
+        text_a(img, (cx, y + 50), sc.get("y1_sub", ""), fit_font("disp", 34, sc.get("y1_sub", ""), 400, "Black"), T["accent"], clamp((t - ra - 0.15) / 0.2), "mm")
+    chrome(img, tg)
+
+def sc_p_pit(img, sc, t, D, tg, k):
+    """Warhead cross-section: explosive lenses around the pit; at squeeze_at they crush inward -> flash."""
+    cx, cy = W / 2, 880; sq = sc.get("squeeze_at", 5.0); u = clamp((t - sq) / 0.35)
+    a = clamp(t / 0.3)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    rc = 400
+    d.ellipse([cx - rc, cy - rc, cx + rc, cy + rc], fill=(26, 30, 28, 235), outline=(120, 130, 120, 255), width=6)
+    rin, rout = 205 - 80 * ease(u), 380 - 150 * ease(u); n = 24
+    for i in range(n):
+        a0 = 2 * math.pi * i / n + 0.03; a1 = 2 * math.pi * (i + 1) / n - 0.03
+        pts = [(cx + rin * math.cos(a0), cy + rin * math.sin(a0)), (cx + rout * math.cos(a0), cy + rout * math.sin(a0)),
+               (cx + rout * math.cos(a1), cy + rout * math.sin(a1)), (cx + rin * math.cos(a1), cy + rin * math.sin(a1))]
+        c = (255, 140, 40) if i % 2 == 0 else (220, 100, 30)
+        d.polygon(pts, fill=c + (255,))
+        if t > sq - 0.6 and t < sq:   # detonators flash around the rim just before the squeeze
+            if int(tg * 30 + i) % 3 == 0:
+                px, py = cx + (rout + 14) * math.cos((a0 + a1) / 2), cy + (rout + 14) * math.sin((a0 + a1) / 2)
+                d.ellipse([px - 9, py - 9, px + 9, py + 9], fill=(255, 255, 200, 255))
+    paste_a(img, lay, (0, 0), a)
+    draw_pit(img, cx, cy, int(170 - 70 * ease(u)), tg, a, heat=1 + 2 * u)
+    # labels
+    la = clamp((t - 0.5) / 0.4) * (1 - clamp((t - sq) / 0.3))
+    text_a(img, (W / 2, 330), sc.get("label", ""), F("anton", 110), T["accent"], la, "mm", shadow=10)
+    text_a(img, (W / 2, 425), sc.get("label_sub", ""), F("disp", 42, "Black"), WHITE, la, "mm", shadow=6)
+    hb = clamp((t - 1.8) / 0.4) * (1 - clamp((t - sq) / 0.3))
+    text_a(img, (W / 2, 1330), "▲ " + sc.get("he", "") + " ▲", F("disp", 44, "Black"), (255, 150, 60), hb, "mm", shadow=6)
+    if t > sq:   # flash + shock ring + shake
+        f_ = max(0, 1 - (t - sq - 0.3) / 0.9)
+        ring = Image.new("RGBA", (W, H), (0, 0, 0, 0)); rr_ = 60 + 1400 * clamp((t - sq - 0.25) / 1.1)
+        ImageDraw.Draw(ring).ellipse([cx - rr_, cy - rr_, cx + rr_, cy + rr_], outline=(255, 240, 200, int(220 * f_)), width=30)
+        img.alpha_composite(ring.filter(ImageFilter.GaussianBlur(8)))
+        if t > sq + 0.3:
+            fl = max(0, 1 - (t - sq - 0.3) / 0.7); img.alpha_composite(Image.new("RGBA", (W, H), (255, 250, 235, int(255 * fl))))
+        if t > sq + 0.9:
+            text_a(img, (W / 2, 330), "NUCLEAR", F("anton", 140), T["alert"], clamp((t - sq - 0.9) / 0.2), "mm", shadow=12)
+            text_a(img, (W / 2, 470), "EXPLOSION", F("anton", 140), WHITE, clamp((t - sq - 1.0) / 0.2), "mm", shadow=12)
+    chrome(img, tg)
+
+def factory_icon(d, x, y, w, h, tg, lit=(255, 200, 80)):
+    """Saw-tooth factory silhouette with two stacks; (x, y) = bottom-left."""
+    teeth = 4; tw = w * 0.7 / teeth; base = y - h * 0.45
+    pts = [(x, y), (x, base)]
+    for i in range(teeth): pts += [(x + i * tw, base - h * 0.25), (x + (i + 1) * tw, base)]
+    pts += [(x + w * 0.7, base), (x + w * 0.7, y - h * 0.55), (x + w, y - h * 0.55), (x + w, y)]
+    d.polygon(pts, fill=(30, 36, 32, 255), outline=(110, 130, 110, 255))
+    for sx in (x + w * 0.76, x + w * 0.9):
+        d.rectangle([sx, y - h, sx + w * 0.06, y - h * 0.55], fill=(36, 42, 38, 255), outline=(110, 130, 110, 255))
+    for i in range(9):
+        wx = x + 30 + i * (w - 60) / 9; on = (math.sin(i * 2.3 + tg * 3) > -0.3)
+        d.rectangle([wx, y - h * 0.3, wx + 34, y - h * 0.18], fill=(lit + (230,)) if on else (60, 60, 50, 255))
+
+def sc_p_factory(img, sc, t, D, tg, k):
+    a = clamp(t / 0.3)
+    text_a(img, (W / 2, 300), sc.get("place", ""), F("mono", 38), T["accent2"], a, "mm", shadow=4)
+    text_a(img, (W / 2, 350), sc.get("years", ""), F("mono", 32), MUTED, a, "mm")
+    g = ease(clamp((t - 0.3) / 1.6))
+    lo, hi = 1000 * g, 2000 * g
+    text_a(img, (W / 2, 500), f"{lo:,.0f} – {hi:,.0f}", fit_font("anton", 170, "2,000 – 2,000", W - 100), T["accent"], a, "mm", shadow=12)
+    text_a(img, (W / 2, 625), sc.get("big_sub", ""), F("disp", 54, "Black"), WHITE, clamp((t - 0.6) / 0.3), "mm", shadow=6)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for j in range(4):   # smoke puffs
+        ph = (tg * 0.35 + j / 4) % 1
+        for sx in (130 + 600 * 0.76, 130 + 600 * 0.9):
+            r_ = 18 + 40 * ph; d.ellipse([sx + 18 - r_, 760 - 330 * ph - r_, sx + 18 + r_, 760 - 330 * ph + r_], fill=(120, 130, 120, int(110 * (1 - ph))))
+    lay = lay.filter(ImageFilter.GaussianBlur(6)); d = ImageDraw.Draw(lay)
+    factory_icon(d, 130, 1120, 600, 360, tg)
+    d.rectangle([100, 1130, W - 60, 1150], fill=(70, 80, 72, 255))
+    for i in range(14):
+        x = 120 + ((tg * 160 + i * 75) % (W - 160)); d.ellipse([x - 4, 1132, x + 4, 1148], fill=(40, 44, 40, 255))
+    paste_a(img, lay, (0, 0), a)
+    for i in range(6):   # pits rolling out of the factory on the belt
+        x = 700 + ((tg * 160 + i * 70) % 340)
+        draw_pit(img, x, 1100, 26, tg + i, a * clamp((x - 700) / 40), heat=0.6, beat=False)
+    chrome(img, tg)
+
+def sc_p_years(img, sc, t, D, tg, k):
+    """Year counter racing past a flat line of 'few pits', then the first new pit with its diamond stamp."""
+    da = sc.get("date_at", 4.0); y0, y1 = sc.get("from", 1989), sc.get("to", 2024)
+    p = ease_io(clamp((t - 0.3) / max(0.5, da - 0.8)))
+    yr = int(round(y0 + (y1 - y0) * p))
+    a = clamp(t / 0.3) * (1 - clamp((t - da) / 0.3))
+    text_a(img, (W / 2, 420), str(yr), F("anton", 230), WHITE, a, "mm", shadow=12)
+    x0, x1, gy = 110, W - 110, 900
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    d.line([x0, gy, x1, gy], fill=(80, 90, 80, 200), width=3)
+    pts = [(x0, gy - 300), (x0 + 30, gy - 300), (x0 + 60, gy - 8)]
+    for i in range(1, 60):
+        xx = x0 + 60 + i * (x1 - x0 - 60) / 60; bump = 22 if 22 < i < 30 else 0
+        pts.append((xx, gy - 8 - bump * abs(math.sin(i))))
+    n = max(2, int(len(pts) * clamp(p * 1.02)))
+    d.line(pts[:n], fill=T["accent"] + (255,), width=8, joint="curve")
+    paste_a(img, lay, (0, 0), a)
+    text_a(img, (x0, gy - 330), "1980s: THOUSANDS", F("mono", 28), MUTED, a * clamp(t / 0.6), "la")
+    text_a(img, (W / 2, gy + 60), sc.get("flat", ""), F("disp", 46, "Black"), T["accent"], a * clamp((t - 1.2) / 0.4), "mm", shadow=6)
+    if t > da:
+        q = back(clamp((t - da) / 0.5)); cx, cy = W / 2, 800
+        rd = 300 * clamp(q, 0.3, 1.1)
+        dl = Image.new("RGBA", (W, H), (0, 0, 0, 0)); dd = ImageDraw.Draw(dl)
+        dd.polygon([(cx, cy - rd), (cx + rd, cy), (cx, cy + rd), (cx - rd, cy)], outline=T["accent"] + (255,), width=10)
+        img.alpha_composite(dl)
+        draw_pit(img, cx, cy, int(150 * clamp(q, 0.3, 1.05)), tg)
+        text_a(img, (W / 2, 330), sc.get("date", ""), F("anton", 130), T["alert"], clamp((t - da) / 0.2), "mm", shadow=10)
+        text_a(img, (W / 2, 1180), sc.get("what", ""), fit_font("anton", 80, sc.get("what", ""), W - 120), WHITE, clamp((t - da - 0.3) / 0.3), "mm", shadow=8)
+        text_a(img, (W / 2, 1270), sc.get("where", ""), F("mono", 32), T["accent2"], clamp((t - da - 0.5) / 0.3), "mm")
+    chrome(img, tg)
+
+def sc_p_ramp(img, sc, t, D, tg, k):
+    """Three rising bars: pits per year targets, the last (biggest) one in red with the siren."""
+    bars = sc["bars"]; ats = sc.get("bar_at", [1.0 + 2.0 * i for i in range(len(bars))]); mx = max(b[1] for b in bars)
+    text_a(img, (W / 2, 310), sc.get("kicker", ""), F("mono", 38), T["accent2"], clamp(t / 0.3), "mm", shadow=4)
+    base, top = 1250, 520; bw = 230
+    for i, (yr, v, lab) in enumerate(bars):
+        x = W / 2 + (i - 1) * 310; g = ease(clamp((t - ats[i]) / 0.8)); last = i == len(bars) - 1
+        col = T["alert"] if last else T["accent"]
+        rect_a(img, (x - bw / 2, top, x + bw / 2, base), (20, 24, 22), 0.6, 18, (60, 70, 60), 2)
+        if g > 0:
+            h = (base - top) * v / mx * g
+            rect_a(img, (x - bw / 2 + 8, base - h, x + bw / 2 - 8, base - 6), col, 0.92, 14)
+            text_a(img, (x, base - h - 70), f"{v * g:.0f}", F("anton", 110 if last else 92), col, clamp((t - ats[i]) / 0.2), "mm", shadow=8)
+        text_a(img, (x, base + 50), yr, F("anton", 64), WHITE, clamp((t - ats[i] + 0.4) / 0.3), "mm")
+        text_a(img, (x, base + 110), lab, fit_font("disp", 30, lab, 290, "Black"), MUTED, clamp((t - ats[i]) / 0.3), "mm")
+    alarm(img, tg, clamp((t - ats[-1]) / 0.5))
+    chrome(img, tg)
+
+def bolt(d, x, y, s, col):
+    d.polygon([(x + 8 * s, y - 40 * s), (x - 16 * s, y + 6 * s), (x, y + 6 * s), (x - 8 * s, y + 40 * s), (x + 18 * s, y - 8 * s), (x + 2 * s, y - 8 * s)], fill=col + (255,))
+
+def sc_p_mox(img, sc, t, D, tg, k):
+    """The twist: the half-built 'bombs -> electricity' plant becomes the bomb-core factory."""
+    na, sa, ca = sc.get("now_at", 4.0), sc.get("stamp_at", 7.0), sc.get("cost_at", 9.0)
+    a = clamp(t / 0.3)
+    text_a(img, (W / 2, 300), sc.get("place", ""), fit_font("mono", 34, sc.get("place", ""), W - 120), T["accent2"], a, "mm", shadow=4)
+    red = clamp((t - na) / 0.6)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    bx0, by0, bx1, by1 = 170, 500, 910, 830
+    d.rectangle([bx0, by0, bx1, by1], fill=(32, 36, 34, 255), outline=(120, 130, 120, 255), width=4)
+    for i in range(6):   # unfinished: open grid at the right end
+        x = bx0 + 40 + i * 120
+        for j in range(2):
+            y = by0 + 60 + j * 130
+            c = (int(70 + 185 * red), int(70 - 30 * red), int(60 - 30 * red), 255) if i < 5 else (0, 0, 0, 0)
+            if i < 5: d.rectangle([x, y, x + 80, y + 70], fill=c)
+            else: d.rectangle([x, y, x + 80, y + 70], outline=(120, 130, 120, 255), width=3)
+    d.line([bx1 - 40, by0, bx1 - 40, by0 - 120], fill=(200, 170, 60, 255), width=10)   # crane
+    d.line([bx1 - 220, by0 - 120, bx1 + 60, by0 - 120], fill=(200, 170, 60, 255), width=10)
+    d.line([bx1 - 180, by0 - 120, bx1 - 180, by0 - 40 + 10 * math.sin(tg * 2)], fill=(160, 160, 150, 255), width=3)
+    paste_a(img, lay, (0, 0), a)
+    # the original purpose
+    wa = clamp((t - 0.6) / 0.4)
+    rect_a(img, (110, 880, W - 110, 1060), (12, 40, 24), 0.9 * wa, 22, (90, 220, 120), 3)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    bomb_icon(d, 190, 980, 1.3, (200, 200, 190)); d.line([240, 970, 290, 970], fill=(90, 220, 120, 255), width=6)
+    d.polygon([(290, 958), (306, 970), (290, 982)], fill=(90, 220, 120, 255)); bolt(d, 335, 970, 1.2, (255, 220, 60))
+    paste_a(img, lay, (0, 0), wa)
+    text_a(img, (620, 940), sc.get("was", ""), fit_font("disp", 36, sc.get("was", ""), 560, "Black"), WHITE, wa, "mm")
+    text_a(img, (620, 1000), sc.get("was2", ""), fit_font("disp", 36, sc.get("was2", ""), 560, "Black"), (130, 235, 150), wa, "mm")
+    if t > na:
+        q = clamp((t - na) / 0.3); d = ImageDraw.Draw(img)
+        d.line([120, 890, 120 + (W - 240) * q, 1050], fill=T["alert"] + (255,), width=14)
+        d.line([W - 120, 890, W - 120 - (W - 240) * q, 1050], fill=T["alert"] + (255,), width=14)
+        text_a(img, (W / 2, 1140), sc.get("now", ""), fit_font("anton", 100, sc.get("now", ""), W - 120), T["alert"], clamp((t - na - 0.2) / 0.25), "mm", shadow=10)
+        draw_pit(img, bx0 + 80 + 360, by0 + 165, int(60 * clamp((t - na) / 0.5)), tg, clamp((t - na) / 0.4))
+    if t > sa: slam(img, stamp_img(sc.get("stamp", ""), 66, rot=-8), W / 2, 670, sa, t, max_w=W - 120)
+    if t > ca:
+        g = back(clamp((t - ca) / 0.45)); s_ = clamp(g, 0.3, 1.1)
+        rect_a(img, (W / 2 - 330 * s_, 1290 - 85 * s_, W / 2 + 330 * s_, 1290 + 85 * s_), (40, 30, 6), 0.95, 24, T["accent"], 5)
+        text_a(img, (W / 2, 1270), sc.get("cost", ""), F("anton", int(110 * s_)), T["accent"], clamp((t - ca) / 0.15), "mm", shadow=8)
+        text_a(img, (W / 2, 1345), sc.get("cost_sub", ""), F("mono", 26), WHITE, clamp((t - ca - 0.2) / 0.2), "mm")
+    chrome(img, tg)
+
+def sc_p_debate(img, sc, t, D, tg, k):
+    ra = sc.get("right_at", 4.0)
+    for side, (lines, at, col, x0) in enumerate([(sc["left"], 0.2, T["accent2"], 70), (sc["right"], ra, T["accent"], W / 2 + 15)]):
+        a = clamp((t - at) / 0.35); dx = (1 - ease(a)) * (-120 if side == 0 else 120)
+        x1 = x0 + W / 2 - 85
+        rect_a(img, (x0 + dx, 380, x1 + dx, 1120), (16, 20, 18), 0.92 * a, 26, col, 4)
+        cx = (x0 + x1) / 2 + dx
+        if side == 0: paste_a(img, R.flag("US", 150), (cx - 75, 430), a)
+        elif a > 0: atom(img, cx, 500, 70, tg, a, col)
+        text_a(img, (cx, 640), lines[0], fit_font("anton", 58, lines[0], x1 - x0 - 40), col, a, "mm", shadow=6)
+        for j, s in enumerate(lines[1:]):
+            words = s.split(); half = (len(words) + 1) // 2
+            for m, part in enumerate([" ".join(words[:half]), " ".join(words[half:])]):
+                text_a(img, (cx, 760 + j * 170 + m * 62), part, fit_font("disp", 48, part, x1 - x0 - 50, "Black"), WHITE, clamp((t - at - 0.3 - j * 0.6) / 0.3), "mm")
+    va = clamp((t - ra) / 0.3)
+    if va > 0:
+        rect_a(img, (W / 2 - 60, 690, W / 2 + 60, 810), T["alert"], va, 60)
+        text_a(img, (W / 2, 748), "VS", F("anton", 64), (255, 255, 255), va, "mm")
+    text_a(img, (W / 2, 1180), sc.get("note", ""), fit_font("disp", 32, sc.get("note", ""), W - 140, "Medium"), MUTED, clamp((t - ra - 1.5) / 0.4), "mm")
+    chrome(img, tg)
+
+def sc_p_treaty(img, sc, t, D, tg, k):
+    """The treaty paper tears in two, EXPIRED stamp, then NO LIMITS under the siren."""
+    ta, sa, ba = sc.get("tear_at", 2.0), sc.get("stamp_at", 2.6), sc.get("big_at", 5.0)
+    pw, ph = 760, 600; card = paper(pw, ph).copy(); d = ImageDraw.Draw(card)
+    d.rectangle([0, 0, pw, 60], fill=(160, 40, 40, 255)); d.text((pw / 2, 30), "TREATY", font=F("mono", 30), fill=(250, 240, 230), anchor="mm")
+    d.text((pw / 2, 170), sc.get("title", ""), font=F("anton", 120), fill=(30, 26, 22), anchor="mm")
+    d.text((pw / 2, 280), sc.get("years", ""), font=F("anton", 64), fill=(90, 70, 50), anchor="mm")
+    d.text((pw / 2, 360), sc.get("sub", ""), font=fit_font("disp", 34, sc.get("sub", ""), pw - 60, "Black"), fill=(60, 50, 40), anchor="mm")
+    for j in range(4): d.line([60, 430 + j * 36, pw - 60 - (j * 70) % 200, 430 + j * 36], fill=(150, 135, 110), width=4)
+    tq = ease(clamp((t - ta) / 0.7)); a = clamp(t / 0.3); bx, by = W / 2 - pw / 2, 330
+    if tq <= 0:
+        paste_a(img, card, (bx, by), a)
+    else:   # zig-zag tear down the middle, halves drift apart and tilt
+        m = Image.new("L", (pw, ph), 0); md = ImageDraw.Draw(m)
+        zz = [(pw / 2 + (18 if j % 2 else -18), j * ph / 14) for j in range(15)]
+        md.polygon([(0, 0)] + zz + [(0, ph)], fill=255)
+        L_ = card.copy(); L_.putalpha(Image.fromarray(np.minimum(np.asarray(card.getchannel("A")), np.asarray(m))))
+        Rm = Image.fromarray(255 - np.asarray(m)); R_ = card.copy(); R_.putalpha(Image.fromarray(np.minimum(np.asarray(card.getchannel("A")), np.asarray(Rm))))
+        Lr = L_.rotate(8 * tq, expand=True, resample=Image.BICUBIC); Rr = R_.rotate(-8 * tq, expand=True, resample=Image.BICUBIC)
+        paste_a(img, Lr, (bx - 90 * tq - (Lr.width - pw) / 2, by + 30 * tq - (Lr.height - ph) / 2), a)
+        paste_a(img, Rr, (bx + 90 * tq - (Rr.width - pw) / 2, by + 30 * tq - (Rr.height - ph) / 2), a)
+    if t > sa: slam(img, stamp_img(sc.get("stamp", ""), 70), W / 2, by + ph / 2 + 40, sa, t, max_w=W - 140)
+    if t > ba:
+        g = back(clamp((t - ba) / 0.5)); s_ = clamp(g, 0.3, 1.1)
+        text_a(img, (W / 2, 1110), sc.get("big", ""), F("anton", int(190 * s_)), T["alert"], clamp((t - ba) / 0.15), "mm", shadow=14)
+        text_a(img, (W / 2, 1260), sc.get("big_sub", ""), F("disp", 50, "Black"), WHITE, clamp((t - ba - 0.3) / 0.3), "mm", shadow=6)
+        alarm(img, tg, clamp((t - ba) / 0.4))
+    chrome(img, tg)
+
+R.SCENE_FN.update({"p_hook": sc_p_hook, "p_pit": sc_p_pit, "p_factory": sc_p_factory, "p_years": sc_p_years, "p_ramp": sc_p_ramp,
+                   "p_mox": sc_p_mox, "p_debate": sc_p_debate, "p_treaty": sc_p_treaty})
+
 if __name__ == "__main__":
     R.main()
