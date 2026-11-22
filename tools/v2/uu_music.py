@@ -43,7 +43,7 @@ pad = (np.sin(2 * np.pi * 880 * t) * 0.4 + np.sin(2 * np.pi * 1318.5 * t) * 0.25
 music += lp(pad, 3000) * 0.006
 
 ranks = [i for i, sc in enumerate(spec["scenes"]) if sc["type"] == "rank"]
-outro = [i for i, sc in enumerate(spec["scenes"]) if sc["type"] == "outro"]
+outro = [i for i, sc in enumerate(spec["scenes"]) if sc["type"].endswith("outro")]
 t_end_beats = ST[outro[0]] if outro else T
 def chime(L=2.2, f0=1568.0):
     """Bright metallic clink (gold): inharmonic partials with fast decay."""
@@ -102,7 +102,7 @@ if film:   # proud period-film score: tanpura drone, sitar-like phrases, brass s
         if st == "measure":
             for at in sc.get("panel_at", []): add(music, boom(0.4, 90, 8, 0.8), ST[i] + at, 0.4)
 # heartbeat, faster as the countdown approaches #1
-bt = 0.6 if not (film or theme in ("pharma", "news")) else T
+bt = 0.6 if not (film or theme in ("pharma", "news", "orbit")) else T
 while bt < t_end_beats - 0.5:
     k = sum(1 for i in ranks if ST[i] <= bt)
     bpm = 66 + 6 * k
@@ -283,6 +283,25 @@ for i, sc in enumerate(spec["scenes"]):   # bomb-core reel (024) scene sounds
         add(music, bp(rng.standard_normal(L), 900, 6000) * np.abs(np.sin(2 * np.pi * 13 * tp)) * np.exp(-tp * 3), ST[i] + ta, 0.35)
         add(music, boom(0.7, 60, 8, 1.2), ST[i] + sc.get("stamp_at", 2.6) + 0.16, 0.8)
         ba = sc.get("big_at", 5.0); add(music, boom(1.5, 45, 1.6, 3.5), ST[i] + ba, 1.0); add(music, siren(max(1.0, D[i] - ba)), ST[i] + ba, 0.12)
+if theme == "orbit":   # cinematic space thriller: deep slow pulse, cold high shimmer, hits on reveals (no sirens, no Geiger)
+    tq = 0.8
+    while tq < (ST[outro[0]] if outro else T) - 0.5:
+        add(music, boom(0.32, 48, 3.2, 1.6), tq); tq += 2.4
+    sh = sum(np.sin(2 * np.pi * f * t + p) for f, p in ((1975.5, 0), (2093.0, 1.1), (2637.0, 2.3))) * (0.5 + 0.5 * np.sin(2 * np.pi * 0.07 * t)) ** 2
+    music += lp(sh, 5000) * 0.004
+    for i, sc in enumerate(spec["scenes"]):
+        ty = sc["type"]; hit = lambda at, g=0.8: (add(music, riser(1.0), ST[i] + at - 1.0, 0.22), add(music, boom(g, 55, 2.4, 3), ST[i] + at, g))
+        if ty == "or_hook": hit(sc.get("fell_at", 4.5) + 1.5, 0.9)
+        if ty == "or_count": add(music, boom(0.6, 70, 4, 2), ST[i] + 2.2, 0.6)
+        if ty == "or_file": add(music, boom(0.6, 60, 7, 1.4), ST[i] + sc.get("stamp_at", 5) + 0.16, 0.8)
+        if ty == "or_debris": hit(sc.get("rec_at", 7))
+        if ty == "or_k1402":
+            add(music, boom(0.7, 60, 3, 2.5), ST[i] + sc.get("hit_at", 2), 0.7); add(music, chime(2.0, 880.0), ST[i] + sc.get("core_at", 6), 0.05)
+        if ty == "or_orbit": hit(sc.get("warn_at", 6), 0.7)
+        if ty == "or_nak":
+            for j in range(6): add(music, chime(1.6, 2349.3 * (1 + 0.06 * j)), ST[i] + sc.get("drop_at", 3) - 0.6 + j * 0.13, 0.025)
+        if ty == "or_question": hit(sc.get("a_at", 4) + 1.6, 0.8)
+        if ty == "or_photo2": add(music, riser(1.2), ST[i] + sc.get("img2_at", 9) - 1.0, 0.2)
 for s0 in ST[1:-1]:
     Lw = int(0.45 * SR); tw = np.arange(Lw) / SR
     add(music, bp(rng.standard_normal(Lw), 700, 5000) * np.sin(np.pi * tw / 0.45) ** 2, s0 - 0.3, 0.16)

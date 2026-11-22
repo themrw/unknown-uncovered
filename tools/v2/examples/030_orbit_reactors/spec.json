@@ -1,0 +1,129 @@
+{
+ "format": "story",
+ "theme": "orbit",
+ "tts": "parler",
+ "speed": 1.08,
+ "lead": 0.2,
+ "tail": 0.35,
+ "voice_job": "030_short",
+ "punch": true,
+ "captions": true,
+ "caption_y": 1520,
+ "siren": [],
+ "header": "NUCLEAR REACTORS ABOVE YOUR HEAD",
+ "source": "NASA ODPO · UN GA Res 47/68 (1992) · Canada AECB · Science & Global Security",
+ "ticker": "",
+ "credits_from": [
+  "media/030_orbit/credits.json",
+  "media/030b_orbit/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "or_hook",
+   "bg": "media/030b_orbit/nightsky_1.jpg",
+   "kicker": "RIGHT NOW · ABOVE YOUR HEAD",
+   "top": "30+ NUCLEAR REACTORS",
+   "top2": "are circling the Earth",
+   "fell_txt": "ONE HAS ALREADY FALLEN",
+   "vo": "इस वक़्त, आपके सिर के ऊपर, तीस से ज़्यादा परमाणु रिएक्टर, धरती का चक्कर लगा रहे हैं। और इन्हीं में से एक, आसमान से गिर भी चुका है।",
+   "fell_at": 5.47
+  },
+  {
+   "type": "or_count",
+   "bg": "media/030b_orbit/reactor_0.jpg",
+   "n": 30,
+   "plus": "+",
+   "lbl": "NUCLEAR REACTORS",
+   "lbl2": "from Soviet spy satellites · still in orbit",
+   "split": [
+    [
+     "USSR",
+     "almost all of them",
+     "alert"
+    ],
+    [
+     "USA",
+     "just one · SNAP-10A, 1965",
+     "accent"
+    ]
+   ],
+   "photo_lbl": "SOVIET 'TOPAZ' SPACE REACTOR · MUSEUM",
+   "vo": "ये रिएक्टर, शीत युद्ध में, सोवियत संघ के जासूसी सैटेलाइट्स में लगाए गए थे। और आज भी, तीस से ज़्यादा, हमारे ऊपर घूम रहे हैं।",
+   "split_at": 5.02
+  },
+  {
+   "type": "or_debris",
+   "kicker": "24 JAN 1978 · KOSMOS 954 CRASHED",
+   "area": "124,000 KM²",
+   "area_lbl": "radioactive debris field in Canada",
+   "trail": "~600 KM TRAIL · GREAT SLAVE LAKE → BAKER LAKE",
+   "rec": "~0.1%",
+   "rec_lbl": "of the reactor fuel was ever recovered",
+   "rec_at": 12.86,
+   "pay": "",
+   "pay_at": 999,
+   "vo": "चौबीस जनवरी, उन्नीस सौ अठहत्तर। ऐसा ही एक सैटेलाइट, बेक़ाबू होकर, कनाडा पर गिरा, और एक लाख चौबीस हज़ार वर्ग किलोमीटर में, रेडियोधर्मी मलबा बिखर गया। महीनों की खोज के बाद भी, उसके परमाणु ईंधन का, सिर्फ़ शून्य दशमलव एक प्रतिशत ही मिल पाया।",
+   "bg": "media/030b_orbit/slakeice_0.jpg"
+  },
+  {
+   "type": "or_k1402",
+   "bg": "media/030b_orbit/iocean_0.jpg",
+   "kicker": "5 YEARS LATER · 1983",
+   "big": "KOSMOS 1402",
+   "sub": "fell into the Indian Ocean",
+   "hit_lbl": "KOSMOS 1402 · 23 JAN 1983",
+   "core_lbl": "REACTOR · 7 FEB 1983",
+   "vo": "पाँच साल बाद, एक और रिएक्टर वाला सैटेलाइट, बेक़ाबू होकर, हिंद महासागर में आ गिरा।",
+   "hit_at": 3.43,
+   "core_at": 999
+  },
+  {
+   "type": "or_nak",
+   "bg": "media/030b_orbit/limb_1.jpg",
+   "kicker": "AND IT DIDN'T END THERE",
+   "big": "16 REACTORS",
+   "sub": "leaked liquid-metal coolant into space",
+   "drops": "THOUSANDS OF DROPLETS",
+   "drops_lbl": "up to 5.5 cm · still orbiting Earth",
+   "vo": "और बाक़ी रिएक्टरों से रिसा, धातु का कूलेंट, हज़ारों गोलियाँ बनकर, आज भी, हमारे ऊपर घूम रहा है।",
+   "drop_at": 2.59
+  },
+  {
+   "type": "or_question",
+   "q": "WHO GAVE THEM THE RIGHT?",
+   "a1": [
+    "NUCLEAR WEAPONS IN ORBIT",
+    "BANNED (1967)",
+    "green"
+   ],
+   "a2": [
+    "NUCLEAR REACTORS IN ORBIT",
+    "NO BINDING LAW",
+    "alert"
+   ],
+   "a_at": 5.61,
+   "vo": "तो सवाल ये है: इन देशों को, हमारे सिर के ऊपर, परमाणु रिएक्टर घुमाने का हक़, किसने दिया? अंतरिक्ष में परमाणु हथियारों पर तो रोक है, पर रिएक्टरों के लिए, कोई सख़्त क़ानून नहीं।",
+   "bg": "media/030b_orbit/unga_1.jpg"
+  },
+  {
+   "type": "or_outro",
+   "min": 7.5,
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "30+ reactors overhead.",
+     "WHITE"
+    ],
+    [
+     "No binding law.",
+     "alert"
+    ]
+   ],
+   "vo": "क्या ये कभी, हम पर भी गिर सकते हैं? कमेंट में ज़रूर बताइए। ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।",
+   "bg": "media/030b_orbit/limb_0.jpg"
+  }
+ ],
+ "look": "cinematic"
+}

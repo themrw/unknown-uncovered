@@ -2166,5 +2166,252 @@ def sc_np_two(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"np_hook": sc_np_hook, "np_coord": sc_np_coord, "np_list": sc_np_list, "np_timeline": sc_np_timeline, "np_counter": sc_np_counter, "np_two": sc_np_two})
 
+
+# ---------------------------------------------------------------- reel 030: nuclear reactors in orbit (cinematic, photo-led)
+AMBER = (255, 196, 92); ICE = (196, 226, 255)
+
+def cine_bg(img, sc, t, D, k, key="bg", dark=0.45):
+    p = sc.get(key)
+    if not p: return
+    kenburns(img, p, t, D, k)
+    img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(255 * sc.get("dark", dark)))))
+    shade(img)
+
+def title_block(img, t, kicker="", big="", sub="", y=300, t0=0.0, big_col=WHITE, sub_col=AMBER, big_size=128):
+    a = ease(clamp((t - t0) / 0.5)); dy = 24 * (1 - a)
+    if kicker:
+        text_a(img, (W / 2, y), typed(kicker, prog(t, t0, 0.6)), F("mono", 30), AMBER, 0.95, "mm", shadow=4)
+    if big:
+        text_a(img, (W / 2, y + 105 + dy), big, fit_font("anton", big_size, big, W - 120), big_col, a, "mm", shadow=14)
+    if sub:
+        b = ease(clamp((t - t0 - 0.35) / 0.5))
+        text_a(img, (W / 2, y + 205 + 20 * (1 - b)), sub, fit_font("disp", 50, sub, W - 140, "Bold"), sub_col, b, "mm", shadow=8)
+
+def glow_dot(lay, x, y, r, col, a=1.0):
+    g = Image.new("RGBA", (int(r * 8), int(r * 8)), (0, 0, 0, 0)); c = r * 4
+    ImageDraw.Draw(g).ellipse([c - r * 2.6, c - r * 2.6, c + r * 2.6, c + r * 2.6], fill=col + (int(110 * a),))
+    g = g.filter(ImageFilter.GaussianBlur(r * 1.1)); ImageDraw.Draw(g).ellipse([c - r, c - r, c + r, c + r], fill=(255, 246, 220, int(255 * a)))
+    lay.alpha_composite(g, (int(x - c), int(y - c)))
+
+def sc_or_hook(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.18)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    fa = sc.get("fell_at", 4.5)
+    sats = [(0.10, 0.30, 1.0), (0.55, 0.22, 0.8), (0.25, 0.48, 0.9), (0.80, 0.40, 1.1), (0.40, 0.62, 0.7), (0.70, 0.12, 0.85)]
+    for j, (fx, fy, sp) in enumerate(sats):
+        x = ((fx + 0.035 * sp * (t + 2)) % 1.1 - 0.05) * W; y = fy * H * 0.95 + 120 + 40 * math.sin(j + t * 0.1)
+        if j == 0 and t > fa: continue
+        for q in range(16):
+            d.line([x - (q + 1) * 9 * sp, y - (q + 1) * 2, x - q * 9 * sp, y - q * 2], fill=AMBER + (int(120 * (1 - q / 16)),), width=2)
+        glow_dot(lay, x, y, 5, AMBER, clamp(t / 0.6))
+    if t > fa:   # one of them drops: a fireball streak
+        q = clamp((t - fa) / 1.6); e = q * q
+        x0, y0 = ((0.10 + 0.035 * (fa + 2)) % 1.1 - 0.05) * W, 0.30 * H * 0.95 + 120
+        x, y = x0 + 420 * e, y0 + 1000 * e
+        for m in range(40):
+            f = m / 40; px, py = x - (x - x0) * f * 0.5, y - (y - y0) * f * 0.5
+            r_ = 16 * (1 - f) + 2
+            d.ellipse([px - r_, py - r_, px + r_, py + r_], fill=(255, int(160 - 90 * f), 60, int(200 * (1 - f))))
+        lay = lay.filter(ImageFilter.GaussianBlur(1.5)); glow_dot(lay, x, y, 12, (255, 140, 50))
+        if q >= 1:
+            fl = clamp((t - fa - 1.6) / 1.2)
+            hz = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(hz).ellipse([x - 500, y - 160, x + 500, y + 160], fill=(255, 130, 50, int(150 * (1 - fl))))
+            img.alpha_composite(hz.filter(ImageFilter.GaussianBlur(60)))
+    img.alpha_composite(lay)
+    title_block(img, t, sc.get("kicker", ""), sc.get("top", ""), sc.get("top2", ""), y=260, t0=0.1)
+    if t > fa + 1.0:
+        b = ease(clamp((t - fa - 1.0) / 0.5))
+        d2 = ImageDraw.Draw(img); d2.line([W / 2 - 170 * b, 1255, W / 2 + 170 * b, 1255], fill=AMBER + (230,), width=3)
+        text_a(img, (W / 2, 1320), sc.get("fell_txt", "ONE HAS ALREADY FALLEN"), F("anton", 74), WHITE, b, "mm", shadow=10)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_or_count(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.5)
+    g = ease(clamp((t - 0.2) / 2.0)); n = int(round(sc["n"] * g))
+    a = clamp(t / 0.4)
+    text_a(img, (W / 2, 420), f"{n}", F("anton", 300), WHITE, a, "mm", shadow=16)
+    if g > 0.99:
+        w = ImageDraw.Draw(img).textlength(f"{n}", font=F("anton", 300))
+        text_a(img, (W / 2 + w / 2 + 50, 380), sc.get("plus", ""), F("anton", 170), AMBER, clamp((t - 2.2) / 0.3), "mm", shadow=12)
+    text_a(img, (W / 2, 620), sc.get("lbl", ""), fit_font("anton", 64, sc.get("lbl", ""), W - 140), WHITE, clamp((t - 0.4) / 0.4), "mm", shadow=8)
+    text_a(img, (W / 2, 700), sc.get("lbl2", ""), F("disp", 46, "Bold"), AMBER, clamp((t - 0.6) / 0.4), "mm", shadow=8)
+    d = ImageDraw.Draw(img); x0 = 120; step = (W - 240) / 30
+    for j in range(31):
+        on = j < n + 1 and g > j / 31; col = (120, 180, 255) if j == 30 else AMBER
+        h = 46 if on else 20
+        d.rounded_rectangle([x0 + j * step - 4, 800 - h / 2, x0 + j * step + 4, 800 + h / 2], 4, fill=(col + (235,)) if on else (255, 255, 255, 60))
+    sa = sc.get("split_at", 3.0)
+    for i, (who, txt, col) in enumerate(sc.get("split", [])):
+        b = ease(clamp((t - sa - i * 0.7) / 0.4)); y = 1110 + i * 92; c = AMBER if col == "alert" else (120, 180, 255)
+        rect_a(img, (110, y - 38, W - 110, y + 38), (8, 10, 14), 0.55 * b, 14)
+        rect_a(img, (110, y - 38, 116, y + 38), c, b)
+        text_a(img, (150, y), who, F("anton", 48), c, b, "lm"); text_a(img, (330, y), txt, fit_font("disp", 40, txt, W - 460, "Bold"), WHITE, b, "lm")
+    if sc.get("photo_lbl"): text_a(img, (W / 2, 1600), sc["photo_lbl"], F("mono", 24), (220, 220, 210), 0.8 * a, "mm", shadow=4)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_or_file(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.55)
+    a = draw_dossier(img, sc, t, y0=sc.get("y0", 330))
+    credit(img, sc.get("bg"), a); chrome(img, tg, a)
+
+def _map_card(sc, t, D, cw, ch, lat0, lon0, zoom, hl):
+    G = R.GLOBE; g = G.render(lat0, lon0, highlight=hl, hl_alpha=0.35, dim_others=0.0)
+    s_ = zoom / G.R; gs = g.resize((int(g.width * s_), int(g.height * s_)), Image.BICUBIC).filter(ImageFilter.GaussianBlur(1.2))
+    card = Image.new("RGBA", (cw, ch), (6, 10, 14, 255)); card.alpha_composite(gs, (int(cw / 2 - gs.width / 2), int(ch / 2 - gs.height / 2)))
+    def P(lo, la):
+        p, v = G.project(np.radians([lo]), np.radians([la]), math.radians(lat0), math.radians(lon0))
+        return cw / 2 + (p[0][0] - G.S / 2) * s_, ch / 2 + (p[0][1] - G.S / 2) * s_
+    return card, P
+
+def _round_paste(img, card, x, y, a=1.0, r=26, border=(255, 255, 255, 70)):
+    m = Image.new("L", card.size, 0); ImageDraw.Draw(m).rounded_rectangle([0, 0, card.width - 1, card.height - 1], r, fill=int(255 * a))
+    sh = Image.new("RGBA", (card.width + 80, card.height + 80), (0, 0, 0, 0)); ImageDraw.Draw(sh).rounded_rectangle([40, 50, card.width + 40, card.height + 50], r, fill=(0, 0, 0, int(160 * a)))
+    img.alpha_composite(sh.filter(ImageFilter.GaussianBlur(20)), (int(x - 40), int(y - 40)))
+    img.paste(card, (int(x), int(y)), Image.composite(card.getchannel("A"), Image.new("L", card.size, 0), m).point(lambda v: int(v * a)) if a < 1 else m)
+    ImageDraw.Draw(img).rounded_rectangle([x, y, x + card.width, y + card.height], r, outline=border[:3] + (int(border[3] * a),), width=2)
+
+def sc_or_debris(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.55)
+    title_block(img, t, sc.get("kicker", ""), sc.get("area", ""), sc.get("area_lbl", ""), y=230, t0=0.1, big_col=WHITE, big_size=140)
+    cw, ch = 900, 500; zoom = 1500 + 250 * ease_io(clamp(t / max(D, 1)))
+    card, P = _map_card(sc, t, D, cw, ch, 63.0, -104.5, zoom, ["CA"])
+    a0, b0 = P(-112.5, 61.6); a1, b1 = P(-96.0, 64.3)
+    q = ease(clamp((t - 0.8) / 2.4)); lay = Image.new("RGBA", card.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    import random; rnd = random.Random(954); s_ = zoom / R.GLOBE.R
+    for j in range(int(380 * q)):
+        f = rnd.random() * q; x = a0 + (a1 - a0) * f + rnd.gauss(0, (60 * (1 - f) + 20) * s_ / 4.2); y = b0 + (b1 - b0) * f + rnd.gauss(0, (50 * (1 - f) + 16) * s_ / 4.2)
+        r_ = rnd.choice((2, 3, 3, 4, 5)); d.ellipse([x - r_, y - r_, x + r_, y + r_], fill=(255, 120, 60, 220))
+    card.alpha_composite(lay.filter(ImageFilter.GaussianBlur(6))); card.alpha_composite(lay)
+    dd = ImageDraw.Draw(card)
+    for (x, y, nm, an) in ((a0, b0, "GREAT SLAVE LAKE", "rm"), (a1, b1, "BAKER LAKE", "lm")):
+        if q > (0.05 if an == "rm" else 0.95):
+            dd.ellipse([x - 9, y - 9, x + 9, y + 9], outline=(255, 255, 255, 255), width=3)
+            dd.text((x - 18 if an == "rm" else x + 18, y + 34), nm, font=F("mono", 26), fill=(240, 240, 235), anchor=an)
+    dd.text((24, ch - 24), sc.get("trail", ""), font=F("mono", 22), fill=AMBER + (230,), anchor="ld")
+    _round_paste(img, card, W / 2 - cw / 2, 560, clamp((t - 0.3) / 0.5))
+    ra = sc.get("rec_at", 7.0)
+    if t > ra:
+        b = ease(clamp((t - ra) / 0.5))
+        text_a(img, (W / 2, 1170 + 20 * (1 - b)), "ONLY " + sc.get("rec", ""), F("anton", 120), AMBER, b, "mm", shadow=12)
+        text_a(img, (W / 2, 1265), sc.get("rec_lbl", ""), fit_font("disp", 44, sc.get("rec_lbl", ""), W - 160, "Bold"), WHITE, b, "mm", shadow=8)
+    pa = sc.get("pay_at", 12.0)
+    if t > pa:
+        b = ease(clamp((t - pa) / 0.5))
+        text_a(img, (W / 2, 1345), sc.get("pay", ""), fit_font("mono", 28, sc.get("pay", ""), W - 140), (230, 230, 222), b, "mm", shadow=6)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_or_k1402(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.5)
+    title_block(img, t, sc.get("kicker", ""), sc.get("big", ""), sc.get("sub", ""), y=230, t0=0.1)
+    G = R.GLOBE; lat0, lon0 = -5.0, 32.0 + 6 * ease_io(clamp(t / max(D, 1)))
+    g = G.render(lat0, lon0, highlight=["IN"], hl_alpha=0.9, dim_others=0.0)
+    gr = 380; s_ = gr / G.R; gs = g.resize((int(g.width * s_), int(g.height * s_)), Image.LANCZOS)
+    cx, cy = W / 2, 900; a = clamp((t - 0.3) / 0.6)
+    paste_a(img, gs, (cx - gs.width / 2, cy - gs.height / 2), a)
+    def P(lo, la):
+        p, v = G.project(np.radians([lo]), np.radians([la]), math.radians(lat0), math.radians(lon0))
+        return cx + (p[0][0] - G.S / 2) * s_, cy + (p[0][1] - G.S / 2) * s_
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    ix, iy = P(78, 22); d.text((ix + 30, iy - 30), "INDIA", font=F("mono", 26), fill=(255, 255, 255, int(230 * a)))
+    hit = sc.get("hit_at", 2.0); core = sc.get("core_at", 6.0)
+    for (lo, la, at_, lbl, side) in ((84, -25, hit, sc.get("hit_lbl", ""), 1), (-22, -19, core, sc.get("core_lbl", ""), -1)):
+        if t > at_:
+            b = clamp((t - at_) / 0.5); x, y = P(lo, la)
+            rr = 14 + 50 * ((t - at_) % 1.6) / 1.6
+            d.ellipse([x - rr, y - rr, x + rr, y + rr], outline=AMBER + (int(200 * (1 - ((t - at_) % 1.6) / 1.6)),), width=3)
+            glow_dot(lay, x, y, 7, (255, 120, 50), b)
+            tx = min(max(x, 200), W - 200); d.text((tx, y + 46), lbl, font=F("mono", 24), fill=(255, 255, 255, int(240 * b)), anchor="mm")
+    if t > core:
+        x0_, y0_ = P(84, -25); x1_, y1_ = P(-22, -19); q = ease(clamp((t - core + 0.6) / 1.0))
+        for m in range(30):
+            if m % 2: continue
+            f0, f1 = m / 30 * q, (m + 1) / 30 * q
+            def B(f): mx, my = (x0_ + x1_) / 2, min(y0_, y1_) + 160; return ((1 - f) ** 2 * x0_ + 2 * (1 - f) * f * mx + f * f * x1_, (1 - f) ** 2 * y0_ + 2 * (1 - f) * f * my + f * f * y1_)
+            d.line([B(f0), B(f1)], fill=AMBER + (200,), width=3)
+    img.alpha_composite(lay)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_or_orbit(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.28)
+    wa = sc.get("warn_at", 6.0); dec = ease(clamp((t - wa) / 5.0))
+    title_block(img, t, sc.get("kicker", ""), sc.get("ring", ""), "", y=250, t0=0.1, big_size=84)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    Rr = 2600; cy0 = 700 + Rr + 60 * dec
+    for m in range(0, 120, 2):
+        a0 = -110 + m * 0.33; a1 = a0 + 0.33
+        d.arc([W / 2 - Rr, cy0 - Rr, W / 2 + Rr, cy0 + Rr], a0 - 90 + 90, a1 - 90 + 90, fill=AMBER + (150,), width=3)
+    for j in range(7):
+        ang = math.radians(-90 + (-12 + j * 4 + t * 0.35) % 24 - 12 + 12 - 12)
+        x = W / 2 + Rr * math.cos(ang) ; y = cy0 + Rr * math.sin(ang)
+        glow_dot(lay, x, y, 6, AMBER, clamp((t - 0.6) / 0.6))
+    img.alpha_composite(lay)
+    ya = ease(clamp((t - 1.5) / 0.5))
+    text_a(img, (W / 2, 1000), sc.get("years", ""), F("anton", 120), WHITE, ya, "mm", shadow=12)
+    text_a(img, (W / 2, 1090), sc.get("years_lbl", ""), F("disp", 44, "Bold"), (220, 220, 214), ya, "mm", shadow=8)
+    if t > wa:
+        b = ease(clamp((t - wa) / 0.5))
+        text_a(img, (W / 2, 1250), sc.get("warn", ""), fit_font("anton", 96, sc.get("warn", ""), W - 120), AMBER, b, "mm", shadow=12)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+_drops = None
+def sc_or_nak(img, sc, t, D, tg, k):
+    global _drops
+    cine_bg(img, sc, t, D, k, dark=0.35)
+    if _drops is None:
+        r = np.random.default_rng(1980); n = 260
+        _drops = np.stack([r.uniform(-0.1, 1.1, n), r.uniform(0.05, 0.95, n), r.uniform(0.2, 1.0, n) ** 2.5, r.uniform(0, 6.28, n)], 1)
+    da = sc.get("drop_at", 3.0); q = clamp((t - da + 1.5) / 3.0)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for j, (x, y, z, ph) in enumerate(_drops):
+        if j > len(_drops) * q: break
+        px = ((x + 0.012 * (0.4 + z) * t) % 1.2 - 0.1) * W; py = y * H + 14 * math.sin(t * 0.5 + ph)
+        r_ = 1.5 + 9 * z; sh = 150 + int(90 * (0.5 + 0.5 * math.sin(t * 2 + ph)))
+        d.ellipse([px - r_, py - r_, px + r_, py + r_], fill=(sh, sh, min(255, sh + 15), int(150 + 100 * z)))
+        if r_ > 6: d.ellipse([px - r_ * 0.45, py - r_ * 0.6, px - r_ * 0.05, py - r_ * 0.2], fill=(255, 255, 255, 220))
+    img.alpha_composite(lay.filter(ImageFilter.GaussianBlur(0.8)))
+    title_block(img, t, sc.get("kicker", ""), sc.get("big", ""), sc.get("sub", ""), y=230, t0=0.1)
+    if t > da:
+        b = ease(clamp((t - da) / 0.5))
+        rect_a(img, (110, 1110, W - 110, 1320), (6, 8, 12), 0.6 * b, 20)
+        text_a(img, (W / 2, 1180), sc.get("drops", ""), fit_font("anton", 88, sc.get("drops", ""), W - 260), WHITE, b, "mm", shadow=8)
+        text_a(img, (W / 2, 1265), sc.get("drops_lbl", ""), fit_font("disp", 42, sc.get("drops_lbl", ""), W - 260, "Bold"), AMBER, b, "mm", shadow=6)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_or_question(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.62)
+    a = ease(clamp(t / 0.5)); q = sc.get("q", ""); words = q.split(); half = (len(words) + 1) // 2
+    text_a(img, (W / 2, 330 + 20 * (1 - a)), " ".join(words[:half]), fit_font("anton", 120, " ".join(words[:half]), W - 120), WHITE, a, "mm", shadow=12)
+    text_a(img, (W / 2, 470 + 20 * (1 - a)), " ".join(words[half:]), fit_font("anton", 132, " ".join(words[half:]), W - 120), AMBER, a, "mm", shadow=12)
+    aa = sc.get("a_at", 4.0)
+    for i, key in enumerate(("a1", "a2")):
+        lab, ans, col = sc[key]; b = ease(clamp((t - aa - i * 1.6) / 0.5)); y = 760 + i * 250
+        c = (140, 220, 160) if col == "green" else AMBER
+        rect_a(img, (90, y - 95, W - 90, y + 95), (6, 8, 12), 0.62 * b, 18)
+        rect_a(img, (90, y - 95, 97, y + 95), c, b)
+        text_a(img, (130, y - 38), lab, fit_font("disp", 40, lab, W - 280, "Bold"), (225, 225, 220), b, "lm")
+        text_a(img, (130, y + 34), ans, fit_font("anton", 66, ans, W - 280), c, b, "lm")
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_or_photo2(img, sc, t, D, tg, k):
+    kenburns(img, sc["img"], t, D, k); at_ = sc.get("img2_at", 99); cur = sc["img"]
+    if sc.get("img2") and t > at_:
+        b = ease(clamp((t - at_) / 0.8)); tmp = Image.new("RGBA", (W, H)); kenburns(tmp, sc["img2"], t - at_, D - at_, k + 1)
+        img.paste(Image.blend(img, tmp, b))
+        cur = sc["img2"] if b > 0.5 else cur
+    img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(255 * sc.get("dark", 0.35)))))
+    shade(img)
+    if sc.get("img2") and t > at_ + 0.4:
+        caption(img, dict(sc, kicker=sc.get("kicker2", ""), big=sc.get("big2", ""), lines=sc.get("lines2", [])), t - at_ - 0.4, D - at_, sc.get("cap_y", 1110))
+    elif not (sc.get("img2") and t > at_):
+        caption(img, sc, t + sc.get("cap_lead", 0.0), D, sc.get("cap_y", 1110))
+    credit(img, cur, clamp(t / 0.6)); chrome(img, tg)
+
+_outro = R.SCENE_FN["outro"]
+def sc_or_outro(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.5); _outro(img, sc, t, D, tg, k)
+
+R.SCENE_FN.update({"or_outro": sc_or_outro, "or_hook": sc_or_hook, "or_count": sc_or_count, "or_file": sc_or_file, "or_debris": sc_or_debris, "or_k1402": sc_or_k1402,
+                   "or_orbit": sc_or_orbit, "or_nak": sc_or_nak, "or_question": sc_or_question, "or_photo2": sc_or_photo2})
+
 if __name__ == "__main__":
     R.main()

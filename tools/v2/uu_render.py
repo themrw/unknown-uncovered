@@ -27,6 +27,8 @@ THEMES = {
                 land=(24, 30, 32), land_edge=(70, 90, 90), ocean=(8, 14, 18), part=(255, 140, 80), motif="radar"),
     "money": dict(bg=(8, 7, 4), glow=(70, 50, 8), accent=(255, 200, 60), accent2=(90, 220, 140), alert=(255, 90, 70),
                   land=(34, 30, 20), land_edge=(110, 95, 55), ocean=(12, 11, 8), part=(255, 215, 120), motif="chart"),
+    "orbit": dict(bg=(4, 6, 12), glow=(20, 30, 60), accent=(255, 196, 92), accent2=(110, 170, 255), alert=(255, 120, 80),
+                  land=(30, 38, 54), land_edge=(120, 140, 180), ocean=(6, 10, 22), part=(200, 215, 255), motif="stars"),
     "space": dict(bg=(4, 4, 12), glow=(30, 20, 80), accent=(140, 200, 255), accent2=(255, 140, 220), alert=(255, 90, 120),
                   land=(22, 26, 48), land_edge=(80, 100, 170), ocean=(6, 8, 22), part=(220, 230, 255), motif="stars"),
     "missile": dict(bg=(4, 7, 16), glow=(18, 36, 86), accent=(255, 152, 40), accent2=(110, 205, 255), alert=(255, 58, 72),
@@ -642,7 +644,7 @@ def caption_chunks(vo, maxc=20):
 def draw_caption(img, sc, t, D):
     """Big Hindi caption for the phrase being spoken now (timed by character share of the narration)."""
     vo = sc.get("caption", sc.get("vo", ""))
-    if not vo or sc.get("type") == "outro": return
+    if not vo or str(sc.get("type")).endswith("outro"): return
     key = id(sc)
     if key not in _cap:
         ch = caption_chunks(vo); tot = sum(len(c) for c in ch); lead = SPEC.get("lead", 0.3)
