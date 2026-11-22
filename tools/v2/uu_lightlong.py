@@ -87,9 +87,25 @@ def tag_icon(img, x, y, s, a):
     lay = lay.rotate(8 * math.sin(t_glob[0] * 2) , center=(x, y), resample=Image.BICUBIC); paste_a(img, lay, (0, 0), a)
 t_glob = [0.0]
 
+def drop_icon(img, cx, cy, s, a, tg=0.0):
+    """Water drop with a glucose cube and salt crystals: the ORS motif."""
+    if a <= 0: return
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay); r = 190 * s; bob = 8 * math.sin(tg * 2)
+    pts = [(cx + r * math.sin(th) * (1 - 0.0), cy + bob + r * 0.35 - r * math.cos(th)) for th in [i * math.pi / 40 for i in range(-40, 41)]]
+    d.ellipse([cx - r, cy + bob - r * 0.3, cx + r, cy + bob + r * 1.7], fill=(120, 200, 230, 255))
+    d.polygon([(cx - r * 0.86, cy + bob + 0.2 * r), (cx, cy + bob - 1.35 * r), (cx + r * 0.86, cy + bob + 0.2 * r)], fill=(120, 200, 230, 255))
+    d.ellipse([cx - r * 0.55, cy + bob + r * 0.05, cx - r * 0.2, cy + bob + r * 0.6], fill=(220, 244, 252, 200))
+    d.rounded_rectangle([cx + r * 0.05, cy + bob + r * 0.55, cx + r * 0.55, cy + bob + r * 1.05], 10, fill=(255, 255, 255, 255), outline=(200, 210, 214, 255), width=3)
+    for j in range(5):
+        x = cx - r * 0.5 + j * r * 0.22; y = cy + bob + r * 1.25 + (j % 2) * 10
+        d.polygon([(x, y - 12), (x + 12, y), (x, y + 12), (x - 12, y)], fill=(255, 255, 255, 255), outline=(180, 196, 204, 255))
+    paste_a(img, lay, (0, 0), a)
+
 def ll_stat(img, sc, t, D, tg, k):
     t_glob[0] = t
-    tag_icon(img, 1200, 330, 1.2, clamp((t - 0.3) / 0.4))
+    ic = sc.get("icon", "tag")
+    if ic == "tag": tag_icon(img, 1200, 330, 1.2, clamp((t - 0.3) / 0.4))
+    elif ic == "drop": drop_icon(img, 1400, 420, 1.3, clamp((t - 0.3) / 0.4), tg)
     left_text(img, sc, t); fin(img, sc, t, tg)
 
 def kenburns(path, w, h, t, D):
