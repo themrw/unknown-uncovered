@@ -148,11 +148,12 @@ def ll_photo(img, sc, t, D, tg, k):
 
 def ll_date(img, sc, t, D, tg, k):
     d_, m_, y_ = sc["date"]; a = clamp((t - 0.2) / 0.3); q = back(clamp((t - 0.2) / 0.6))
+    if not d_: d_, y_ = y_, ""   # no day: the year goes big in the middle
     x0, y0 = 220, 240
     card(img, (x0, y0, x0 + 520, y0 + 600), a, 34)
     rect_a(img, (x0, y0, x0 + 520, y0 + 130), RED, a, 34); rect_a(img, (x0, y0 + 80, x0 + 520, y0 + 130), RED, a, 0)
     text_a(img, (x0 + 260, y0 + 68), m_, F("anton", 76), (255, 255, 255), a, "mm")
-    text_a(img, (x0 + 260, y0 + 330), d_, F("anton", int(260 * clamp(q, 0.4, 1.05))), INK, a, "mm")
+    text_a(img, (x0 + 260, y0 + 330), d_, fit_font("anton", int(260 * clamp(q, 0.4, 1.05)), d_, 440), INK, a, "mm")
     text_a(img, (x0 + 260, y0 + 520), y_, F("anton", 92), TEAL, a, "mm")
     for j in range(2): rect_a(img, (x0 + 120 + j * 250, y0 - 30, x0 + 150 + j * 250, y0 + 40), (120, 128, 136), a, 10)
     la = 1.0; text_a(img, (860, 460), typed(sc.get("label", ""), prog(t, la, 1.0)), fit_font("anton", 84, sc.get("label", ""), 980), INK, 1, shadow=4)
@@ -162,7 +163,7 @@ def ll_date(img, sc, t, D, tg, k):
 def ll_notice(img, sc, t, D, tg, k):
     a = clamp((t - 0.3) / 0.3); x0, y0 = 1080, 230
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); card(lay, (x0, y0, x0 + 620, y0 + 700), 1, 10)
-    d = ImageDraw.Draw(lay); d.text((x0 + 310, y0 + 80), "LEGAL NOTICE", font=F("anton", 64), fill=INK + (255,), anchor="mm")
+    d = ImageDraw.Draw(lay); d.text((x0 + 310, y0 + 80), sc.get("doc", "LEGAL NOTICE"), font=F("anton", 64), fill=INK + (255,), anchor="mm")
     for j in range(9): d.rounded_rectangle([x0 + 60, y0 + 170 + j * 50, x0 + 560 - (j % 3) * 70, y0 + 186 + j * 50], 8, fill=(214, 222, 226, 255))
     d.ellipse([x0 + 420, y0 + 560, x0 + 560, y0 + 690], outline=RED + (255,), width=8)
     lay = lay.rotate(4 * (1 - ease(clamp(t / 0.8))) + 3, center=(x0 + 310, y0 + 350), resample=Image.BICUBIC); paste_a(img, lay, (0, 60 * (1 - ease(clamp(t / 0.7)))), a)

@@ -714,6 +714,7 @@ def main():
                 Image.fromarray(frame(k, min(tt, D - 0.1), STARTS[k])).save(os.path.join(OUT, f"still_{k:02d}_{sc['type']}_{tt}.png"))
     else:
         order = sorted(range(len(SCENES)), key=lambda k: -SCENES[k][1])
+        if os.environ.get("UU_ONLY"): order = [int(x) for x in os.environ["UU_ONLY"].split(",")]   # re-render just these scenes
         with Pool(int(os.environ.get("UU_PROCS", "2"))) as pool: list(pool.imap_unordered(render_scene, order))
         with open(os.path.join(OUT, "list.txt"), "w") as fl:
             for k, (sc, _) in enumerate(SCENES): fl.write(f"file '{k:02d}_{sc['type']}.mp4'\n")
