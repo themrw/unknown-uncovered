@@ -2034,5 +2034,137 @@ def sc_o_compare(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"o_compare": sc_o_compare})
 
+
+# ---------------------------------------------------------------- reel 029: India-Pakistan nuclear-site list (nuclear theme)
+def envelope(img, cx, cy, s, a, label="LIST OF NUCLEAR INSTALLATIONS", sealed=True):
+    if a <= 0: return
+    w, h = 520 * s, 330 * s
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], 14, fill=(232, 222, 196, 255), outline=(150, 130, 90, 255), width=4)
+    d.line([cx - w / 2, cy - h / 2, cx, cy + h * 0.05, cx + w / 2, cy - h / 2], fill=(150, 130, 90, 255), width=4)
+    if sealed: d.ellipse([cx - 36 * s, cy - 6 * s, cx + 36 * s, cy + 66 * s], fill=(170, 30, 30, 255))
+    d.text((cx, cy + h * 0.32), label, font=fit_font("mono", int(26 * s), label, w - 40), fill=(60, 50, 40, 255), anchor="mm")
+    d.text((cx, cy - h * 0.3), "CONFIDENTIAL", font=F("anton", int(34 * s)), fill=(170, 30, 30, 255), anchor="mm")
+    sh = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(sh).rounded_rectangle([cx - w / 2 + 12, cy - h / 2 + 18, cx + w / 2 + 12, cy + h / 2 + 18], 14, fill=(0, 0, 0, 150))
+    paste_a(img, sh.filter(ImageFilter.GaussianBlur(14)), (0, 0), a); paste_a(img, lay, (0, 0), a)
+
+def sc_np_hook(img, sc, t, D, tg, k):
+    """Frame one: Wagah photo, the question in three lines; a sealed list slides between the two flags; WRONG stamp."""
+    if sc.get("img"): kenburns(img, sc["img"], t, D, k)
+    img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, 150))); shade(img)
+    text_a(img, (W / 2, 330), sc.get("q1", ""), fit_font("anton", 96, sc.get("q1", ""), W - 140), WHITE, 1, "mm", shadow=10)
+    text_a(img, (W / 2, 450), sc.get("q2", ""), fit_font("anton", 104, sc.get("q2", ""), W - 100), T["accent"], 1, "mm", shadow=10)
+    text_a(img, (W / 2, 565), sc.get("q3", ""), fit_font("anton", 96, sc.get("q3", ""), W - 140), WHITE, 1, "mm", shadow=10)
+    paste_a(img, R.flag("IN", 200), (90, 780), 1); paste_a(img, R.flag("PK", 200), (W - 290, 780), 1)
+    p = 0.5 + 0.5 * math.sin(tg * 1.6)
+    envelope(img, W / 2 + (p - 0.5) * 260, 1000, 0.85, 1)
+    wa = sc.get("wrong_at", 5.0)
+    if t > wa:
+        sp = clamp((t - wa) / 0.18); s_ = 1.8 - 0.8 * ease(sp)
+        f = F("anton", 150); lab = sc.get("wrong", "WRONG."); tw = ImageDraw.Draw(Image.new("L", (1, 1))).textlength(lab, font=f)
+        st = Image.new("RGBA", (int(tw) + 90, 230), (0, 0, 0, 0)); sd = ImageDraw.Draw(st)
+        sd.rounded_rectangle([6, 6, st.width - 6, 224], 18, outline=T["alert"] + (245,), width=12); sd.text((st.width / 2, 115), lab, font=f, fill=T["alert"] + (245,), anchor="mm")
+        st = st.rotate(-8, expand=True, resample=Image.BICUBIC); st = st.resize((int(st.width * s_), int(st.height * s_)), Image.LANCZOS)
+        paste_a(img, st, (W / 2 - st.width / 2, 1240 - st.height / 2), clamp(sp * 1.5))
+    chrome(img, tg)
+
+def sc_np_coord(img, sc, t, D, tg, k):
+    """Calendar '1 JANUARY'; the envelope crosses from India to Pakistan and back; redacted coordinates type out."""
+    a = clamp(t / 0.3)
+    cx = W / 2; card(img, (cx - 230, 280, cx + 230, 700), a, 26) if False else None
+    rect_a(img, (cx - 230, 280, cx + 230, 700), (240, 236, 226), a, 26)
+    rect_a(img, (cx - 230, 280, cx + 230, 380), T["alert"], a, 26); rect_a(img, (cx - 230, 340, cx + 230, 380), T["alert"], a)
+    text_a(img, (cx, 330), sc.get("mon", ""), F("anton", 60), (255, 255, 255), a, "mm")
+    text_a(img, (cx, 545), sc.get("day", "1"), F("anton", 260), (30, 26, 22), a, "mm")
+    text_a(img, (cx, 760), sc.get("sub", ""), F("anton", 64), T["accent"], clamp((t - 0.5) / 0.3), "mm", shadow=6)
+    ea = sc.get("env_at", 2.0)
+    if t > ea - 0.3:
+        b = clamp((t - ea + 0.3) / 0.3)
+        paste_a(img, R.flag("IN", 150), (70, 880), b); paste_a(img, R.flag("PK", 150), (W - 220, 880), b)
+        ph = ((t - ea) / 2.4) % 2; x = 300 + (ph if ph < 1 else 2 - ph) * (W - 600)
+        envelope(img, x, 960, 0.55, b)
+        d = ImageDraw.Draw(img)
+        for j in range(18):
+            xx = 230 + j * 35
+            if xx < W - 230: d.line([xx, 960, xx + 16, 960], fill=(200, 200, 190, int(120 * b)), width=3)
+    ca = sc.get("coord_at", 5.0)
+    if t > ca:
+        for j, key in enumerate(("lat", "lon")):
+            s = sc.get(key, ""); n = int(len(s) * clamp((t - ca - j * 0.5) / 0.9))
+            rect_a(img, (90, 1150 + j * 110 - 45, W - 90, 1150 + j * 110 + 45), (14, 18, 14), 0.9 * clamp((t - ca - j * 0.5) / 0.2), 12, T["accent2"], 2)
+            text_a(img, (120, 1150 + j * 110), s[:n], F("mono", 44), T["accent2"], 1, "lm")
+    chrome(img, tg)
+
+def sc_np_list(img, sc, t, D, tg, k):
+    pw, ph = 860, 980; card_ = paper(pw, ph).copy(); d = ImageDraw.Draw(card_)
+    d.rectangle([0, 0, pw, 80], fill=(150, 30, 30, 255)); d.text((pw / 2, 40), sc.get("title", ""), font=fit_font("mono", 34, sc.get("title", ""), pw - 40), fill=(250, 240, 230), anchor="mm")
+    items = sc["items"]; ats = sc.get("item_at", [0.6 + 0.9 * i for i in range(len(items))])
+    for i, it in enumerate(items):
+        y = 150 + i * 150
+        if t > ats[i]:
+            q = clamp((t - ats[i]) / 0.3)
+            d.text((50, y), f"{i + 1:02d}", font=F("anton", 56), fill=(120, 100, 80), anchor="lm")
+            d.text((150, y - 20), it, font=fit_font("anton", 54, it, pw - 200), fill=(30, 26, 22), anchor="lm")
+            d.rectangle([150, y + 26, 150 + (pw - 240) * q, y + 56], fill=(20, 20, 20, 255))
+    d.text((pw / 2, ph - 60), "LAT/LONG ATTACHED · 1 JAN", font=F("mono", 30), fill=(120, 100, 80), anchor="mm")
+    paste_a(img, card_, (W / 2 - pw / 2, 300), clamp(t / 0.3))
+    sa = sc.get("stamp_at")
+    if sa is not None and t > sa:
+        sp = clamp((t - sa) / 0.18); s_ = 1.8 - 0.8 * ease(sp)
+        f = F("anton", 76); lab = sc.get("stamp", ""); tw = ImageDraw.Draw(Image.new("L", (1, 1))).textlength(lab, font=f)
+        st = Image.new("RGBA", (int(tw) + 70, 130), (0, 0, 0, 0)); sd = ImageDraw.Draw(st)
+        sd.rounded_rectangle([5, 5, st.width - 5, 125], 12, outline=(200, 30, 30, 240), width=9); sd.text((st.width / 2, 65), lab, font=f, fill=(200, 30, 30, 240), anchor="mm")
+        st = st.rotate(-10, expand=True, resample=Image.BICUBIC); st = st.resize((int(st.width * s_), int(st.height * s_)), Image.LANCZOS)
+        paste_a(img, st, (W / 2 - st.width / 2, 820 - st.height / 2), clamp(sp * 1.5))
+    chrome(img, tg)
+
+def sc_np_timeline(img, sc, t, D, tg, k):
+    rows = sc["rows"]; ats = sc.get("row_at", [0.5 + 1.2 * i for i in range(len(rows))])
+    text_a(img, (W / 2, 320), "WAR · CRISIS · CONFLICT", F("anton", 72), T["alert"], clamp(t / 0.3), "mm", shadow=8)
+    x0 = 150; rect_a(img, (x0 - 4, 420, x0 + 4, 400 + 230 * len(rows)), (90, 90, 80), clamp(t / 0.3))
+    for i, (yr, ev) in enumerate(rows):
+        y = 500 + i * 230; a = clamp((t - ats[i]) / 0.3); dx = (1 - ease(a)) * 120
+        ImageDraw.Draw(img).ellipse([x0 - 22, y - 22, x0 + 22, y + 22], fill=T["alert"] + (int(255 * a),))
+        text_a(img, (x0 + 60 + dx, y - 38), yr, F("anton", 64), WHITE, a, "lm", shadow=6)
+        text_a(img, (x0 + 60 + dx, y + 30), ev, fit_font("disp", 40, ev, 560, "Black"), MUTED, a, "lm")
+        ta = clamp((t - ats[i] - 0.5) / 0.3)
+        if ta > 0:
+            rect_a(img, (W - 330, y - 50, W - 80, y + 50), (16, 60, 30), ta, 16, (90, 220, 120), 3)
+            text_a(img, (W - 205, y - 12), "✓ " if False else "LIST", F("anton", 40), (130, 240, 150), ta, "mm")
+            text_a(img, (W - 205, y + 26), "EXCHANGED", F("mono", 24), (130, 240, 150), ta, "mm")
+    chrome(img, tg)
+
+def sc_np_counter(img, sc, t, D, tg, k):
+    g = ease(clamp((t - 0.2) / 2.2)); n = int(round(sc["n"] * g))
+    text_a(img, (W / 2, 640), str(n), F("anton", 420), T["accent"], clamp(t / 0.3), "mm", shadow=16)
+    text_a(img, (W / 2, 900), sc.get("lbl", ""), fit_font("anton", 80, sc.get("lbl", ""), W - 120), WHITE, clamp((t - 0.4) / 0.3), "mm", shadow=8)
+    text_a(img, (W / 2, 990), sc.get("sub", ""), fit_font("mono", 34, sc.get("sub", ""), W - 140), T["accent2"], clamp((t - 0.6) / 0.3), "mm")
+    text_a(img, (W / 2, 1180), sc.get("note", ""), fit_font("disp", 44, sc.get("note", ""), W - 140, "Bold"), MUTED, clamp((t - 2.6) / 0.4), "mm")
+    for j in range(min(n, 35)):   # one dot per year
+        x = 120 + (j % 18) * 50; y = 1280 + (j // 18) * 50
+        ImageDraw.Draw(img).ellipse([x - 14, y - 14, x + 14, y + 14], fill=T["accent"] + (230,))
+    chrome(img, tg)
+
+def sc_np_two(img, sc, t, D, tg, k):
+    ra = sc.get("right_at", 4.0)
+    for side, (lines, at, col, x0) in enumerate([(sc["left"], 0.2, (90, 220, 120), 70), (sc["right"], ra, T["alert"], W / 2 + 15)]):
+        a = clamp((t - at) / 0.35); dx = (1 - ease(a)) * (-120 if side == 0 else 120); x1 = x0 + W / 2 - 85; cx = (x0 + x1) / 2 + dx
+        rect_a(img, (x0 + dx, 380, x1 + dx, 1180), (16, 20, 18), 0.92 * a, 26, col, 4)
+        if side == 0:
+            ImageDraw.Draw(img).line([cx - 140, 520, cx + 140, 520], fill=col + (int(255 * a),), width=14)
+        else:
+            dd = ImageDraw.Draw(img); r_ = 80
+            for rr in (r_, r_ * 0.6, r_ * 0.2): dd.ellipse([cx - rr, 520 - rr, cx + rr, 520 + rr], outline=col + (int(255 * a),), width=8)
+        text_a(img, (cx, 700), lines[0], fit_font("anton", 70, lines[0], x1 - x0 - 40), col, a, "mm", shadow=6)
+        for j, s in enumerate(lines[1:]):
+            text_a(img, (cx, 830 + j * 70), s, fit_font("disp", 44, s, x1 - x0 - 50, "Black"), WHITE, clamp((t - at - 0.3 - j * 0.3) / 0.3), "mm")
+    va = clamp((t - ra) / 0.3)
+    if va > 0:
+        rect_a(img, (W / 2 - 60, 720, W / 2 + 60, 840), T["accent"], va, 60)
+        text_a(img, (W / 2, 778), "OR", F("anton", 60), (20, 20, 20), va, "mm")
+    chrome(img, tg)
+
+R.SCENE_FN.update({"np_hook": sc_np_hook, "np_coord": sc_np_coord, "np_list": sc_np_list, "np_timeline": sc_np_timeline, "np_counter": sc_np_counter, "np_two": sc_np_two})
+
 if __name__ == "__main__":
     R.main()

@@ -1,0 +1,177 @@
+{
+ "format": "story",
+ "theme": "nuclear",
+ "tts": "parler",
+ "speed": 1.08,
+ "lead": 0.2,
+ "tail": 0.35,
+ "voice_job": "029_main",
+ "punch": true,
+ "captions": true,
+ "caption_y": 1520,
+ "header": "INDIA-PAKISTAN NUCLEAR LIST",
+ "source": "MEA India · MOFA Pakistan · Agreement text (1988) · NTI · CISSM",
+ "ticker": "",
+ "credits_from": [
+  "media/029_nalist/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "np_hook",
+   "img": "media/029_nalist/wagah_1.jpg",
+   "q1": "INDIA & PAKISTAN",
+   "q2": "HIDE THEIR NUCLEAR SITES",
+   "q3": "FROM EACH OTHER?",
+   "wrong": "WRONG.",
+   "wrong_at": 6.58,
+   "vo": "क्या आपको भी लगता है, कि भारत और पाकिस्तान, अपने-अपने न्यूक्लियर साइट्स, एक-दूसरे से छुपा कर रखते हैं? तो आप बिल्कुल ग़लत हैं। असल में, ठीक इसका उल्टा है।"
+  },
+  {
+   "type": "np_coord",
+   "day": "1",
+   "mon": "JANUARY",
+   "sub": "EVERY YEAR",
+   "lat": "LATITUDE   ██°██′██″ N",
+   "lon": "LONGITUDE  ██°██′██″ E",
+   "env_at": 1.37,
+   "coord_at": 5.82,
+   "vo": "हर साल, एक जनवरी को, दोनों देश, एक-दूसरे को, अपने परमाणु ठिकानों की लिस्ट सौंपते हैं। और उसमें लिखे होते हैं, हर ठिकाने के अक्षांश और देशांतर, यानी, उनकी ठीक-ठीक लोकेशन।"
+  },
+  {
+   "type": "dossier",
+   "file": "AGREEMENT // NON-ATTACK",
+   "ref": "ISLAMABAD",
+   "stamp": "STILL IN FORCE",
+   "rows": [
+    [
+     "SIGNED",
+     "31 DEC 1988, ISLAMABAD"
+    ],
+    [
+     "ERA",
+     "RAJIV GANDHI · BENAZIR BHUTTO"
+    ],
+    [
+     "PROMISE",
+     "NO ATTACK ON NUCLEAR SITES"
+    ],
+    [
+     "IN FORCE",
+     "27 JAN 1991"
+    ],
+    [
+     "FIRST LIST",
+     "1 JAN 1992"
+    ]
+   ],
+   "vo": "ये नियम है, उन्नीस सौ अट्ठासी के एक समझौते का, जो राजीव गांधी और बेनज़ीर भुट्टो के दौर में, इस्लामाबाद में साइन हुआ था। वादा ये, कि दोनों देश, एक-दूसरे के परमाणु ठिकानों पर, कभी हमला नहीं करेंगे। पहली लिस्ट, एक जनवरी उन्नीस सौ बानवे को सौंपी गई।",
+   "stamp_at": 12.9
+  },
+  {
+   "type": "np_list",
+   "title": "LIST OF NUCLEAR INSTALLATIONS",
+   "items": [
+    "POWER REACTORS",
+    "RESEARCH REACTORS",
+    "URANIUM ENRICHMENT",
+    "FUEL FABRICATION",
+    "REPROCESSING"
+   ],
+   "stamp": "NEVER MADE PUBLIC",
+   "vo": "इस लिस्ट में आते हैं, परमाणु बिजली और रिसर्च रिएक्टर, यूरेनियम संवर्धन, ईंधन बनाने, और री-प्रोसेसिंग की सुविधाएँ। पर ये लिस्ट, कभी सार्वजनिक नहीं की जाती।",
+   "item_at": [
+    1.41,
+    2.44,
+    3.47,
+    4.62,
+    5.59
+   ],
+   "stamp_at": 7.72
+  },
+  {
+   "type": "np_timeline",
+   "rows": [
+    [
+     "1999",
+     "KARGIL WAR"
+    ],
+    [
+     "2001–02",
+     "BORDER STANDOFF"
+    ],
+    [
+     "2019",
+     "PULWAMA · BALAKOT"
+    ],
+    [
+     "MAY 2025",
+     "4-DAY CONFLICT"
+    ]
+   ],
+   "tick": "LIST EXCHANGED",
+   "vo": "और सबसे हैरान करने वाली बात? कारगिल युद्ध हो, सीमा पर महीनों का तनाव हो, बालाकोट हो, या मई दो हज़ार पच्चीस का, चार दिन का सैन्य टकराव। ये लिस्ट, एक भी साल नहीं रुकी।",
+   "row_at": [
+    1.9,
+    3.02,
+    4.79,
+    5.68
+   ]
+  },
+  {
+   "type": "np_counter",
+   "n": 35,
+   "lbl": "CONSECUTIVE EXCHANGES",
+   "sub": "1 JANUARY 1992 → 1 JANUARY 2026",
+   "note": "the oldest surviving India-Pakistan nuclear agreement",
+   "vo": "एक जनवरी दो हज़ार छब्बीस को, ये लगातार पैंतीसवीं बार हुआ। आज ये, दोनों देशों के बीच, सबसे पुराना चलता हुआ परमाणु समझौता है।"
+  },
+  {
+   "type": "photo",
+   "img": "media/029_nalist/reactor_1.jpg",
+   "cap_y": 860,
+   "dark": 0.35,
+   "kicker": "BUT WHY TELL AN ENEMY?",
+   "big": "RADIATION",
+   "lines": [
+    "a strike on a reactor could spread",
+    "radiation across the border too"
+   ],
+   "vo": "पर दुश्मन को, अपने परमाणु ठिकानों का पता क्यों देना? क्योंकि किसी परमाणु रिएक्टर पर हमला, रेडिएशन को, सीमा के पार भी फैला सकता है। यानी, ये लिस्ट कहती है: लड़ाई जो भी हो, ये जगहें निशाना नहीं बनेंगी।"
+  },
+  {
+   "type": "np_two",
+   "left": [
+    "A RED LINE",
+    "never crossed,",
+    "even in war"
+   ],
+   "right": [
+    "A TARGET MAP?",
+    "the other side knows",
+    "exactly where to look"
+   ],
+   "vo": "कुछ लोग कहते हैं, ये समझदारी है, एक ऐसी लाल लकीर, जो जंग में भी पार नहीं होती। तो कुछ पूछते हैं, क्या दुश्मन को, अपने ठिकानों का पता देना, ख़तरनाक नहीं?",
+   "right_at": 5.43
+  },
+  {
+   "type": "outro",
+   "min": 7.5,
+   "highlight": [
+    "IN",
+    "PK"
+   ],
+   "lines": [
+    [
+     "Enemies.",
+     "WHITE"
+    ],
+    [
+     "Still swapping lists.",
+     "alert"
+    ]
+   ],
+   "vo": "आपको क्या लगता है, ये ठीक है, या फिर बहुत ही ख़तरनाक? कमेंट में ज़रूर बताइए। ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ],
+ "siren": []
+}
