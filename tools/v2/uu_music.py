@@ -249,6 +249,8 @@ def siren(L, f0=620, f1=920, rate=0.55):
     tt = np.arange(int(L * SR)) / SR; f = f0 + (f1 - f0) * (0.5 - 0.5 * np.cos(2 * np.pi * rate * tt))
     ph = 2 * np.pi * np.cumsum(f) / SR; y = np.sin(ph) + 0.35 * np.sin(2 * ph) + 0.15 * np.sin(3 * ph)
     return lp(y, 2200) * np.minimum(1, tt / 0.6) * np.minimum(1, (L - tt) / 0.8) * 0.5
+for i in spec.get("siren", []):   # optional distant siren under chosen scenes
+    add(music, siren(D[i] + 0.4), ST[i] - 0.2, 0.09)
 for i, sc in enumerate(spec["scenes"]):   # bomb-core reel (024) scene sounds
     ty = sc["type"]
     if ty == "p_hook":
