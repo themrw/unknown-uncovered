@@ -1,0 +1,106 @@
+{
+ "format": "story",
+ "theme": "ocean",
+ "look": "cinematic",
+ "speed": 1.08,
+ "lead": 0.2,
+ "tail": 0.35,
+ "voice_job": "031_main",
+ "punch": true,
+ "captions": true,
+ "caption_y": 1520,
+ "siren": [],
+ "header": "UNKNOWN UNCOVERED",
+ "source": "Sources: Australian Govt (DFAT, Home Affairs), NASA Sea Level Change Team, Constitution of Tuvalu 2023, Devpolicy (ANU)",
+ "ticker": "TUVALU · CLIMATE VISA · FALEPILI UNION",
+ "credits_from": [
+  "media/031_tuvalu/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "tv_hook",
+   "bg": "media/031_tuvalu/funafuti_0.jpg",
+   "n": 8750,
+   "lbl": "PEOPLE ENTERED A LOTTERY",
+   "lbl2": "to leave their own country forever",
+   "eq": "= 82% OF THE POPULATION",
+   "vo": "सोचिए, आपके देश की आधी से ज़्यादा जनता, एक लॉटरी में नाम लिखवा दे, सिर्फ़ इसलिए, कि उन्हें अपना देश, हमेशा के लिए छोड़ना है।",
+   "eq_at": 4.51
+  },
+  {
+   "type": "tv_globe",
+   "bg": "media/031_tuvalu/lagoon_2.jpg",
+   "kicker": "MIDDLE OF THE PACIFIC OCEAN",
+   "big": "TUVALU",
+   "sub": "9 tiny islands · ~11,000 people",
+   "h": "2 M",
+   "h_lbl": "average height above the sea",
+   "vo": "ये है तुवालु। प्रशांत महासागर के बीच, नौ छोटे-छोटे द्वीप, और करीब ग्यारह हज़ार लोग। पूरे देश की औसत ऊँचाई, समुद्र से सिर्फ़ दो मीटर है।",
+   "h_at": 5.87
+  },
+  {
+   "type": "tv_stat",
+   "bg": "media/031_tuvalu/lagoon_1.jpg",
+   "kicker": "NASA SEA LEVEL CHANGE TEAM",
+   "big": "1.5×",
+   "lbl": "faster sea-level rise than the world average",
+   "big2": "2050",
+   "lbl2": "much of the land below the daily high tide",
+   "vo": "नासा के मुताबिक़, यहाँ समुद्र, दुनिया के औसत से डेढ़ गुना तेज़ी से बढ़ा है। और दो हज़ार पचास तक, देश की बहुत सी ज़मीन, रोज़ के ज्वार से भी नीचे होगी।",
+   "s2_at": 4.98
+  },
+  {
+   "type": "tv_lottery",
+   "bg": "media/031_tuvalu/runway_1.jpg",
+   "kicker": "AUSTRALIA · WORLD'S FIRST CLIMATE VISA",
+   "d1": 3125,
+   "d1_lbl": "IN JUST 4 DAYS",
+   "d2": 8750,
+   "d2_lbl": "BY THE TIME THE BALLOT CLOSED",
+   "vo": "इसलिए ऑस्ट्रेलिया ने, दुनिया का पहला क्लाइमेट वीज़ा दिया। लॉटरी खुली, और सिर्फ़ चार दिन में, तीन हज़ार से ज़्यादा लोगों ने नाम लिखवा दिया। आख़िर तक, आठ हज़ार सात सौ पचास।",
+   "d1_at": 3.65,
+   "d2_at": 8.17
+  },
+  {
+   "type": "tv_quota",
+   "bg": "media/031_tuvalu/funafuti_1.jpg",
+   "total": 8750,
+   "quota": 280,
+   "q_lbl": "VISAS PER YEAR",
+   "yrs": "30–40 YEARS",
+   "yrs_lbl": "to empty the whole country",
+   "vo": "पर हर साल जगह, सिर्फ़ दो सौ अस्सी। यानी अगर सब जाना चाहें, तो पूरा देश ख़ाली होने में, तीस से चालीस साल लगेंगे।",
+   "q_at": 0.4,
+   "y_at": 2.26
+  },
+  {
+   "type": "tv_law",
+   "bg": "media/031_tuvalu/funafuti_2.jpg",
+   "kicker": "THE TWIST",
+   "doc": "CONSTITUTION OF TUVALU · 2023",
+   "quote": "“…shall remain in perpetuity…”",
+   "note": "even if all its land disappears under the sea",
+   "vo": "और सबसे चौंकाने वाली बात। तुवालु ने अपने संविधान में लिख दिया है, कि अगर उसकी पूरी ज़मीन, समुद्र में डूब भी जाए, तब भी, ये देश हमेशा ज़िंदा रहेगा।",
+   "doc_at": 1.79,
+   "note_at": 4.23
+  },
+  {
+   "type": "or_outro",
+   "bg": "media/031_tuvalu/lagoon_0.jpg",
+   "highlight": [
+    "AU"
+   ],
+   "lines": [
+    [
+     "Stay or leave?",
+     "WHITE"
+    ],
+    [
+     "Tell us in the comments.",
+     "accent"
+    ]
+   ],
+   "vo": "अगर आपका घर, धीरे-धीरे समुद्र में डूब रहा हो, तो आप क्या करते? रुकते, या चले जाते? कमेंट में बताइए। ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ]
+}

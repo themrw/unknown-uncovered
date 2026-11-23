@@ -1,0 +1,209 @@
+{
+ "format": "story",
+ "theme": "orbit",
+ "look": "cinematic",
+ "speed": 1.08,
+ "lead": 0.2,
+ "tail": 0.35,
+ "voice_job": "032_bm",
+ "punch": true,
+ "captions": true,
+ "caption_y": 1520,
+ "siren": [],
+ "header": "UNKNOWN UNCOVERED",
+ "source": "Sources: Lowy Institute Asia Power Index 2026; BrahMos Aerospace; Govt of India; Philippine DND",
+ "ticker": "BRAHMOS · ASIA POWER INDEX 2026",
+ "credits_from": [
+  "media/032_asiapower/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "bm_hook",
+   "bg": "media/032_asiapower/brahmos_4.jpg",
+   "top": "BRAHMOS",
+   "top2": "BOOSTED INDIA'S RANKING",
+   "facts": [
+    [
+     "MACH 2.8",
+     "~3× the speed of sound"
+    ],
+    [
+     "290 KM",
+     "export-version range"
+    ],
+    [
+     "3 BUYERS",
+     "all China's neighbours"
+    ]
+   ],
+   "vo": "ब्रह्मोस ने बढ़ाई भारत की रैंकिंग! आवाज़ से क़रीब तीन गुना तेज़, क़रीब तीन सौ किलोमीटर तक मार, और चीन के तीन पड़ोसी, इसके ख़रीदार।",
+   "f_at": [
+    2.44,
+    4.36,
+    6.27
+   ]
+  },
+  {
+   "type": "bm_report",
+   "bg": "media/032_asiapower/asia_0.jpg",
+   "kicker": "LOWY INSTITUTE · ASIA POWER INDEX 2026",
+   "cards": [
+    [
+     "INDIA OVERALL",
+     "#3 · 40.5",
+     "accent"
+    ],
+    [
+     "ECONOMIC CAPABILITY",
+     "DOWN 0.7",
+     "bad"
+    ],
+    [
+     "DEFENCE NETWORKS",
+     "#11 → #9",
+     "good"
+    ]
+   ],
+   "why": "credited to BrahMos sales in Southeast Asia",
+   "vo": "एशिया की नई पावर रिपोर्ट में, भारत तीसरे नंबर पर है। इस साल भारत का आर्थिक स्कोर थोड़ा गिरा, फिर भी कुल स्कोर बढ़ा। और रक्षा साझेदारी में, भारत दो पायदान ऊपर, नौवें नंबर पर पहुँचा, जिसका बड़ा कारण बताया गया, ब्रह्मोस की बिक्री।",
+   "c_at": [
+    2.09,
+    3.55,
+    7.52
+   ],
+   "why_at": 11.63
+  },
+  {
+   "type": "bm_specs",
+   "bg": "media/032_asiapower/parade_1.jpg",
+   "name1": "BRAHMAPUTRA",
+   "name2": "MOSKVA",
+   "specs": [
+    [
+     "SPEED",
+     "MACH 2.8"
+    ],
+    [
+     "RANGE (EXPORT)",
+     "290 KM"
+    ],
+    [
+     "LAUNCH",
+     "LAND · SEA · AIR"
+    ],
+    [
+     "ATTACK",
+     "SEA-SKIMMING"
+    ]
+   ],
+   "vo": "ब्रह्मोस, भारत और रूस की साझा मिसाइल है। नाम बना है दो नदियों से, ब्रह्मपुत्र और मॉस्कवा। ये ज़मीन, समुद्र और हवा, तीनों से दागी जा सकती है, और दुश्मन के जहाज़ को, समुद्र की सतह के बिल्कुल पास उड़कर निशाना बनाती है।",
+   "n_at": 2.95,
+   "s_at": 6.23
+  },
+  {
+   "type": "bm_map",
+   "bg": "media/032_asiapower/scs_2.jpg",
+   "buyers": [
+    [
+     "PH",
+     "PHILIPPINES",
+     121.0,
+     14.6
+    ],
+    [
+     "VN",
+     "VIETNAM",
+     105.8,
+     21.0
+    ],
+    [
+     "ID",
+     "INDONESIA",
+     106.8,
+     -6.2
+    ]
+   ],
+   "sea": "SOUTH CHINA SEA",
+   "vo": "और अब इसके ख़रीदार हैं, फ़िलीपींस, वियतनाम, और इंडोनेशिया। तीनों का, दक्षिण चीन सागर में, चीन के साथ समुद्री विवाद है।",
+   "b_at": [
+    1.73,
+    2.43,
+    3.2
+   ],
+   "dispute_at": 3.97
+  },
+  {
+   "type": "bm_money",
+   "bg": "media/032_asiapower/brahmos_2.jpg",
+   "rows": [
+    [
+     "PH",
+     "PHILIPPINES · 2022",
+     "$375M",
+     "first foreign buyer"
+    ],
+    [
+     "VN",
+     "VIETNAM · 2026",
+     "~$620–700M",
+     "coastal-defence package"
+    ],
+    [
+     "ID",
+     "INDONESIA · 2026",
+     "$200–350M",
+     "initial shore-based order"
+    ]
+   ],
+   "total": "$1 BILLION+",
+   "vo": "फ़िलीपींस ने दो हज़ार बाईस में, तीन सौ पचहत्तर मिलियन डॉलर का सौदा किया, और वो इसका पहला विदेशी ख़रीदार बना। वियतनाम और इंडोनेशिया को मिलाकर, ये कारोबार, एक अरब डॉलर से भी ऊपर पहुँच रहा है।",
+   "r_at": [
+    0.2,
+    6.9,
+    7.57
+   ],
+   "t_at": 8.93
+  },
+  {
+   "type": "bm_twist",
+   "bg": "media/032_asiapower/ship_0.jpg",
+   "kicker": "THE TWIST",
+   "l1": [
+    "MADE BY",
+    "INDIA + RUSSIA"
+   ],
+   "l2": [
+    "EVERY EXPORT NEEDS",
+    "RUSSIA'S YES"
+   ],
+   "l3": [
+    "NOW IN THE HANDS OF",
+    "CHINA'S NEIGHBOURS"
+   ],
+   "vo": "पर एक दिलचस्प बात। ब्रह्मोस को किसी तीसरे देश को बेचने के लिए, रूस की हाँ ज़रूरी होती है। यानी, भारत की मिसाइल, रूस की मंज़ूरी, और चीन के पड़ोसियों के हाथ।",
+   "l_at": [
+    0.6,
+    4.37,
+    8.68
+   ]
+  },
+  {
+   "type": "or_outro",
+   "bg": "media/032_asiapower/asia_1.jpg",
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "Will BrahMos make India",
+     "WHITE"
+    ],
+    [
+     "Asia's arms supplier?",
+     "accent"
+    ]
+   ],
+   "vo": "क्या ब्रह्मोस, भारत को एशिया का बड़ा हथियार सप्लायर बना देगा? कमेंट में ज़रूर बताइए। ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ]
+}

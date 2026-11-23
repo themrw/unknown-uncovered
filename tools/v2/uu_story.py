@@ -2177,10 +2177,11 @@ def cine_bg(img, sc, t, D, k, key="bg", dark=0.45):
     img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(255 * sc.get("dark", dark)))))
     shade(img)
 
-def title_block(img, t, kicker="", big="", sub="", y=300, t0=0.0, big_col=WHITE, sub_col=AMBER, big_size=128):
+def title_block(img, t, kicker="", big="", sub="", y=300, t0=0.0, big_col=WHITE, sub_col=None, big_size=128):
+    sub_col = sub_col or T["accent"]
     a = ease(clamp((t - t0) / 0.5)); dy = 24 * (1 - a)
     if kicker:
-        text_a(img, (W / 2, y), typed(kicker, prog(t, t0, 0.6)), F("mono", 30), AMBER, 0.95, "mm", shadow=4)
+        text_a(img, (W / 2, y), typed(kicker, prog(t, t0, 0.6)), F("mono", 30), T["accent"], 0.95, "mm", shadow=4)
     if big:
         text_a(img, (W / 2, y + 105 + dy), big, fit_font("anton", big_size, big, W - 120), big_col, a, "mm", shadow=14)
     if sub:
@@ -2412,6 +2413,359 @@ def sc_or_outro(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"or_outro": sc_or_outro, "or_hook": sc_or_hook, "or_count": sc_or_count, "or_file": sc_or_file, "or_debris": sc_or_debris, "or_k1402": sc_or_k1402,
                    "or_orbit": sc_or_orbit, "or_nak": sc_or_nak, "or_question": sc_or_question, "or_photo2": sc_or_photo2})
+
+# ---------------------------------------------------------------- reel 031: Tuvalu climate-visa lottery (ocean theme, cinematic)
+def _num(n): return f"{int(n):,}"
+
+def sc_tv_hook(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.45)
+    g = ease(clamp((t - 0.2) / 2.6)); A = T["accent"]
+    text_a(img, (W / 2, 470), _num(sc["n"] * g), F("anton", 250), WHITE, clamp(t / 0.3), "mm", shadow=16)
+    text_a(img, (W / 2, 640), sc.get("lbl", ""), fit_font("anton", 66, sc.get("lbl", ""), W - 120), WHITE, clamp((t - 0.5) / 0.4), "mm", shadow=8)
+    text_a(img, (W / 2, 720), sc.get("lbl2", ""), F("disp", 46, "Bold"), A, clamp((t - 0.8) / 0.4), "mm", shadow=8)
+    ea = sc.get("eq_at", 4.0)
+    if t > ea:
+        b = ease(clamp((t - ea) / 0.5))
+        rect_a(img, (130, 1110, W - 130, 1230), (6, 10, 14), 0.6 * b, 20)
+        rect_a(img, (130, 1110, 137, 1230), T["alert"], b)
+        text_a(img, (W / 2 + 4, 1170), sc.get("eq", ""), fit_font("anton", 68, sc.get("eq", ""), W - 320), T["alert"], b, "mm")
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_tv_globe(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.55)
+    title_block(img, t, sc.get("kicker", ""), sc.get("big", ""), sc.get("sub", ""), y=230, t0=0.1, big_size=150)
+    G = R.GLOBE; lat0, lon0 = -12.0, 165.0 + 10 * ease_io(clamp(t / max(D, 1)))
+    g = G.render(lat0, lon0, highlight=sc.get("highlight"), hl_alpha=0.6, dim_others=0.0)
+    gr = 330; s_ = gr / G.R; gs = g.resize((int(g.width * s_), int(g.height * s_)), Image.LANCZOS)
+    cx, cy = W / 2, 860; a = clamp((t - 0.3) / 0.6)
+    paste_a(img, gs, (cx - gs.width / 2, cy - gs.height / 2), a)
+    p, v = G.project(np.radians([179.2]), np.radians([-8.5]), math.radians(lat0), math.radians(lon0))
+    x, y = cx + (p[0][0] - G.S / 2) * s_, cy + (p[0][1] - G.S / 2) * s_
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    if t > 0.9:
+        b = clamp((t - 0.9) / 0.5); ph = ((t - 0.9) % 1.6) / 1.6; rr = 12 + 60 * ph
+        d.ellipse([x - rr, y - rr, x + rr, y + rr], outline=T["accent"] + (int(220 * (1 - ph) * b),), width=3)
+        glow_dot(lay, x, y, 7, T["accent"], b)
+        d.text((x + 26, y - 4), "TUVALU", font=F("mono", 28), fill=(255, 255, 255, int(240 * b)), anchor="lm")
+    img.alpha_composite(lay)
+    ha = sc.get("h_at", 5.0)
+    if t > ha:
+        b = ease(clamp((t - ha) / 0.5))
+        rect_a(img, (150, 1150, W - 150, 1350), (6, 10, 14), 0.6 * b, 20)
+        text_a(img, (W / 2, 1225 + 16 * (1 - b)), sc.get("h", ""), F("anton", 110), T["accent"], b, "mm", shadow=8)
+        text_a(img, (W / 2, 1310), sc.get("h_lbl", ""), F("disp", 40, "Bold"), WHITE, b, "mm", shadow=6)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_tv_stat(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.5)
+    a = ease(clamp((t - 0.2) / 0.5))
+    text_a(img, (W / 2, 270), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 30), T["accent"], 0.95, "mm", shadow=4)
+    text_a(img, (W / 2, 450 + 20 * (1 - a)), sc.get("big", ""), F("anton", 230), T["accent"], a, "mm", shadow=16)
+    text_a(img, (W / 2, 620), sc.get("lbl", ""), fit_font("disp", 46, sc.get("lbl", ""), W - 140, "Bold"), WHITE, a, "mm", shadow=8)
+    sa = sc.get("s2_at", 5.0)
+    if t > sa:
+        b = ease(clamp((t - sa) / 0.5))
+        ImageDraw.Draw(img).line([W / 2 - 160 * b, 760, W / 2 + 160 * b, 760], fill=(255, 255, 255, 160), width=2)
+        text_a(img, (W / 2, 930 + 20 * (1 - b)), sc.get("big2", ""), F("anton", 230), T["alert"], b, "mm", shadow=16)
+        text_a(img, (W / 2, 1100), sc.get("lbl2", ""), fit_font("disp", 46, sc.get("lbl2", ""), W - 140, "Bold"), WHITE, b, "mm", shadow=8)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_tv_lottery(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.58)
+    text_a(img, (W / 2, 270), typed(sc.get("kicker", ""), prog(t, 0.1, 0.8)), F("mono", 30), T["accent"], 0.95, "mm", shadow=4)
+    d1, d2 = sc.get("d1_at", 4.0), sc.get("d2_at", 8.0)
+    if t < d1: n = 0; lbl = ""
+    elif t < d2: n = sc["d1"] * ease(clamp((t - d1) / 1.4)); lbl = sc.get("d1_lbl", "")
+    else: n = sc["d1"] + (sc["d2"] - sc["d1"]) * ease(clamp((t - d2) / 1.6)); lbl = sc.get("d2_lbl", "")
+    a = clamp((t - d1 + 0.3) / 0.4)
+    text_a(img, (W / 2, 520), _num(n), F("anton", 250), WHITE, a, "mm", shadow=16)
+    text_a(img, (W / 2, 690), "REGISTRATIONS", F("anton", 60), WHITE, a, "mm", shadow=8)
+    if lbl: text_a(img, (W / 2, 770), lbl, F("disp", 46, "Bold"), T["accent"], a, "mm", shadow=8)
+    pop = 10643; x0, x1, y = 130, W - 130, 940
+    rect_a(img, (x0, y - 18, x1, y + 18), (255, 255, 255), 0.18 * a, 18)
+    fw = (x1 - x0) * min(1, n / pop)
+    if fw > 4: rect_a(img, (x0, y - 18, x0 + fw, y + 18), T["alert"] if n > pop / 2 else T["accent"], 0.95 * a, 18)
+    text_a(img, (x0, y + 56), "RESIDENT POPULATION 10,643 (CENSUS 2022)", F("mono", 24), (225, 225, 220), a, "lm", shadow=4)
+    text_a(img, (x1, y - 50), f"{int(round(100 * n / pop))}%", F("anton", 56), WHITE, a, "rm", shadow=6)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_tv_quota(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.62)
+    a = ease(clamp(t / 0.5)); qa = sc.get("q_at", 0.6); ya = sc.get("y_at", 4.0)
+    text_a(img, (W / 2, 270), f"{_num(sc['total'])} WANT TO GO", F("anton", 76), WHITE, a, "mm", shadow=8)
+    cols, rows = 25, 14; gx, gy = (W - 200) / (cols - 1), 36; x0, y0 = 100, 380
+    n_hl = round(sc["quota"] / sc["total"] * cols * rows)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    q = ease(clamp((t - qa) / 0.8))
+    for j in range(cols * rows):
+        x = x0 + (j % cols) * gx; y = y0 + (j // cols) * gy; hl = j < n_hl and q > 0
+        col = T["accent"] + (int(255 * q),) if hl else (255, 255, 255, int((150 - 90 * q) * a))
+        d.ellipse([x - 7, y - 16, x + 7, y - 2], fill=col); d.rounded_rectangle([x - 10, y, x + 10, y + 16], 6, fill=col)
+    img.alpha_composite(lay)
+    if q > 0:
+        text_a(img, (W / 2, 950), f"ONLY {sc['quota']}", F("anton", 120), T["accent"], q, "mm", shadow=10)
+        text_a(img, (W / 2, 1045), sc.get("q_lbl", ""), F("anton", 52), WHITE, q, "mm", shadow=6)
+    if t > ya:
+        b = ease(clamp((t - ya) / 0.5))
+        rect_a(img, (130, 1140, W - 130, 1340), (6, 10, 14), 0.6 * b, 20)
+        text_a(img, (W / 2, 1215 + 16 * (1 - b)), sc.get("yrs", ""), F("anton", 104), T["alert"], b, "mm")
+        text_a(img, (W / 2, 1300), sc.get("yrs_lbl", ""), F("disp", 40, "Bold"), WHITE, b, "mm")
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_tv_law(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.55)
+    text_a(img, (W / 2, 290), typed(sc.get("kicker", ""), prog(t, 0.1, 0.5)), F("mono", 34), T["alert"], 0.95, "mm", shadow=4)
+    da = sc.get("doc_at", 2.0); b = ease(clamp((t - da) / 0.7))
+    if b > 0:
+        cw, ch = 860, 560; card = Image.new("RGBA", (cw, ch), (236, 230, 214, 255)); cd = ImageDraw.Draw(card)
+        cd.rectangle([18, 18, cw - 18, ch - 18], outline=(120, 100, 70, 255), width=2)
+        cd.text((cw / 2, 80), sc.get("doc", ""), font=F("mono", 30), fill=(60, 50, 40), anchor="mm")
+        cd.line([120, 120, cw - 120, 120], fill=(120, 100, 70), width=2)
+        cd.text((cw / 2, 175), "SECTION 2 · THE STATE OF TUVALU", font=F("mono", 24), fill=(110, 95, 75), anchor="mm")
+        cd.text((cw / 2, 300), sc.get("quote", ""), font=fit_font("disp", 64, sc.get("quote", ""), cw - 100, "Bold"), fill=(25, 25, 25), anchor="mm")
+        hl = ease(clamp((t - da - 1.2) / 0.8))
+        if hl > 0:
+            qf = fit_font("disp", 64, sc.get("quote", ""), cw - 100, "Bold"); w_ = cd.textlength(sc.get("quote", ""), font=qf)
+            ov = Image.new("RGBA", (cw, ch), (0, 0, 0, 0)); ImageDraw.Draw(ov).rectangle([cw / 2 - w_ / 2 - 10, 270, cw / 2 - w_ / 2 - 10 + (w_ + 20) * hl, 334], fill=T["accent"] + (110,))
+            card = Image.alpha_composite(card, ov); cd = ImageDraw.Draw(card)
+        cd.text((cw / 2, 420), "notwithstanding the impacts of climate change", font=F("disp", 34, "Bold"), fill=(80, 70, 60), anchor="mm")
+        card = card.rotate(-2 * (1 - b) - 1, expand=True, resample=Image.BICUBIC)
+        sh = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(sh).rectangle([W / 2 - cw / 2 + 20, 470, W / 2 + cw / 2 + 20, 470 + ch + 30], fill=(0, 0, 0, int(170 * b)))
+        img.alpha_composite(sh.filter(ImageFilter.GaussianBlur(24)))
+        paste_a(img, card, (W / 2 - card.width / 2, 440 + 60 * (1 - b)), b)
+    na = sc.get("note_at", da + 2.5)
+    if t > na:
+        c = ease(clamp((t - na) / 0.5))
+        text_a(img, (W / 2, 1150), sc.get("note", ""), fit_font("anton", 62, sc.get("note", ""), W - 120), WHITE, c, "mm", shadow=10)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+R.SCENE_FN.update({"tv_hook": sc_tv_hook, "tv_globe": sc_tv_globe, "tv_stat": sc_tv_stat, "tv_lottery": sc_tv_lottery, "tv_quota": sc_tv_quota, "tv_law": sc_tv_law})
+
+# ---------------------------------------------------------------- reel 032: Asia Power Index 2026 (cinematic countdown)
+GOOD = (120, 225, 150)
+
+def sc_ap_hook(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.45)
+    title_block(img, t, sc.get("kicker", ""), sc.get("big", ""), sc.get("sub", ""), y=300, t0=0.1, big_size=110)
+    qa = sc.get("q_at", 4.0)
+    if t > qa:
+        b = ease(clamp((t - qa) / 0.5)); fl = R.flag("IN", 200)
+        paste_a(img, fl, (W / 2 - 330, 900 - fl.height / 2), b)
+        pul = 1 + 0.06 * math.sin((t - qa) * 6)
+        text_a(img, (W / 2 + 120, 900), "#?", F("anton", int(240 * pul)), T["accent"], b, "mm", shadow=14)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+def sc_ap_rank(img, sc, t, D, tg, k):
+    india = sc.get("cc") == "IN"
+    cine_bg(img, sc, t, D, k, dark=0.5)
+    a = ease(clamp(t / 0.4)); A = T["accent"]
+    text_a(img, (W / 2, 280), f"RANK {sc['rank']} OF 27", F("mono", 34), A, a, "mm", shadow=4)
+    text_a(img, (W / 2, 480 + 30 * (1 - a)), f"#{sc['rank']}", F("anton", 300), A if india else WHITE, a, "mm", shadow=16)
+    b = ease(clamp((t - 0.45) / 0.5)); fl = R.flag(sc["cc"], 170)
+    paste_a(img, fl, (W / 2 - fl.width / 2, 700 - fl.height / 2 + 20 * (1 - b)), b)
+    text_a(img, (W / 2, 880), sc["name"], fit_font("anton", 140, sc["name"], W - 120), WHITE, b, "mm", shadow=12)
+    g = ease(clamp((t - 0.7) / 1.4)); sv = sc["score"] * g
+    text_a(img, (W / 2, 1035), f"{sv:.1f}", F("anton", 110), A if india else WHITE, b, "mm", shadow=10)
+    x0, x1, y = 140, W - 140, 1135
+    rect_a(img, (x0, y - 14, x1, y + 14), (255, 255, 255), 0.18 * b, 14)
+    if g > 0.01: rect_a(img, (x0, y - 14, x0 + (x1 - x0) * sv / 100, y + 14), A if india else (230, 230, 230), 0.95 * b, 14)
+    text_a(img, (x1, y + 44), "/ 100", F("mono", 24), (220, 220, 214), b, "rm", shadow=4)
+    if sc.get("badge") and t > 2.0:
+        c = ease(clamp((t - 2.0) / 0.5))
+        rect_a(img, (W / 2 - 250, 1210, W / 2 + 250, 1300), A, 0.95 * c, 18)
+        text_a(img, (W / 2, 1255), sc["badge"], F("anton", 62), (20, 16, 8), c, "mm")
+        if sc.get("note"): text_a(img, (W / 2, 1360), sc["note"], F("disp", 44, "Bold"), WHITE, c, "mm", shadow=8)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def _half(path, t, D, k, top):
+    tmp = Image.new("RGBA", (W, H), (0, 0, 0, 255)); kenburns(tmp, path, t, D, k)
+    return tmp.crop((0, H // 4, W, H // 4 + H // 2))
+
+def sc_ap_top2(img, sc, t, D, tg, k):
+    A = T["accent"]; ba = sc.get("b_at", 4.0)
+    up = _half(sc["bg"], t, D, k, True); img.paste(up, (0, 0))
+    if t > ba - 0.3:
+        lo = _half(sc["bg2"], t - ba, D, k + 1, False); m = clamp((t - ba + 0.3) / 0.6)
+        img.paste(Image.blend(Image.new("RGBA", lo.size, (0, 0, 0, 255)), lo, m), (0, H // 2))
+    else: img.paste(Image.new("RGBA", (W, H // 2), (0, 0, 0, 255)), (0, H // 2))
+    img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, 120)))
+    shade(img)
+    for (cc, nm, sv, rk), y0, t0 in ((sc["a"], 230, 0.2), (sc["b"], 230 + H // 2, ba)):
+        b = ease(clamp((t - t0) / 0.5))
+        if b <= 0: continue
+        fl = R.flag(cc, 120); paste_a(img, fl, (110, y0 + 60 - fl.height / 2), b)
+        text_a(img, (260, y0 + 20), f"#{rk}", F("anton", 90), A, b, "lm", shadow=8)
+        text_a(img, (260, y0 + 120), nm, fit_font("anton", 76, nm, W - 300), WHITE, b, "lm", shadow=8)
+        g = ease(clamp((t - t0 - 0.2) / 1.2))
+        text_a(img, (W - 110, y0 + 20), f"{sv * g:.1f}", F("anton", 110), WHITE, b, "rm", shadow=10)
+        rect_a(img, (110, y0 + 200, W - 110, y0 + 222), (255, 255, 255), 0.2 * b, 11)
+        rect_a(img, (110, y0 + 200, 110 + (W - 220) * sv * g / 100, y0 + 222), A if rk == 1 else (230, 230, 230), 0.95 * b, 11)
+    ga = sc.get("gap_at", 7.0)
+    if t > ga:
+        c = ease(clamp((t - ga) / 0.5))
+        rect_a(img, (W / 2 - 300, H / 2 - 80, W / 2 + 300, H / 2 + 80), (14, 10, 4), 0.92 * c, 30, A, 4)
+        text_a(img, (W / 2, H / 2 - 20), sc.get("gap", ""), F("anton", 90), A, c, "mm")
+        text_a(img, (W / 2, H / 2 + 50), sc.get("gap_lbl", ""), F("disp", 36, "Bold"), WHITE, c, "mm")
+    credit(img, sc["bg2"] if t > ba else sc["bg"], 1.0); chrome(img, tg)
+
+def sc_ap_drop(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.6)
+    a = ease(clamp(t / 0.4)); g = ease(clamp((t - 0.8) / 1.6)); v = sc["frm"] + (sc["to"] - sc["frm"]) * g
+    text_a(img, (W / 2, 290), typed(sc.get("kicker", ""), prog(t, 0.1, 0.7)), F("mono", 30), T["accent"], 0.95, "mm", shadow=4)
+    fl = R.flag("US", 150); paste_a(img, fl, (W / 2 - fl.width / 2, 400), a)
+    text_a(img, (W / 2, 690), f"{v:.1f}", F("anton", 220), WHITE, a, "mm", shadow=14)
+    d = ImageDraw.Draw(img)
+    if g > 0:
+        c = T["alert"] + (int(255 * min(1, g * 2)),); ay = 860 + 30 * g
+        d.polygon([(W / 2 - 60, ay - 40), (W / 2 + 60, ay - 40), (W / 2, ay + 40)], fill=c)
+    da = sc.get("big_at", 3.0)
+    if t > da:
+        b = ease(clamp((t - da) / 0.5))
+        text_a(img, (W / 2, 1050), sc.get("big", ""), F("anton", 170), T["alert"], b, "mm", shadow=14)
+        text_a(img, (W / 2, 1185), sc.get("lbl", ""), fit_font("disp", 46, sc.get("lbl", ""), W - 140, "Bold"), WHITE, b, "mm", shadow=8)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_ap_india(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.6)
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 280), typed(sc.get("kicker", ""), prog(t, 0.1, 0.6)), F("mono", 32), T["accent"], 0.95, "mm", shadow=4)
+    fl = R.flag("IN", 130); paste_a(img, fl, (W / 2 - fl.width / 2, 340), a)
+    ats = sc.get("c_at", [0.5, 4.0, 8.0])
+    for i, (lab, val, kind) in enumerate(sc.get("cards", [])):
+        b = ease(clamp((t - ats[i]) / 0.5)); y = 600 + i * 230; c = GOOD if kind == "good" else T["alert"]
+        if b <= 0: continue
+        dx = 120 * (1 - b)
+        rect_a(img, (90 + dx, y - 90, W - 90 + dx, y + 90), (6, 8, 12), 0.66 * b, 18)
+        rect_a(img, (90 + dx, y - 90, 97 + dx, y + 90), c, b)
+        text_a(img, (130 + dx, y - 38), lab, F("mono", 30), (215, 215, 210), b, "lm")
+        text_a(img, (130 + dx, y + 30), val, fit_font("anton", 70, val, W - 280), c, b, "lm")
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+R.SCENE_FN.update({"ap_hook": sc_ap_hook, "ap_rank": sc_ap_rank, "ap_top2": sc_ap_top2, "ap_drop": sc_ap_drop, "ap_india": sc_ap_india})
+
+# ---------------------------------------------------------------- reel 032: BrahMos boosted India's ranking (cinematic)
+def sc_bm_hook(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.42); A = T["accent"]
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 330 + 20 * (1 - a)), sc.get("top", ""), F("anton", 190), A, a, "mm", shadow=16)
+    text_a(img, (W / 2, 480), sc.get("top2", ""), fit_font("anton", 76, sc.get("top2", ""), W - 120), WHITE, clamp((t - 0.3) / 0.4), "mm", shadow=10)
+    ats = sc.get("f_at", [2.0, 3.5, 5.0])
+    for i, (big, lbl) in enumerate(sc.get("facts", [])):
+        b = ease(clamp((t - ats[i]) / 0.45)); y = 760 + i * 190
+        if b <= 0: continue
+        rect_a(img, (130, y - 75, W - 130, y + 75), (6, 8, 12), 0.6 * b, 18)
+        rect_a(img, (130, y - 75, 137, y + 75), A, b)
+        text_a(img, (180 + 30 * (1 - b), y - 12), big, F("anton", 84), WHITE, b, "lm")
+        text_a(img, (W - 170, y + 4), lbl, fit_font("disp", 34, lbl, 420, "Bold"), A, b, "rm")
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def _cards(img, t, cards, ats, y0=600, step=230):
+    for i, (lab, val, kind) in enumerate(cards):
+        b = ease(clamp((t - ats[i]) / 0.5)); y = y0 + i * step
+        c = GOOD if kind == "good" else (T["alert"] if kind == "bad" else T["accent"])
+        if b <= 0: continue
+        dx = 120 * (1 - b)
+        rect_a(img, (90 + dx, y - 90, W - 90 + dx, y + 90), (6, 8, 12), 0.66 * b, 18)
+        rect_a(img, (90 + dx, y - 90, 97 + dx, y + 90), c, b)
+        text_a(img, (130 + dx, y - 38), lab, F("mono", 30), (215, 215, 210), b, "lm")
+        text_a(img, (130 + dx, y + 30), val, fit_font("anton", 76, val, W - 280), c, b, "lm")
+
+def sc_bm_report(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.6); a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 280), typed(sc.get("kicker", ""), prog(t, 0.1, 0.8)), F("mono", 30), T["accent"], 0.95, "mm", shadow=4)
+    fl = R.flag("IN", 120); paste_a(img, fl, (W / 2 - fl.width / 2, 340), a)
+    ats = sc.get("c_at", [0.4, 3.0, 6.0]); _cards(img, t, sc.get("cards", []), ats)
+    wa = sc.get("why_at", ats[-1] + 1.5)
+    if t > wa:
+        b = ease(clamp((t - wa) / 0.5))
+        text_a(img, (W / 2, 1290), sc.get("why", ""), fit_font("disp", 44, sc.get("why", ""), W - 140, "Bold"), GOOD, b, "mm", shadow=8)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_bm_specs(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.55); A = T["accent"]; a = ease(clamp(t / 0.4))
+    na = sc.get("n_at", 1.5)
+    if t > na:
+        b = ease(clamp((t - na) / 0.5))
+        text_a(img, (W / 2, 290), sc["name1"], F("anton", 84), WHITE, b, "mm", shadow=8)
+        text_a(img, (W / 2, 370), "+", F("anton", 60), A, b, "mm")
+        text_a(img, (W / 2, 450), sc["name2"], F("anton", 84), WHITE, b, "mm", shadow=8)
+        c = ease(clamp((t - na - 0.9) / 0.5))
+        text_a(img, (W / 2, 590), "= BRAHMOS", F("anton", 130), A, c, "mm", shadow=12)
+    sa = sc.get("s_at", 5.0)
+    for i, (lab, val) in enumerate(sc.get("specs", [])):
+        b = ease(clamp((t - sa - i * 0.35) / 0.45)); x = 110 + (i % 2) * 440; y = 780 + (i // 2) * 220
+        if b <= 0: continue
+        rect_a(img, (x, y, x + 420, y + 190), (6, 8, 12), 0.62 * b, 18)
+        text_a(img, (x + 30, y + 50), lab, F("mono", 26), (210, 210, 205), b, "lm")
+        text_a(img, (x + 30, y + 125), val, fit_font("anton", 70, val, 370), A, b, "lm")
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_bm_map(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.6); A = T["accent"]
+    G = R.GLOBE; lat0, lon0 = 8.0, 104.0 + 6 * ease_io(clamp(t / max(D, 1)))
+    codes = [b[0] for b in sc["buyers"]]
+    g = G.render(lat0, lon0, highlight=codes, hl_alpha=0.85, dim_others=0.0)
+    gr = 460; s_ = gr / G.R; gs = g.resize((int(g.width * s_), int(g.height * s_)), Image.LANCZOS)
+    cx, cy = W / 2, 820; a = clamp((t - 0.1) / 0.5)
+    paste_a(img, gs, (cx - gs.width / 2, cy - gs.height / 2), a)
+    def P(lo, la):
+        p, v = G.project(np.radians([lo]), np.radians([la]), math.radians(lat0), math.radians(lon0))
+        return cx + (p[0][0] - G.S / 2) * s_, cy + (p[0][1] - G.S / 2) * s_
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    ix, iy = P(78.5, 17.4); glow_dot(lay, ix, iy, 8, (255, 160, 60), a)
+    d.text((ix - 16, iy - 30), "INDIA", font=F("mono", 28), fill=(255, 255, 255, int(240 * a)), anchor="rm")
+    sx, sy = P(114.0, 12.0); d.text((sx, sy), sc.get("sea", ""), font=F("mono", 24), fill=(170, 210, 255, int(200 * clamp((t - 0.6) / 0.6))), anchor="mm")
+    ats = sc.get("b_at", [0.8, 1.6, 2.4])
+    for i, (cc, nm, lo, la) in enumerate(sc["buyers"]):
+        b = clamp((t - ats[i]) / 0.9)
+        if b <= 0: continue
+        x1, y1 = P(lo, la); mx, my = (ix + x1) / 2, min(iy, y1) - 140
+        pts = [((1 - f) ** 2 * ix + 2 * (1 - f) * f * mx + f * f * x1, (1 - f) ** 2 * iy + 2 * (1 - f) * f * my + f * f * y1) for f in np.linspace(0, ease(b), 40)]
+        d.line(pts, fill=A + (230,), width=4)
+        if b >= 1:
+            glow_dot(lay, x1, y1, 8, A)
+            sd = -1 if cc == "VN" else 1; fl = R.flag(cc, 60)
+            lay.alpha_composite(fl, (int(x1 + 18 if sd > 0 else x1 - 18 - fl.width), int(y1 - 60)))
+            d.text((x1 + 18 * sd, y1 + 22), nm, font=F("anton", 34), fill=(255, 255, 255, 255), anchor="lm" if sd > 0 else "rm")
+    img.alpha_composite(lay)
+    da = sc.get("dispute_at", 5.0)
+    if t > da:
+        b = ease(clamp((t - da) / 0.5))
+        rect_a(img, (110, 1230, W - 110, 1340), (40, 10, 6), 0.8 * b, 18, T["alert"], 3)
+        text_a(img, (W / 2, 1285), "ALL 3 HAVE SEA DISPUTES WITH CHINA", fit_font("anton", 54, "ALL 3 HAVE SEA DISPUTES WITH CHINA", W - 280), WHITE, b, "mm")
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_bm_money(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.62); A = T["accent"]; a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 280), "BRAHMOS EXPORT DEALS", F("mono", 32), A, a, "mm", shadow=4)
+    ats = sc.get("r_at", [0.4, 4.0, 5.0])
+    for i, (cc, lab, val, note) in enumerate(sc.get("rows", [])):
+        b = ease(clamp((t - ats[i]) / 0.5)); y = 470 + i * 210
+        if b <= 0: continue
+        rect_a(img, (90, y - 85, W - 90, y + 85), (6, 8, 12), 0.66 * b, 18)
+        fl = R.flag(cc, 80); paste_a(img, fl, (120, y - fl.height / 2), b)
+        text_a(img, (230, y - 30), lab, F("mono", 28), (215, 215, 210), b, "lm")
+        text_a(img, (230, y + 30), note, F("disp", 32, "Bold"), (190, 190, 185), b, "lm")
+        text_a(img, (W - 120, y), val, fit_font("anton", 66, val, 330), A, b, "rm")
+    ta = sc.get("t_at", 6.0)
+    if t > ta:
+        b = ease(clamp((t - ta) / 0.5))
+        text_a(img, (W / 2, 1180 + 20 * (1 - b)), sc.get("total", ""), F("anton", 150), GOOD, b, "mm", shadow=14)
+        text_a(img, (W / 2, 1290), "and counting", F("disp", 40, "Bold"), WHITE, b, "mm", shadow=6)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_bm_twist(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.6); A = T["accent"]
+    text_a(img, (W / 2, 290), typed(sc.get("kicker", ""), prog(t, 0.1, 0.4)), F("mono", 36), T["alert"], 0.95, "mm", shadow=4)
+    ats = sc.get("l_at", [0.6, 2.5, 5.0])
+    for i, key in enumerate(("l1", "l2", "l3")):
+        lab, val = sc[key]; b = ease(clamp((t - ats[i]) / 0.5)); y = 520 + i * 250
+        if b <= 0: continue
+        text_a(img, (W / 2, y - 45), lab, F("mono", 32), (215, 215, 210), b, "mm", shadow=4)
+        text_a(img, (W / 2, y + 30 + 20 * (1 - b)), val, fit_font("anton", 92, val, W - 140), [WHITE, A, T["alert"]][i], b, "mm", shadow=10)
+    credit(img, sc.get("bg"), clamp(t / 0.6)); chrome(img, tg)
+
+R.SCENE_FN.update({"bm_hook": sc_bm_hook, "bm_report": sc_bm_report, "bm_specs": sc_bm_specs, "bm_map": sc_bm_map, "bm_money": sc_bm_money, "bm_twist": sc_bm_twist})
 
 if __name__ == "__main__":
     R.main()

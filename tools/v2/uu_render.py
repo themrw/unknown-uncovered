@@ -27,6 +27,8 @@ THEMES = {
                 land=(24, 30, 32), land_edge=(70, 90, 90), ocean=(8, 14, 18), part=(255, 140, 80), motif="radar"),
     "money": dict(bg=(8, 7, 4), glow=(70, 50, 8), accent=(255, 200, 60), accent2=(90, 220, 140), alert=(255, 90, 70),
                   land=(34, 30, 20), land_edge=(110, 95, 55), ocean=(12, 11, 8), part=(255, 215, 120), motif="chart"),
+    "ocean": dict(bg=(3, 10, 16), glow=(10, 40, 60), accent=(110, 220, 235), accent2=(90, 170, 255), alert=(255, 128, 96),
+                  land=(34, 52, 58), land_edge=(130, 170, 180), ocean=(5, 16, 28), part=(190, 235, 245), motif="stars"),
     "orbit": dict(bg=(4, 6, 12), glow=(20, 30, 60), accent=(255, 196, 92), accent2=(110, 170, 255), alert=(255, 120, 80),
                   land=(30, 38, 54), land_edge=(120, 140, 180), ocean=(6, 10, 22), part=(200, 215, 255), motif="stars"),
     "space": dict(bg=(4, 4, 12), glow=(30, 20, 80), accent=(140, 200, 255), accent2=(255, 140, 220), alert=(255, 90, 120),
