@@ -1,10 +1,8 @@
 {"items": [
- {"id": "asia", "search": "Asia at night from International Space Station city lights", "n": 4},
- {"id": "moscow", "search": "Moscow Kremlin night", "n": 3},
- {"id": "tokyo", "search": "Tokyo skyline night", "n": 3},
- {"id": "india", "search": "India Gate New Delhi night", "n": 3},
- {"id": "rb", "search": "Rashtrapati Bhavan", "n": 2},
- {"id": "beijing", "search": "Forbidden City Beijing aerial", "n": 3},
- {"id": "capitol", "search": "United States Capitol night", "n": 3},
- {"id": "brahmos", "search": "BrahMos missile Republic Day parade", "n": 3}
+ {"id": "brahmos", "search": "BrahMos missile launch", "n": 5},
+ {"id": "parade", "search": "BrahMos Republic Day parade", "n": 3},
+ {"id": "asia", "search": "Asia at night from International Space Station city lights", "n": 3},
+ {"id": "scs", "search": "South China Sea from space", "n": 3},
+ {"id": "ship", "search": "Indian Navy destroyer Kolkata class at sea", "n": 3},
+ {"id": "spratly", "search": "Spratly Islands aerial", "n": 2}
 ]}
