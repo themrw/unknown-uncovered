@@ -53,6 +53,21 @@ then update this section in the same commit.
    - Images only with PD / CC0 / CC BY / CC BY-SA licences, credited on screen (the media Action does this). No photos of
      identifiable public figures or private people in focus. Music is synthesized in-house. Long videos carry a disclaimer card.
 
+## Channel analysis, 24 Nov 2026 (the user: "remember these issues to create and upload videos accordingly")
+After 10 days / 27 videos / 2,668 views / 0 comments. Public stats only (YouTube Analytics is blocked from the workspace), so the
+causes are hypotheses; the fixes are standing practice until the numbers say otherwise:
+- **One Short per day, at a fixed time** (~19:00–20:00 IST). Never 3–4 uploads a day. **No long-form versions of Shorts for now**
+  (8 long videos averaged ~25 views); a long video only if the user asks for one specifically.
+- **Shorts 45–60 s.** One hook, ~3 facts, one twist, done. Keep the CTA line short.
+- **Hook in the very first frame:** big text + motion at t=0, no fade-in or typing reveal before the first line is readable.
+- **categoryId 27 (Education) for every Short.** The only Shorts in 25 (News & Politics) were the IAF and BrahMos reels; BrahMos got
+  3 views in 28 h.
+- **Topics:** defence, nuclear and number-driven geopolitics won (445 / 315 / 249 / 220 views). Plain India-history or business
+  stories lost (Cipla 15, ORS 16, Pokhran 28, UPI 41). Tie India-pride stories to a defence, numbers or global-stakes angle.
+- **Engagement:** every upload gets a pinned comment with an easy one-tap question ("1 or 2?"). Reply to early comments.
+- **Vary the look** between reels (photos/footage, palette, scene types) so the channel doesn't read as mass-produced templates.
+- Ask the user for Studio's "Viewed vs swiped away" and "Average % viewed" when judging a reel; we can't read them ourselves.
+
 ## What the audience likes (user's observation, Nov 2026: pick and pitch topics with this in mind)
 Two kinds of reels do well. Prefer topics that fit one of them, and say which one in every pitch:
 1. **India's pride on the world stage**: India beating, surprising or outsmarting the world, told positively and with sourced facts (e.g. reel 016 refinery superpowers, reel 010 how India fooled the CIA at Pokhran, 017 UPI, 018 Haque & Bose).
