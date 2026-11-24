@@ -1,0 +1,9 @@
+{"items": [
+ {"id": "pills", "search": "Pills", "n": 4},
+ {"id": "tablets", "search": "Tablets medicine", "n": 3},
+ {"id": "capsules", "search": "Capsules medicine", "n": 2},
+ {"id": "ship", "search": "Container ship at sea", "n": 3},
+ {"id": "nhava", "search": "Jawaharlal Nehru Port", "n": 2},
+ {"id": "factory", "search": "Pharmaceutical factory", "n": 3},
+ {"id": "chem", "search": "Chemical plant at night", "n": 2}
+]}
