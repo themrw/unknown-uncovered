@@ -25,6 +25,29 @@ English on-screen text, curious facts and world data explained simply.
 - `.github/workflows/upload.yml`: on push of a `videos/*/meta.json`, uploads every folder with no `uploaded.json` to YouTube and every folder with no `instagram.json` to Instagram Reels, and every folder with no `facebook.json` to the Facebook Page as a Reel, then commits the results.
 - `site/`: homepage + privacy policy for the Google OAuth consent screen.
 
+## Two non-negotiable rules (the user, 24 Nov 2026: "always remember")
+1. **No voice glitches, ever.** Indic Parler hallucinates babble on very short lines (reel 029 long: "पहला अध्याय। डर।" came out as
+   2.5 s of garbage at 0:38). So: every `vo` is a full spoken sentence of at least 30 letters, or empty (chapter cards can be
+   music-only). `uu_voice.py ... request` refuses shorter lines, and `uu_voice.py spec.json` ends with a **voice check** (speaking
+   rate vs the reel's median, silent gaps). If it prints `VOICE CHECK FAILED`, re-voice those scenes with a fuller sentence before
+   rendering. Never render, send or publish with a failed check. After the final mux, also look at the per-second loudness of the
+   finished audio around every scene start for anything odd.
+2. **Nothing that could get the channel into legal trouble.** Every fact, number, quote and claim must come from a reliable,
+   citable source: government documents and press releases (MEA, PIB, ministries, RBI, CAG, courts), official reports (UN, IAEA,
+   SIPRI, NASA, Lowy, BIMCO, World Bank…), or established media. We only report and attribute; we never assert something as our
+   own finding. Rules that follow from this:
+   - Unconfirmed claims (from books, leaks, "reports say") are labelled as claims in both voice and on screen ("reported",
+     "claimed", "UNCONFIRMED"), together with who made them and that they were never officially confirmed. If we can't name a
+     source, it doesn't go in.
+   - No accusations or defamatory statements about any person, company or country. Named leaders get respectful titles
+     ("प्रधानमंत्री … जी") and only their documented public actions or statements, with a date and source. Stay politically neutral.
+   - Don't make the headline bigger than the source (e.g. "BrahMos boosted India's ranking" was fine because the report credits it
+     for the defence-networks rank; "BrahMos saved India's #3" was not, and wasn't used).
+   - Every video's description lists its sources. Keep `videos/NNN_slug/sources.md` with the URL behind each claim so it can be
+     produced on request.
+   - Images only with PD / CC0 / CC BY / CC BY-SA licences, credited on screen (the media Action does this). No photos of
+     identifiable public figures or private people in focus. Music is synthesized in-house. Long videos carry a disclaimer card.
+
 ## What the audience likes (user's observation, Nov 2026: pick and pitch topics with this in mind)
 Two kinds of reels do well. Prefer topics that fit one of them, and say which one in every pitch:
 1. **India's pride on the world stage**: India beating, surprising or outsmarting the world, told positively and with sourced facts (e.g. reel 016 refinery superpowers, reel 010 how India fooled the CIA at Pokhran, 017 UPI, 018 Haque & Bose).

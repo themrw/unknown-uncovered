@@ -35,8 +35,15 @@ def trim(a, sr, thr=0.01, pad=0.05):
     if len(idx) == 0: return a
     return a[max(0, idx[0] - int(pad * sr)): min(len(a), idx[-1] + int(pad * sr * 2))]
 
+MIN_CHARS = 30   # Parler hallucinates extra babble on very short lines (reel 033: "पहला अध्याय। डर।" -> 2.5 s of garbage)
+def spoken(text): return len([c for c in text if c.isalpha() or "\u0900" <= c <= "\u097f"])
+
 if len(sys.argv) > 3 and sys.argv[2] == "request":
     job = sys.argv[3]
+    short = [(i, sc["vo"]) for i, sc in enumerate(spec["scenes"]) if sc.get("vo") and spoken(sc["vo"]) < MIN_CHARS]
+    if short and not os.environ.get("UU_ALLOW_SHORT"):
+        for i, t in short: print(f"TOO SHORT scene {i:02d}: {t!r} -> write a full sentence (>= {MIN_CHARS} letters) or leave vo empty")
+        sys.exit("refusing to request voice: short lines glitch in Parler (set UU_ALLOW_SHORT=1 to override)")
     req = {"description": spec.get("voice_desc", DESC), "seed": spec.get("voice_seed", 7),
            "items": [{"name": f"{i:02d}", "text": say(sc["vo"])} for i, sc in enumerate(spec["scenes"])]}
     p = os.path.join(REPO, "voice", "requests", f"{job}.json"); os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -68,3 +75,25 @@ for i, sc in enumerate(spec["scenes"]):
     durs.append(round(sf.info(out).duration, 3))
 json.dump(durs, open(os.path.join(vo, "durs.json"), "w"))
 print(durs, round(sum(durs), 1))
+
+# ---- glitch check (mandatory before rendering): speaking rate and silent gaps per scene
+def gaps(path, thr_db=-45, win=0.05):
+    x, r = sf.read(path, dtype="float32"); x = x.mean(1) if x.ndim > 1 else x; n = int(win * r)
+    e = np.array([20 * np.log10(np.sqrt((x[j:j + n] ** 2).mean()) + 1e-9) for j in range(0, max(1, len(x) - n), n)])
+    run = best = 0
+    for v in e:
+        run = run + 1 if v < thr_db else 0; best = max(best, run)
+    return best * win
+rates = [(i, spoken(sc["vo"]) / d) for i, (sc, d) in enumerate(zip(spec["scenes"], durs)) if sc.get("vo") and d > 0]
+med = float(np.median([r for _, r in rates])) if rates else 0
+bad = []
+for i, r in rates:
+    sc = spec["scenes"][i]; g = gaps(os.path.join(vo, f"{i:02d}.wav"))
+    why = []
+    if spoken(sc["vo"]) < MIN_CHARS: why.append("very short line")
+    if r < 0.75 * med: why.append(f"too slow {r:.1f} vs median {med:.1f} letters/s (extra babble?)")
+    if r > 1.35 * med: why.append(f"too fast {r:.1f} vs median {med:.1f} letters/s (words dropped?)")
+    if g > 1.2: why.append(f"{g:.1f}s silent gap inside")
+    if why: bad.append(i); print(f"GLITCH? scene {i:02d}: " + "; ".join(why) + f" | {sc['vo'][:60]}")
+if bad: print(f"VOICE CHECK FAILED for scenes {bad}: re-voice them (fuller sentence) before rendering"); sys.exit(2)
+print(f"voice check OK ({len(rates)} scenes, median {med:.1f} letters/s)")
