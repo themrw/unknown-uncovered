@@ -930,5 +930,67 @@ def sc_growth(img, sc, t, D, tg, k):
 R.SCENE_FN.update({"duel": sc_duel, "stall": sc_stall, "paynet": sc_paynet, "jio": sc_jio, "qrtown": sc_qrtown,
                    "walletpipe": sc_walletpipe, "soundbox": sc_soundbox, "festive": sc_festive, "growth": sc_growth})
 
+# ---------------------------------------------------------------- 033: India–Pakistan nuclear list (long)
+_site_globe = {}
+def sc_sites_l(img, sc, t, D, tg, k):
+    lat0, lon0 = 24.0, 74.0
+    if k not in _site_globe:
+        G = R.Globe(1250); _site_globe[k] = (G, G.render(lat0, lon0, highlight=["IN"], hl_alpha=0.30, dim_others=0.15))
+    G, gim = _site_globe[k]
+    z = 1.0 + 0.12 * ease_io(t / D)
+    cx, cy = G.point(25.0, 64.0, lat0, lon0)[0]
+    cw, ch = W / z, H / z
+    crop = gim.crop((int(cx - cw / 2), int(cy - ch / 2), int(cx + cw / 2), int(cy + ch / 2))).resize((W, H), Image.BILINEAR)
+    img.alpha_composite(crop); img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, 80)))
+    d = ImageDraw.Draw(img)
+    def to_screen(la, lo):
+        (px, py), _ = G.point(la, lo, lat0, lon0)
+        return (px - (cx - cw / 2)) * z, (py - (cy - ch / 2)) * z
+    fields = sc["fields"]; t0 = sc.get("sites_at", 1.2)
+    for i, (name, la, lo, cc) in enumerate(fields):
+        aa = prog(t, t0 + i * 0.45, 0.4)
+        if aa <= 0: continue
+        sx, sy = to_screen(la, lo); col = T["accent"] if cc == "IN" else T["accent2"]
+        ph = (tg * 0.6 + i * 0.13) % 1; rr = 14 + ph * 34
+        d.ellipse([sx - rr, sy - rr, sx + rr, sy + rr], outline=col + (int(200 * (1 - ph) * aa),), width=3)
+        d.ellipse([sx - 8, sy - 8, sx + 8, sy + 8], fill=col + (int(255 * aa),))
+        text_a(img, (sx + 18, sy + (16 if name == "TROMBAY" else -6)), name, F("mono", 24), WHITE, aa, "lm", shadow=5)
+    a = clamp(t / 0.4)
+    text_a(img, (90, 150), sc.get("title", ""), F("disp", 56, "Black"), WHITE, a, shadow=8)
+    text_a(img, (92, 222), sc.get("sub", ""), F("inter", 26, "Medium"), MUTED, a, shadow=4)
+    cats = sc.get("cats", []); c0 = sc.get("cats_at", 0.6)
+    for i, c in enumerate(cats):
+        aa = prog(t, c0 + i * 0.7, 0.4)
+        if aa <= 0: continue
+        y = 330 + i * 78
+        rect_a(img, (90, y, 640, y + 62), (8, 10, 14), 0.72 * aa, 12)
+        rect_a(img, (90, y, 96, y + 62), T["accent"], aa)
+        text_a(img, (116, y + 31), c, F("disp", 30, "Bold"), WHITE, aa, "lm")
+    if sc.get("total"):
+        chip(img, 90, H - 200, sc["total"], T["alert"], prog(t, sc.get("total_at", D - 4), 0.4), 44)
+    chrome(img, tg, a)
+
+def sc_gaps_l(img, sc, t, D, tg, k):
+    a = clamp(t / 0.4)
+    text_a(img, (W / 2, 150), sc.get("kicker", ""), F("mono", 30), T["accent"], a, "mm")
+    good, bad = (120, 225, 150), T["alert"]
+    for j, (head, col, xs) in enumerate(((sc.get("left", ""), good, 120), (sc.get("right", ""), bad, W / 2 + 30))):
+        text_a(img, (xs + 20, 250), head, F("anton", 64), col, a, "lm", shadow=6)
+    ats = sc.get("row_at", [1.0, 3.0, 5.0])
+    for i, (lab, l, r) in enumerate(sc.get("rows", [])):
+        aa = prog(t, ats[i], 0.5); y = 340 + i * 190
+        if aa <= 0: continue
+        for (txt, col, xs) in ((l, good, 120), (r, bad, W / 2 + 30)):
+            rect_a(img, (xs, y, xs + W / 2 - 150, y + 160), (8, 10, 14), 0.72 * aa, 16)
+            rect_a(img, (xs, y, xs + 7, y + 160), col, aa)
+            text_a(img, (xs + 34, y + 48), lab.upper(), F("mono", 24), MUTED, aa, "lm")
+            text_a(img, (xs + 34, y + 105), txt, fit_font("disp", 42, txt, W / 2 - 220, "Bold"), WHITE, aa, "lm")
+    if sc.get("lines"):
+        la = prog(t, sc.get("line_at", D - 3), 0.5)
+        text_a(img, (W / 2, H - 150), sc["lines"][0], F("disp", 52, "Black"), T["accent"], la, "mm", shadow=8)
+    chrome(img, tg, a)
+
+R.SCENE_FN.update({"sites": sc_sites_l, "gaps": sc_gaps_l})
+
 if __name__ == "__main__":
     R.main()

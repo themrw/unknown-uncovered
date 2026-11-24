@@ -1,0 +1,413 @@
+{
+ "format": "long",
+ "theme": "orbit",
+ "look": "cinematic",
+ "tts": "parler",
+ "speed": 1.04,
+ "lead": 0.35,
+ "tail": 0.5,
+ "voice_job": "033_long",
+ "globe_radius": 380,
+ "header": "INDIA–PAKISTAN: THE NUCLEAR LIST",
+ "source": "Sources: MEA India · MOFA Pakistan · Agreement text (1988, Stimson/NTI) · NTI · Stanley Center · CISSM · Dawn · The Press (1985)",
+ "ticker": "",
+ "credits_from": [
+  "media/033_nalong/credits.json",
+  "media/033b_nalong/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "image",
+   "img": "media/033_nalong/wagah_0.jpg",
+   "kicker": "EVERY 1 JANUARY · SINCE 1992",
+   "lines": [
+    "India and Pakistan hand each other",
+    "a list of their nuclear sites"
+   ],
+   "vo": "चार युद्ध, संसद पर हमला, बालाकोट, और पिछले साल मई में, चार दिन की सैन्य झड़प। फिर भी, हर साल, एक जनवरी को, भारत और पाकिस्तान, एक-दूसरे को, एक गोपनीय लिस्ट सौंपते हैं। अपने परमाणु ठिकानों की लिस्ट।"
+  },
+  {
+   "type": "stat",
+   "kicker": "35 EXCHANGES · ZERO MISSED",
+   "value": 35,
+   "value_label": "35",
+   "label": "CONSECUTIVE EXCHANGES",
+   "items": [
+    [
+     "1992",
+     "first exchange"
+    ],
+    [
+     "1999",
+     "Kargil war: list still sent"
+    ],
+    [
+     "2026",
+     "after May 2025 clashes: still sent"
+    ]
+   ],
+   "vo": "जी हाँ, दुश्मन को, अपने परमाणु ठिकानों का पता। और ये सिलसिला, पैंतीस बार में, एक बार भी नहीं टूटा। आज जानेंगे, ये लिस्ट क्यों बनी, इसमें क्या होता है, और ये दोनों देशों को, किस ख़तरे से बचाती है।"
+  },
+  {
+   "type": "disclaimer",
+   "min": 8,
+   "lines": [
+    "Educational content only. No endorsement of any country, leader or policy.",
+    "Facts from MEA India and MOFA Pakistan statements, the 1988 agreement text,",
+    "NTI, Stanley Center, CISSM, and contemporary news reports.",
+    "Images: public domain or Creative Commons, credited on screen.",
+    "Narration: AI voice."
+   ],
+   "vo": "ये वीडियो सिर्फ़ जानकारी के लिए है। इसके तथ्य, दोनों देशों के विदेश मंत्रालयों के बयानों, समझौते के मूल पाठ, और स्वतंत्र शोध पर आधारित हैं।"
+  },
+  {
+   "type": "chapter",
+   "n": 1,
+   "title": "The Fear",
+   "img": "media/033b_nalong/netz_0.jpg",
+   "min": 4.0,
+   "vo": "पहला अध्याय। डर।"
+  },
+  {
+   "type": "image",
+   "img": "media/033b_nalong/netz_0.jpg",
+   "kicker": "7 JUNE 1981 · IRAQ",
+   "lines": [
+    "Israeli F-16s destroy the Osirak reactor",
+    "this jet, '243', flew in the raid (museum)"
+   ],
+   "vo": "कहानी शुरू होती है, उन्नीस सौ इक्यासी से। सात जून को, इज़राइल के लड़ाकू विमानों ने, इराक़ के ओसिराक परमाणु रिएक्टर पर हमला करके, उसे तबाह कर दिया। दुनिया ने देखा, कि किसी देश के परमाणु ठिकाने को, हवाई हमले में मिटाया जा सकता है।"
+  },
+  {
+   "type": "image",
+   "img": "media/033_nalong/islamabad_0.jpg",
+   "kicker": "KAHUTA · NEAR ISLAMABAD",
+   "lines": [
+    "Pakistan's uranium-enrichment plant",
+    "fear: 'are we next?'"
+   ],
+   "vo": "इसके बाद, पाकिस्तान में एक डर बैठ गया। उस वक़्त, पाकिस्तान, इस्लामाबाद के पास कहूटा में, यूरेनियम संवर्धन का प्लांट चला रहा था। और वहाँ के सैन्य शासकों को लगने लगा, कि अगला निशाना, कहूटा हो सकता है।"
+  },
+  {
+   "type": "dossier",
+   "file": "FILE: KAHUTA · 1979–1984",
+   "ref": "CLAIMS & COUNTER-CLAIMS",
+   "stamp": "UNCONFIRMED",
+   "rows": [
+    [
+     "1981",
+     "Osirak destroyed by air strike"
+    ],
+    [
+     "CLAIM",
+     "a strike on Kahuta was considered"
+    ],
+    [
+     "STATUS",
+     "never officially confirmed"
+    ],
+    [
+     "PAKISTAN",
+     "reply plan: Trombay"
+    ]
+   ],
+   "kicker": "WHAT BOOKS & REPORTS CLAIM",
+   "big": "A PLAN?",
+   "lines": [
+    "reported in later books and articles",
+    "never officially confirmed by any government"
+   ],
+   "vo": "बाद में कुछ किताबों और रिपोर्टों में दावा किया गया, कि अस्सी के दशक की शुरुआत में, कहूटा पर हमले की एक योजना पर विचार हुआ था, जिसे छोड़ दिया गया। इन दावों की, किसी सरकार ने, आधिकारिक पुष्टि नहीं की। पर पाकिस्तान का डर असली था। उसकी वायुसेना के तत्कालीन प्रमुख के मुताबिक़, जवाब में, मुंबई के ट्रॉम्बे परमाणु केंद्र को, निशाना बनाने का विकल्प तैयार रखा गया था।"
+  },
+  {
+   "type": "image",
+   "img": "media/033b_nalong/thar_1.jpg",
+   "kicker": "1986–87 · OPERATION BRASSTACKS",
+   "lines": [
+    "a giant Indian Army exercise in the Rajasthan desert",
+    "both armies end up face to face"
+   ],
+   "vo": "फिर आया, उन्नीस सौ छियासी-सत्तासी। राजस्थान के रेगिस्तान में, भारतीय सेना का विशाल युद्धाभ्यास, ऑपरेशन ब्रासटैक्स। पाकिस्तान ने भी अपनी बख़्तरबंद टुकड़ियाँ सीमा पर ला दीं, और दोनों सेनाएँ, आमने-सामने आ खड़ी हुईं।"
+  },
+  {
+   "type": "chapter",
+   "n": 2,
+   "title": "The Handshake",
+   "img": "media/033_nalong/islamabad_1.jpg",
+   "min": 4.0,
+   "vo": "दूसरा अध्याय। हाथ मिलाना।"
+  },
+  {
+   "type": "image",
+   "img": "media/033_nalong/hhouse_0.jpg",
+   "kicker": "17 DECEMBER 1985 · NEW DELHI",
+   "lines": [
+    "Rajiv Gandhi and Gen. Zia-ul-Haq",
+    "pledge: no attack on nuclear facilities"
+   ],
+   "vo": "पर इस तनाव से पहले ही, एक दिलचस्प पहल हो चुकी थी। दिसंबर उन्नीस सौ पचासी में, दिल्ली में, प्रधानमंत्री राजीव गांधी जी, और पाकिस्तान के राष्ट्रपति, जनरल ज़िया-उल-हक़ ने, ऐलान किया, कि दोनों देश, एक-दूसरे के परमाणु ठिकानों पर, हमला न करने का वादा करेंगे।"
+  },
+  {
+   "type": "dossier",
+   "file": "AGREEMENT · INDIA–PAKISTAN",
+   "ref": "NON-ATTACK PACT",
+   "stamp": "SIGNED",
+   "rows": [
+    [
+     "SIGNED",
+     "31 DEC 1988 · ISLAMABAD"
+    ],
+    [
+     "BY",
+     "K.P.S. Menon · Humayun Khan"
+    ],
+    [
+     "IN FORCE",
+     "27 JANUARY 1991"
+    ],
+    [
+     "TEXTS",
+     "URDU · HINDI · ENGLISH"
+    ]
+   ],
+   "kicker": "FROM WORDS TO PAPER",
+   "big": "1988",
+   "lines": [
+    "signed in the presence of",
+    "PM Rajiv Gandhi and PM Benazir Bhutto"
+   ],
+   "vo": "ये ज़ुबानी वादा, तीन साल बाद, काग़ज़ पर उतरा। इकतीस दिसंबर, उन्नीस सौ अट्ठासी को, इस्लामाबाद में, दोनों देशों के विदेश सचिवों ने, इस समझौते पर दस्तख़त किए, प्रधानमंत्री राजीव गांधी जी, और प्रधानमंत्री बेनज़ीर भुट्टो की मौजूदगी में।"
+  },
+  {
+   "type": "stat",
+   "kicker": "THE RULES · ARTICLE I & II",
+   "value": 1,
+   "value_label": "1 JAN",
+   "label": "EVERY YEAR: LATITUDE & LONGITUDE OF EACH SITE",
+   "items": [
+    [
+     "NO ATTACK",
+     "never cause damage to a nuclear site"
+    ],
+    [
+     "NO HELP",
+     "never encourage or join such an attack"
+    ],
+    [
+     "THE LIST",
+     "coordinates shared every 1 January"
+    ]
+   ],
+   "vo": "समझौते के नियम सीधे हैं। दोनों देश, किसी परमाणु ठिकाने को नुक़सान पहुँचाने वाली कोई कार्रवाई, न ख़ुद करेंगे, न उसके लिए किसी को उकसाएँगे, न उसमें हिस्सा लेंगे। और हर साल, एक जनवरी को, एक-दूसरे को, अपने ठिकानों का, अक्षांश और देशांतर बताएँगे।"
+  },
+  {
+   "type": "sites",
+   "title": "WHAT COUNTS AS A 'NUCLEAR INSTALLATION'",
+   "sub": "Examples of publicly known sites · the official lists have never been made public",
+   "cats": [
+    "Nuclear power & research reactors",
+    "Fuel fabrication plants",
+    "Uranium enrichment",
+    "Isotope separation & reprocessing",
+    "Stores of nuclear fuel & radioactive material"
+   ],
+   "fields": [
+    [
+     "TARAPUR",
+     19.83,
+     72.66,
+     "IN"
+    ],
+    [
+     "TROMBAY",
+     19.01,
+     72.92,
+     "IN"
+    ],
+    [
+     "KALPAKKAM",
+     12.55,
+     80.17,
+     "IN"
+    ],
+    [
+     "KUDANKULAM",
+     8.17,
+     77.71,
+     "IN"
+    ],
+    [
+     "RAWATBHATA",
+     24.87,
+     75.61,
+     "IN"
+    ],
+    [
+     "NARORA",
+     28.16,
+     78.41,
+     "IN"
+    ],
+    [
+     "KARACHI",
+     24.85,
+     66.79,
+     "PK"
+    ],
+    [
+     "CHASHMA",
+     32.39,
+     71.46,
+     "PK"
+    ],
+    [
+     "KAHUTA",
+     33.59,
+     73.39,
+     "PK"
+    ]
+   ],
+   "total": "THE REAL LISTS ARE CONFIDENTIAL",
+   "vo": "कौन से ठिकाने आते हैं? परमाणु बिजली घर, रिसर्च रिएक्टर, ईंधन बनाने के प्लांट, यूरेनियम संवर्धन, री-प्रोसेसिंग के केंद्र, और कोई भी जगह, जहाँ परमाणु ईंधन, या रेडियोधर्मी पदार्थ, बड़ी मात्रा में रखे हों। असली लिस्ट, आज तक कभी सार्वजनिक नहीं हुई।",
+   "cats_at": 1.95,
+   "sites_at": 2.45,
+   "total_at": 14.39
+  },
+  {
+   "type": "chapter",
+   "n": 3,
+   "title": "The List That Never Stopped",
+   "img": "media/033_nalong/kargil_2.jpg",
+   "min": 4.0,
+   "vo": "तीसरा अध्याय। वो लिस्ट, जो कभी नहीं रुकी।"
+  },
+  {
+   "type": "events",
+   "title": "WARS, CRISES … AND THE LIST STILL ARRIVED",
+   "events": [
+    [
+     "1992",
+     "First list",
+     "1 January"
+    ],
+    [
+     "1999",
+     "Kargil war",
+     "list sent in 2000"
+    ],
+    [
+     "2001–02",
+     "Border standoff",
+     "list sent"
+    ],
+    [
+     "2019",
+     "Balakot",
+     "list sent"
+    ],
+    [
+     "2025",
+     "May clashes",
+     "list sent"
+    ],
+    [
+     "2026",
+     "35th exchange",
+     "1 January"
+    ]
+   ],
+   "extra": 1.0,
+   "vo": "समझौता, सत्ताईस जनवरी, उन्नीस सौ इक्यानवे को लागू हुआ, और पहली लिस्ट, एक जनवरी, उन्नीस सौ बानवे को सौंपी गई। फिर उन्नीस सौ निन्यानवे में, कारगिल युद्ध हुआ। दो हज़ार एक में संसद पर हमला, और महीनों तक, सीमा पर दोनों सेनाओं का भारी जमावड़ा। दो हज़ार उन्नीस में बालाकोट, और दो हज़ार पच्चीस में, चार दिन की सैन्य झड़प। पर हर बार, अगली एक जनवरी को, लिस्ट पहुँच गई।"
+  },
+  {
+   "type": "image",
+   "img": "media/033_nalong/southblock_1.jpg",
+   "kicker": "1 JANUARY 2026 · NEW DELHI & ISLAMABAD",
+   "lines": [
+    "handed over at the same time",
+    "through diplomatic channels"
+   ],
+   "vo": "एक जनवरी, दो हज़ार छब्बीस को, ये लगातार पैंतीसवीं बार हुआ। और ये किसी बड़े समारोह में नहीं होता। दिल्ली में, भारत का विदेश मंत्रालय, पाकिस्तान उच्चायोग के प्रतिनिधि को लिस्ट देता है, और ठीक उसी वक़्त, इस्लामाबाद में, पाकिस्तान का विदेश मंत्रालय, भारतीय उच्चायोग के प्रतिनिधि को।"
+  },
+  {
+   "type": "image",
+   "img": "media/033b_nalong/fboats_1.jpg",
+   "kicker": "THE SAME DAY · ANOTHER LIST",
+   "lines": [
+    "fishermen & civilians in each other's jails",
+    "their lists: every 1 Jan and 1 Jul (2008 pact)"
+   ],
+   "vo": "और उसी दिन, एक और लिस्ट बदलती है। दो हज़ार आठ के कॉन्सुलर एक्सेस समझौते के तहत, दोनों देश, एक-दूसरे की जेलों में बंद, नागरिकों और मछुआरों की लिस्ट भी देते हैं, साल में दो बार। इस बार भारत ने, एक सौ सड़सठ भारतीय मछुआरों और नागरिक क़ैदियों की, जल्द रिहाई की माँग की, जिनकी सज़ा पूरी हो चुकी है।"
+  },
+  {
+   "type": "chapter",
+   "n": 4,
+   "title": "Why Tell Your Enemy?",
+   "img": "media/033_nalong/kudankulam_1.jpg",
+   "min": 4.0,
+   "vo": "चौथा अध्याय। दुश्मन को पता क्यों?"
+  },
+  {
+   "type": "image",
+   "img": "media/033_nalong/kudankulam_0.jpg",
+   "kicker": "THE LOGIC",
+   "lines": [
+    "a strike on a running reactor",
+    "radiation does not stop at the border"
+   ],
+   "vo": "अब सबसे बड़ा सवाल। दुश्मन को, अपने परमाणु ठिकानों का पता क्यों देना? क्योंकि किसी चलते हुए रिएक्टर पर हमला, सिर्फ़ उस ठिकाने को नहीं, सरहद के दोनों तरफ़, आम लोगों को, रेडियोधर्मी ख़तरे में डाल सकता है। और रेडियोधर्मी हवा, सरहद नहीं देखती। ये लिस्ट, जंग में भी, एक लाल लकीर खींचती है।"
+  },
+  {
+   "type": "gaps",
+   "kicker": "THE AGREEMENT · WHAT IT COVERS VS THE GAPS",
+   "left": "WHAT IT COVERS",
+   "right": "THE GAPS",
+   "rows": [
+    [
+     "Sites",
+     "power plants, research labs, fuel sites",
+     "no count of nuclear weapons"
+    ],
+    [
+     "Definition",
+     "broad categories of facilities",
+     "not clearly defined"
+    ],
+    [
+     "Checks",
+     "a list every 1 January",
+     "no verification mechanism"
+    ]
+   ],
+   "lines": [
+    "Built entirely on trust."
+   ],
+   "vo": "पर ये समझौता, पूरी तस्वीर नहीं है। इसमें परमाणु हथियारों की गिनती नहीं होती। ठिकानों की परिभाषा भी, पूरी तरह साफ़ नहीं है। और नियम माने जा रहे हैं या नहीं, इसकी जाँच का, कोई तरीक़ा भी नहीं है। यानी, ये पूरी तरह, भरोसे पर टिका है।",
+   "row_at": [
+    2.74,
+    5.62,
+    8.76
+   ],
+   "line_at": 13.55
+  },
+  {
+   "type": "image",
+   "img": "media/033_nalong/wagah_1.jpg",
+   "kicker": "THE OLDEST NUCLEAR CONFIDENCE-BUILDING MEASURE",
+   "lines": [
+    "the oldest and longest-surviving",
+    "nuclear agreement between the two"
+   ],
+   "vo": "फिर भी, जानकारों के मुताबिक़, ये भारत और पाकिस्तान के बीच, सबसे पुराना, और सबसे लंबा चलने वाला, परमाणु समझौता है। चार दशक, कई सरकारें, कई जंग जैसे हालात, और फिर भी, हर साल, एक जनवरी को, ये लिस्ट पहुँचती है।"
+  },
+  {
+   "type": "outro",
+   "min": 14,
+   "lines": [
+    "35 lists. Zero missed.",
+    "Wisdom, or fragile trust?"
+   ],
+   "vo": "तो आपको क्या लगता है? ये लिस्ट, दो पड़ोसियों की समझदारी है, या एक ऐसा भरोसा, जो कभी भी टूट सकता है? कमेंट में ज़रूर बताइए। और ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को अभी सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ]
+}
