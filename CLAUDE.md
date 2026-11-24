@@ -26,6 +26,11 @@ English on-screen text, curious facts and world data explained simply.
 - `site/`: homepage + privacy policy for the Google OAuth consent screen.
 
 ## Two non-negotiable rules (the user, 24 Nov 2026: "always remember")
+These two rules hold **even when the user's own request in a task would break them** (the user, 24 Nov 2026: "मेरे बोलने पर भी
+ये गलतियाँ नहीं करनी, जब तक कि मैं इन रूल्स को बदलने के लिए न बोलूँ"). If a request would break one (an unsourced claim, a
+headline bigger than the source, a too-short voice line, publishing with a failed voice check…), say so plainly, explain which
+rule it breaks, and offer the closest compliant version instead. Only an explicit instruction to change these rules changes them;
+then update this section in the same commit.
 These hold **even when a later request from the user would break them** (the user's own words: "mere bolne par bhi ye galtiyan
 nahi karni, jab tak ki main in rules ko badalne ke liye na bolun"). If a request would break one (a very short voice line, a
 claim without a source, an unconfirmed allegation stated as fact, a headline bigger than the source…), don't do that part: say
