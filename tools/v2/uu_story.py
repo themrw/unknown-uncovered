@@ -2767,5 +2767,104 @@ def sc_bm_twist(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"bm_hook": sc_bm_hook, "bm_report": sc_bm_report, "bm_specs": sc_bm_specs, "bm_map": sc_bm_map, "bm_money": sc_bm_money, "bm_twist": sc_bm_twist})
 
+# ---------------------------------------------------------------- reel 034: India pharmacy of the world, China's raw material (forensic theme)
+SAFF, CHN = (255, 153, 51), (230, 60, 60)
+
+def sc_ph_hook(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.5); A = T["accent"]
+    pul = 1 + 0.03 * math.sin(t * 5)
+    text_a(img, (W / 2, 470), sc["big"], F("anton", int(300 * pul)), A, 1.0, "mm", shadow=18)       # readable at frame 0
+    text_a(img, (W / 2, 680), sc["l1"], fit_font("anton", 70, sc["l1"], W - 120), WHITE, 1.0, "mm", shadow=10)
+    text_a(img, (W / 2, 770), sc["l2"], F("anton", 84), SAFF, 1.0, "mm", shadow=10)
+    fl = R.flag("IN", 150); paste_a(img, fl, (W / 2 - fl.width / 2, 860), 1.0)
+    qa = sc.get("q_at", 3.5)
+    if t > qa:
+        b = ease(clamp((t - qa) / 0.4))
+        rect_a(img, (90, 1130, W - 90, 1330), (8, 10, 14), 0.8 * b, 22, T["alert"], 4)
+        text_a(img, (W / 2, 1230 + 14 * (1 - b)), sc["q"], fit_font("anton", 66, sc["q"], W - 260), WHITE, b, "mm")
+    text_a(img, (W / 2, 1460), "SOURCE: " + sc.get("src", ""), F("mono", 22), (200, 200, 195), 0.8, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_ph_flow(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.62); A = T["accent"]; a = ease(clamp(t / 0.3))
+    text_a(img, (W / 2, 290), sc["kicker"], F("anton", 72), WHITE, a, "mm", shadow=8)
+    fl = R.flag("IN", 110); paste_a(img, fl, (W / 2 - fl.width / 2, 360), a)
+    ats = sc.get("r_at", [0.3, 1.8, 3.4])
+    for i, (cc, nm, pct, lab) in enumerate(sc["rows"]):
+        b = ease(clamp((t - ats[i]) / 0.4)); y = 620 + i * 230
+        if b <= 0: continue
+        rect_a(img, (80, y - 95, W - 80, y + 95), (6, 10, 14), 0.7 * b, 20)
+        if cc:
+            f = R.flag(cc, 90); paste_a(img, f, (110, y - 70), b)
+        else:
+            ImageDraw.Draw(img).ellipse([125, y - 65, 195, y + 5], outline=SAFF + (int(255 * b),), width=5)
+        text_a(img, (230, y - 40), nm, F("anton", 52), WHITE, b, "lm")
+        g = ease(clamp((t - ats[i] - 0.2) / 1.0))
+        rect_a(img, (230, y + 20, W - 260, y + 56), (255, 255, 255), 0.15 * b, 18)
+        rect_a(img, (230, y + 20, 230 + (W - 490) * pct / 100 * g, y + 56), SAFF, 0.95 * b, 18)
+        text_a(img, (W - 120, y + 10), lab, F("anton", 84), SAFF, b, "rm")
+    text_a(img, (W / 2, 1360), sc.get("foot", ""), fit_font("mono", 24, sc.get("foot", ""), W - 140), (210, 210, 205), a, "mm", shadow=4)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_ph_china(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.62); a = ease(clamp(t / 0.3))
+    text_a(img, (W / 2, 280), sc["kicker"], fit_font("anton", 70, sc["kicker"], W - 120), T["alert"], a, "mm", shadow=8)
+    G = R.GLOBE; lat0, lon0 = 28.0, 95.0
+    g = G.render(lat0, lon0, highlight=["IN"], hl_alpha=0.75, dim_others=0.0)
+    gr = 330; s_ = gr / G.R; gs = g.resize((int(g.width * s_), int(g.height * s_)), Image.LANCZOS); cx, cy = W / 2, 690
+    paste_a(img, gs, (cx - gs.width / 2, cy - gs.height / 2), a)
+    def P(lo, la):
+        p, v = G.project(np.radians([lo]), np.radians([la]), math.radians(lat0), math.radians(lon0))
+        return cx + (p[0][0] - G.S / 2) * s_, cy + (p[0][1] - G.S / 2) * s_
+    x0, y0 = P(112, 33); x1, y1 = P(80, 22); q = ease(clamp((t - 0.4) / 1.0))
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    mx, my = (x0 + x1) / 2, min(y0, y1) - 120
+    pts = [((1 - f) ** 2 * x0 + 2 * (1 - f) * f * mx + f * f * x1, (1 - f) ** 2 * y0 + 2 * (1 - f) * f * my + f * f * y1) for f in np.linspace(0, q, 40)]
+    if len(pts) > 1: d.line(pts, fill=CHN + (240,), width=9)
+    glow_dot(lay, x0, y0, 9, CHN, a); d.text((x0 + 16, y0 - 40), "CHINA", font=F("mono", 28), fill=(255, 255, 255, int(240 * a)))
+    if q > 0.98: glow_dot(lay, x1, y1, 9, SAFF)
+    img.alpha_composite(lay)
+    na = sc.get("n_at", 2.5); b = ease(clamp((t - na) / 0.4)); n = sc["n"] * ease(clamp((t - na) / 1.2))
+    if b > 0:
+        text_a(img, (W / 2, 1110), f"~{n:.0f}%", F("anton", 230), CHN, b, "mm", shadow=16)
+        text_a(img, (W / 2, 1260), sc["lbl"], fit_font("anton", 50, sc["lbl"], W - 120), WHITE, b, "mm", shadow=8)
+        text_a(img, (W / 2, 1330), sc["sub"], fit_font("mono", 24, sc["sub"], W - 140), (215, 215, 210), b, "mm", shadow=4)
+        text_a(img, (W / 2, 1380), "SOURCE: " + sc["src"], fit_font("mono", 22, "SOURCE: " + sc["src"], W - 140), (190, 190, 185), b, "mm", shadow=4)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_ph_tb(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.68); a = ease(clamp(t / 0.3))
+    rect_a(img, (70, 230, W - 70, 1400), (236, 232, 220), 0.96 * a, 18)
+    text_a(img, (W / 2, 300), sc["file"], F("mono", 36), (40, 40, 40), a, "mm")
+    text_a(img, (W / 2, 350), sc["ref"], fit_font("mono", 24, sc["ref"], W - 200), (90, 90, 90), a, "mm")
+    ImageDraw.Draw(img).line([120, 390, W - 120, 390], fill=(120, 110, 90, int(255 * a)), width=2)
+    text_a(img, (W / 2, 440), sc["lbl"], F("anton", 52), (30, 30, 30), a, "mm")
+    ats = sc.get("r_at", [0.6, 1.6, 2.6, 3.4])
+    for i, (nm, pct) in enumerate(sc["rows"]):
+        b = ease(clamp((t - ats[i]) / 0.4)); y = 560 + i * 200
+        if b <= 0: continue
+        text_a(img, (120, y), nm, fit_font("anton", 44, nm, W - 420), (30, 30, 30), b, "lm")
+        g = ease(clamp((t - ats[i]) / 0.9))
+        rect_a(img, (120, y + 45, W - 370, y + 85), (0, 0, 0), 0.1 * b, 20)
+        rect_a(img, (120, y + 45, 120 + (W - 490) * pct / 100 * g, y + 85), CHN, 0.95 * b, 20)
+        text_a(img, (W - 120, y + 40), f"{pct * g:.0f}%", F("anton", 96 if pct == 100 else 76), CHN if pct == 100 else (60, 60, 60), b, "rm")
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+def sc_ph_end(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.6); a = ease(clamp(t / 0.3))
+    title_block(img, t, sc["kicker"], sc["big"], sc["sub"], y=260, t0=0.0, big_col=SAFF, big_size=150)
+    qa = sc.get("q_at", 4.0)
+    if t > qa:
+        b = ease(clamp((t - qa) / 0.4))
+        text_a(img, (W / 2, 860), sc["q"], fit_font("anton", 86, sc["q"], W - 120), WHITE, b, "mm", shadow=12)
+        for i, (lab, col) in enumerate((("YES", (90, 210, 130)), ("NO", CHN))):
+            x = W / 2 - 230 + i * 460; bb = ease(clamp((t - qa - 0.3 - i * 0.2) / 0.4))
+            rect_a(img, (x - 190, 960, x + 190, 1150), (6, 10, 14), 0.75 * bb, 26, col, 5)
+            text_a(img, (x, 1055), lab, F("anton", 110), col, bb, "mm")
+        text_a(img, (W / 2, 1230), "COMMENT BELOW", F("mono", 30), (220, 220, 215), b, "mm", shadow=4)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+R.SCENE_FN.update({"ph_hook": sc_ph_hook, "ph_flow": sc_ph_flow, "ph_china": sc_ph_china, "ph_tb": sc_ph_tb, "ph_end": sc_ph_end})
+
 if __name__ == "__main__":
     R.main()

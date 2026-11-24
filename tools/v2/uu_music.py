@@ -102,7 +102,7 @@ if film:   # proud period-film score: tanpura drone, sitar-like phrases, brass s
         if st == "measure":
             for at in sc.get("panel_at", []): add(music, boom(0.4, 90, 8, 0.8), ST[i] + at, 0.4)
 # heartbeat, faster as the countdown approaches #1
-bt = 0.6 if not (film or theme in ("pharma", "news", "orbit", "ocean")) else T
+bt = 0.6 if not (film or theme in ("pharma", "news", "orbit", "ocean", "forensic")) else T
 while bt < t_end_beats - 0.5:
     k = sum(1 for i in ranks if ST[i] <= bt)
     bpm = 66 + 6 * k
@@ -283,7 +283,7 @@ for i, sc in enumerate(spec["scenes"]):   # bomb-core reel (024) scene sounds
         add(music, bp(rng.standard_normal(L), 900, 6000) * np.abs(np.sin(2 * np.pi * 13 * tp)) * np.exp(-tp * 3), ST[i] + ta, 0.35)
         add(music, boom(0.7, 60, 8, 1.2), ST[i] + sc.get("stamp_at", 2.6) + 0.16, 0.8)
         ba = sc.get("big_at", 5.0); add(music, boom(1.5, 45, 1.6, 3.5), ST[i] + ba, 1.0); add(music, siren(max(1.0, D[i] - ba)), ST[i] + ba, 0.12)
-if theme in ("orbit", "ocean"):   # cinematic space thriller: deep slow pulse, cold high shimmer, hits on reveals (no sirens, no Geiger)
+if theme in ("orbit", "ocean", "forensic"):   # cinematic space thriller: deep slow pulse, cold high shimmer, hits on reveals (no sirens, no Geiger)
     tq = 0.8
     while tq < (ST[outro[0]] if outro else T) - 0.5:
         add(music, boom(0.32, 48, 3.2, 1.6), tq); tq += 2.4
@@ -309,6 +309,12 @@ if theme in ("orbit", "ocean"):   # cinematic space thriller: deep slow pulse, c
         if ty == "tv_quota": add(music, boom(0.6, 60, 4, 2), ST[i] + sc.get("q_at", 0.6), 0.6); hit(sc.get("y_at", 4), 0.7)
         if ty == "tv_law": hit(sc.get("doc_at", 2), 0.9)
         if ty == "ap_hook": hit(sc.get("q_at", 4), 0.8)
+        if ty == "ph_hook": add(music, boom(0.8, 50, 3, 2.5), ST[i] + 0.05, 0.8); hit(sc.get("q_at", 3.5), 0.7)
+        if ty == "ph_flow":
+            for r_ in sc.get("r_at", []): add(music, boom(0.5, 70, 5, 2), ST[i] + r_, 0.45)
+        if ty == "ph_china": hit(sc.get("n_at", 2.5), 0.9)
+        if ty == "ph_tb": hit(sc.get("r_at", [0.6])[0], 0.9)
+        if ty == "ph_end": hit(sc.get("q_at", 4), 0.7)
         if ty == "bm_hook":
             add(music, boom(0.8, 50, 3, 2.5), ST[i] + 0.1, 0.8)
             for f_ in sc.get("f_at", []): add(music, boom(0.5, 70, 5, 2), ST[i] + f_, 0.45)
