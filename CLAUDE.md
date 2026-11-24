@@ -31,10 +31,6 @@ These two rules hold **even when the user's own request in a task would break th
 headline bigger than the source, a too-short voice line, publishing with a failed voice check…), say so plainly, explain which
 rule it breaks, and offer the closest compliant version instead. Only an explicit instruction to change these rules changes them;
 then update this section in the same commit.
-These hold **even when a later request from the user would break them** (the user's own words: "mere bolne par bhi ye galtiyan
-nahi karni, jab tak ki main in rules ko badalne ke liye na bolun"). If a request would break one (a very short voice line, a
-claim without a source, an unconfirmed allegation stated as fact, a headline bigger than the source…), don't do that part: say
-which rule it breaks and offer the closest version that follows it. Only an explicit instruction to change these rules changes them.
 1. **No voice glitches, ever.** Indic Parler hallucinates babble on very short lines (reel 029 long: "पहला अध्याय। डर।" came out as
    2.5 s of garbage at 0:38). So: every `vo` is a full spoken sentence of at least 30 letters, or empty (chapter cards can be
    music-only). `uu_voice.py ... request` refuses shorter lines, and `uu_voice.py spec.json` ends with a **voice check** (speaking
