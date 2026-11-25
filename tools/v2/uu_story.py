@@ -2866,5 +2866,384 @@ def sc_ph_end(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"ph_hook": sc_ph_hook, "ph_flow": sc_ph_flow, "ph_china": sc_ph_china, "ph_tb": sc_ph_tb, "ph_end": sc_ph_end})
 
+# ---------------------------------------------------------------- reel 035: all the gold ever mined, as one 3D cube (software 3D)
+GSIDE = 22.64          # m: 224,200 t / 19.32 t per m^3, cube root
+RSIDE = 14.15          # m: 54,770 t reserves
+class Cam:
+    def __init__(self, yaw, pitch, dist, target, f=1150, cx=540, cy=930):
+        self.t = np.array(target, float); cp = math.cos(math.radians(pitch))
+        self.p = self.t + dist * np.array([math.sin(math.radians(yaw)) * cp, math.sin(math.radians(pitch)), math.cos(math.radians(yaw)) * cp])
+        fw = self.t - self.p; self.fw = fw / np.linalg.norm(fw)
+        r = np.cross(self.fw, [0, 1, 0]); self.r = r / np.linalg.norm(r); self.u = np.cross(self.r, self.fw)
+        self.f, self.cx, self.cy = f, cx, cy
+    def proj(self, P):
+        d = np.asarray(P, float) - self.p; z = d @ self.fw
+        z = np.maximum(z, 0.05)
+        return np.stack([self.cx + self.f * (d @ self.r) / z, self.cy - self.f * (d @ self.u) / z], -1), z
+
+GOLD_D, GOLD_M, GOLD_H = np.array([70, 42, 8]), np.array([214, 152, 38]), np.array([255, 236, 170])
+def gold_face(img, pts, light, sheen_pos, tint=1.0, alpha=1.0):
+    xs, ys = pts[:, 0], pts[:, 1]
+    x0, y0, x1, y1 = int(max(0, xs.min())), int(max(0, ys.min())), int(min(W, xs.max() + 1)), int(min(H, ys.max() + 1))
+    if x1 <= x0 or y1 <= y0: return
+    m = Image.new("L", (x1 - x0, y1 - y0), 0); ImageDraw.Draw(m).polygon([(x - x0, y - y0) for x, y in pts], fill=int(255 * alpha))
+    yy, xx = np.mgrid[y0:y1, x0:x1].astype(np.float32)
+    v = (yy - ys.min()) / max(1, ys.max() - ys.min()); u = (xx - xs.min()) / max(1, xs.max() - xs.min())
+    k = np.clip(0.12 + 0.88 * light ** 1.2, 0, 1) * (0.85 + 0.25 * (1 - v))
+    sheen = np.exp(-((u * 0.8 + v * 0.6 - sheen_pos) / 0.12) ** 2) * 0.9 + np.exp(-((u * 0.8 + v * 0.6 - sheen_pos - 0.45) / 0.05) ** 2) * 0.5
+    base = np.where(k[..., None] < 0.6, GOLD_D + (GOLD_M - GOLD_D) * (k[..., None] / 0.6), GOLD_M + (GOLD_H - GOLD_M) * ((k[..., None] - 0.6) / 0.4))
+    col = base * tint + sheen[..., None] * np.array([255, 230, 160]) * 0.55
+    rng = np.random.default_rng(int(x0 + y0)); col += (rng.standard_normal(col.shape[:2])[..., None] * 3)
+    tile = Image.fromarray(np.clip(col, 0, 255).astype(np.uint8)).convert("RGBA"); tile.putalpha(m)
+    img.alpha_composite(tile, (x0, y0))
+
+BOX_F = [([0, 1, 2, 3], [0, 0, -1]), ([4, 5, 6, 7], [0, 0, 1]), ([0, 1, 5, 4], [0, -1, 0]), ([3, 2, 6, 7], [0, 1, 0]), ([0, 3, 7, 4], [-1, 0, 0]), ([1, 2, 6, 5], [1, 0, 0])]
+LIGHT = np.array([-0.45, 0.8, 0.55]); LIGHT = LIGHT / np.linalg.norm(LIGHT)
+def box_pts(cx, cz, w, h, y0=0.0):
+    a = w / 2
+    return np.array([[cx - a, y0, cz - a], [cx + a, y0, cz - a], [cx + a, y0 + h, cz - a], [cx - a, y0 + h, cz - a],
+                     [cx - a, y0, cz + a], [cx + a, y0, cz + a], [cx + a, y0 + h, cz + a], [cx - a, y0 + h, cz + a]], float)
+
+def draw_box(img, cam, P, sheen, tint=1.0, alpha=1.0, edge=1.0):
+    S, Z = cam.proj(P); c = P.mean(0); faces = []
+    for idx, n in BOX_F:
+        n = np.array(n, float); fc = P[idx].mean(0)
+        if n @ (cam.p - fc) <= 0: continue
+        faces.append(((fc - cam.p) @ cam.fw, idx, n))
+    for _, idx, n in sorted(faces, key=lambda q: -q[0]):
+        gold_face(img, S[idx], min(0.92, max(0.0, n @ LIGHT) * 0.9 + 0.08 * (n[1] > 0)), sheen + 0.2 * (n[0] + n[2]), tint, alpha)
+        if edge > 0:
+            d = ImageDraw.Draw(img); q = [tuple(S[i]) for i in idx] + [tuple(S[idx[0]])]
+            d.line(q, fill=(255, 240, 190, int(150 * edge * alpha)), width=2)
+    return S
+
+def ground(img, cam, t):
+    sky = np.linspace(0, 1, H)[:, None]; base = (np.array([14, 10, 4]) * (1 - sky) + np.array([30, 22, 8]) * sky)[..., None]
+    arr = np.broadcast_to(base.reshape(H, 1, 3), (H, W, 3)).astype(np.uint8)
+    img.alpha_composite(Image.fromarray(arr).convert("RGBA"))
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for g in range(-120, 121, 6):
+        for P0, P1 in (([g, 0, -120], [g, 0, 120]), ([-120, 0, g], [120, 0, g])):
+            seg = np.linspace(P0, P1, 40); S, Z = cam.proj(seg)
+            for i in range(39):
+                if Z[i] < 1 or Z[i + 1] < 1: continue
+                a = int(60 * max(0, 1 - Z[i] / 170)); d.line([tuple(S[i]), tuple(S[i + 1])], fill=(255, 200, 90, a), width=1)
+    img.alpha_composite(lay)
+
+def shadow(img, cam, cx, cz, w, h):
+    P = np.array([[cx - w / 2 + 3, 0, cz - w / 2 + 6], [cx + w / 2 + 3, 0, cz - w / 2 + 6], [cx + w / 2 + 8, 0, cz + w / 2 + 14], [cx - w / 2 + 8, 0, cz + w / 2 + 14]], float)
+    S, _ = cam.proj(P); lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ImageDraw.Draw(lay).polygon([tuple(p) for p in S], fill=(0, 0, 0, 150))
+    img.alpha_composite(lay.filter(ImageFilter.GaussianBlur(22)))
+
+def bloom(img, k=0.55):
+    a = np.asarray(img.convert("RGB")).astype(np.float32); m = np.clip((a.mean(2) - 170) / 85, 0, 1)[..., None] * a
+    b = Image.fromarray(m.astype(np.uint8)).filter(ImageFilter.GaussianBlur(26)); out = np.clip(a + np.asarray(b).astype(np.float32) * k, 0, 255)
+    img.paste(Image.fromarray(out.astype(np.uint8)).convert("RGBA"))
+
+def billboard(img, cam, kind, x, z, a=1.0, col=(150, 170, 200)):
+    """flat scale figures facing the camera: person 1.75 m, bus 11 x 4.4 m, India Gate ~42 m"""
+    base = np.array([x, 0, z], float); r = cam.r; up = np.array([0, 1, 0.0])
+    def P(u, v): return base + r * u + up * v
+    def poly(pts): S, Z = cam.proj(np.array([P(u, v) for u, v in pts])); return [tuple(p) for p in S]
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay); c = col + (int(230 * a),)
+    if kind == "person":
+        d.polygon(poly([(-0.22, 0), (-0.08, 0), (-0.05, 0.8), (0.05, 0.8), (0.08, 0), (0.22, 0), (0.2, 0.85), (0.26, 1.45), (-0.26, 1.45), (-0.2, 0.85)]), fill=c)
+        S, Z = cam.proj(np.array([P(0, 1.6)])); rr = cam.f * 0.13 / Z[0]; d.ellipse([S[0][0] - rr, S[0][1] - rr, S[0][0] + rr, S[0][1] + rr], fill=c)
+    elif kind == "bus":
+        d.polygon(poly([(-5.5, 0.4), (5.5, 0.4), (5.5, 4.4), (-5.5, 4.4)]), fill=c)
+        for row in (1.4, 3.1):
+            for i in range(6): d.polygon(poly([(-5 + i * 1.75, row), (-4.0 + i * 1.75, row), (-4.0 + i * 1.75, row + 0.9), (-5 + i * 1.75, row + 0.9)]), fill=(40, 50, 70, int(230 * a)))
+        for wx in (-3.5, 3.5):
+            S, Z = cam.proj(np.array([P(wx, 0.5)])); rr = cam.f * 0.5 / Z[0]; d.ellipse([S[0][0] - rr, S[0][1] - rr, S[0][0] + rr, S[0][1] + rr], fill=(20, 20, 25, int(255 * a)))
+    elif kind == "gate":
+        d.polygon(poly([(-15, 0), (15, 0), (15, 33), (-15, 33)]), fill=c)
+        d.polygon(poly([(-12, 33), (12, 33), (12, 37), (-12, 37)]), fill=c)
+        d.polygon(poly([(-8, 37), (8, 37), (7, 42), (-7, 42)]), fill=c)
+        arch = [(-4.75, 0)] + [(-4.75 * math.cos(q), 20 + 4.75 * math.sin(q)) for q in np.linspace(0, math.pi, 20)][::-1] + [(4.75, 0)]
+        arch = [(-4.75, 0), (-4.75, 20)] + [(4.75 * math.cos(q), 20 + 4.75 * math.sin(q)) for q in np.linspace(math.pi, 0, 20)] + [(4.75, 0)]
+        d.polygon(poly(arch), fill=(0, 0, 0, 0))
+        ImageDraw.Draw(lay).polygon(poly(arch), fill=(18, 14, 8, int(240 * a)))
+    img.alpha_composite(lay)
+
+def label3d(img, cam, P, text, col=WHITE, a=1.0, size=40, anchor="mm"):
+    S, Z = cam.proj(np.array([P])); text_a(img, (S[0][0], S[0][1]), text, F("anton", size), col, a, anchor, shadow=8)
+
+def _cam(t, D, yaw0=-35, yaw1=-15, dist=78, pitch=14, ty=None):
+    k = ease_io(clamp(t / max(D, 1)))
+    return Cam(yaw0 + (yaw1 - yaw0) * k, pitch, dist, [0, ty if ty is not None else GSIDE * 0.45, 0])
+
+def sc_gc_hook(img, sc, t, D, tg, k):
+    cam = _cam(t, D, -40, -22, 58, 16); ground(img, cam, t)
+    h = GSIDE * ease(clamp((t + 0.6) / 3.2))
+    shadow(img, cam, 0, 0, GSIDE, h)
+    draw_box(img, cam, box_pts(0, 0, GSIDE, max(0.3, h)), 0.2 + 0.08 * t)
+    rng = np.random.default_rng(7); lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for j in range(60):
+        px, pz = rng.uniform(-14, 14, 2); py = (rng.uniform(0, 30) + t * rng.uniform(2, 6)) % 34
+        S, Z = cam.proj(np.array([[px, py, pz]])); rr = max(1, 60 / Z[0]); d.ellipse([S[0][0] - rr, S[0][1] - rr, S[0][0] + rr, S[0][1] + rr], fill=(255, 220, 120, 150))
+    img.alpha_composite(lay); bloom(img)
+    text_a(img, (W / 2, 250), sc["top"], fit_font("anton", 96, sc["top"], W - 100), WHITE, 1.0, "mm", shadow=14)
+    text_a(img, (W / 2, 360), sc["top2"], fit_font("anton", 84, sc["top2"], W - 120), T["accent"], 1.0, "mm", shadow=12)
+    chrome(img, tg)
+
+def sc_gc_size(img, sc, t, D, tg, k):
+    cam = _cam(t, D, -25, 5, 92, 10, 17); cam.f = 1350; ground(img, cam, t)
+    ga = sc.get("gate_at", 6.0)
+    if t > ga: billboard(img, cam, "gate", -22, -60, ease(clamp((t - ga) / 0.6)), (120, 110, 95))
+    shadow(img, cam, 0, 0, GSIDE, GSIDE); S = draw_box(img, cam, box_pts(0, 0, GSIDE, GSIDE), 0.3 + 0.05 * t)
+    pa = sc.get("people_at", 2.0)
+    if t > pa:
+        b = ease(clamp((t - pa) / 0.5)); billboard(img, cam, "person", 15.5, 9, b, (190, 210, 240)); billboard(img, cam, "bus", 22, -4, b, (200, 60, 50))
+        label3d(img, cam, [15.5, 2.6, 9], "1.75 M", WHITE, b, 26); label3d(img, cam, [22, 6.0, -4], "BUS", WHITE, b, 26)
+    if t > ga: label3d(img, cam, [-22, 45, -60], "INDIA GATE · 42 M", WHITE, ease(clamp((t - ga) / 0.6)), 32)
+    da = sc.get("dim_at", 3.5)
+    if t > da:
+        b = ease(clamp((t - da) / 0.5)); P = np.array([[-GSIDE / 2 - 2, 0, GSIDE / 2], [-GSIDE / 2 - 2, GSIDE * b, GSIDE / 2]]); Sd, _ = cam.proj(P)
+        ImageDraw.Draw(img).line([tuple(Sd[0]), tuple(Sd[1])], fill=WHITE + (230,), width=4)
+        label3d(img, cam, [-GSIDE / 2 - 5, GSIDE / 2, GSIDE / 2], sc["side"], WHITE, b, 60, "rm")
+    bloom(img, 0.4)
+    title_block(img, t, sc["kicker"], sc["big"], sc["sub"], y=200, t0=0.0, big_size=120)
+    chrome(img, tg)
+
+def sc_gc_1950(img, sc, t, D, tg, k):
+    cam = _cam(t, D, 15, -10, 66, 12); ground(img, cam, t)
+    shadow(img, cam, 0, 0, GSIDE, GSIDE)
+    split = ease(clamp((t - 0.5) / 1.2)); hb = GSIDE / 3
+    draw_box(img, cam, box_pts(0, 0, GSIDE, hb), 0.3, 1.0 - 0.45 * split)
+    draw_box(img, cam, box_pts(0, 0, GSIDE, GSIDE - hb, hb), 0.3 + 0.05 * t)
+    if split > 0:
+        label3d(img, cam, [GSIDE / 2 + 3, hb / 2, GSIDE / 2], "BEFORE 1950", (230, 200, 150), split, 38, "lm")
+        label3d(img, cam, [GSIDE / 2 + 3, hb + (GSIDE - hb) / 2, GSIDE / 2], "AFTER 1950", WHITE, split, 46, "lm")
+    bloom(img, 0.4)
+    a = ease(clamp((t - 0.3) / 0.4))
+    text_a(img, (W / 2, 300), sc["big"], F("anton", 230), T["accent"], a, "mm", shadow=16)
+    text_a(img, (W / 2, 450), sc["lbl"], F("anton", 72), WHITE, a, "mm", shadow=10)
+    chrome(img, tg)
+
+def sc_gc_grow(img, sc, t, D, tg, k):
+    k2 = ease_io(clamp(t / max(D, 1))); cam = Cam(-45 + 12 * k2, 24, 30 - 4 * k2, [-6, GSIDE - 2, 6]); cam.cy = 1000; ground(img, cam, t)
+    shadow(img, cam, 0, 0, GSIDE, GSIDE); draw_box(img, cam, box_pts(0, 0, GSIDE, GSIDE), 0.35)
+    sa = sc.get("slab_at", 3.0); thick = 0.37; q = ease(clamp((t - sa) / 1.0)) if t > sa else 0
+    top = GSIDE + (thick if q >= 1 else 0)
+    if t > sa:
+        y0 = GSIDE + 9 * (1 - q)
+        draw_box(img, cam, box_pts(0, 0, GSIDE, thick, y0), 0.6, 1.2, 0.95, 2.5)
+        Sb, _ = cam.proj(np.array([[-GSIDE / 2, y0, GSIDE / 2], [GSIDE / 2, y0, GSIDE / 2], [GSIDE / 2, y0, -GSIDE / 2], [GSIDE / 2, y0 + thick, -GSIDE / 2], [-GSIDE / 2, y0 + thick, GSIDE / 2], [-GSIDE / 2, y0 + thick, -GSIDE / 2]]))
+        gl = Image.new("RGBA", img.size, (0, 0, 0, 0)); gd = ImageDraw.Draw(gl); pa = int(255 * (0.55 + 0.45 * np.sin(np.pi * clamp((t - sa) / 2.5))))
+        for a_, b_ in ((0, 1), (1, 2), (4, 0), (2, 3)): gd.line([tuple(Sb[a_]), tuple(Sb[b_])], fill=(255, 245, 200, pa), width=7)
+        gl = gl.filter(ImageFilter.GaussianBlur(5)); img.alpha_composite(gl)
+    S, Z = cam.proj(np.array([[-8, top, 8], [-8, top + 1.75, 8]])); x, y = S[0]; hpx = S[0][1] - S[1][1]; w_ = hpx * 0.3
+    dd = ImageDraw.Draw(img); c = (30, 50, 95, 255)
+    dd.rounded_rectangle([x - w_ / 2, y - hpx * 0.82, x + w_ / 2, y], int(w_ / 4), fill=c); dd.ellipse([x - w_ * 0.36, y - hpx, x + w_ * 0.36, y - hpx * 0.78], fill=c)
+    dd.rounded_rectangle([x + w_ * 0.7, y - hpx * 0.55 - 26, x + w_ * 0.7 + 230, y - hpx * 0.55 + 26], 12, fill=(10, 10, 14, 200))
+    text_a(img, (x + w_ * 0.7 + 14, y - hpx * 0.55), "1.75 M PERSON", F("anton", 36), WHITE, 1.0, "lm", shadow=2)
+    if q >= 1:
+        la = ease(clamp((t - sa - 1.0) / 0.4)); Sx, _ = cam.proj(np.array([[-GSIDE / 2, GSIDE, GSIDE / 2], [-GSIDE / 2, GSIDE + thick, GSIDE / 2]]))
+        dd.line([(Sx[0][0] - 30, Sx[0][1]), (Sx[0][0] - 30, Sx[1][1])], fill=WHITE + (int(255 * la),), width=4)
+        text_a(img, (Sx[0][0] - 45, (Sx[0][1] + Sx[1][1]) / 2), "37 CM", F("anton", 56), WHITE, la, "rm", shadow=8)
+    bloom(img, 0.45)
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 280), sc["big"], F("anton", 200), T["accent"], a, "mm", shadow=16)
+    text_a(img, (W / 2, 420), sc["lbl"], F("anton", 66), WHITE, a, "mm", shadow=10)
+    text_a(img, (W / 2, 490), sc["sub"], fit_font("mono", 28, sc["sub"], W - 140), (230, 225, 210), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_gc_reserve(img, sc, t, D, tg, k):
+    cam = Cam(-10 + 25 * ease_io(clamp(t / max(D, 1))), 12, 84, [12, 11, 0]); cam.f = 1300; ground(img, cam, t)
+    shadow(img, cam, 0, 0, GSIDE, GSIDE); draw_box(img, cam, box_pts(0, 0, GSIDE, GSIDE), 0.3)
+    ra = sc.get("res_at", 1.5); q = ease(clamp((t - ra) / 1.0))
+    if q > 0:
+        x = 26 + 20 * (1 - q); shadow(img, cam, x, 4, RSIDE, RSIDE); draw_box(img, cam, box_pts(x, 4, RSIDE, RSIDE), 0.5, 0.72, q)
+        label3d(img, cam, [x, RSIDE + 3, 4], sc["big"], WHITE, q, 64)
+        label3d(img, cam, [0, GSIDE + 3, 0], "22.6 M · ALREADY MINED", (240, 230, 200), q, 36)
+    bloom(img, 0.4)
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 280), sc["lbl"], fit_font("anton", 84, sc["lbl"], W - 120), WHITE, a, "mm", shadow=12)
+    text_a(img, (W / 2, 370), sc["sub"], fit_font("mono", 26, sc["sub"], W - 120), (230, 225, 210), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_gc_end(img, sc, t, D, tg, k):
+    cam = Cam(-25 + 8 * t / max(D, 1), 10, 90, [0, 11, 0], cy=1000); ground(img, cam, t)
+    shadow(img, cam, 0, 0, GSIDE, GSIDE); draw_box(img, cam, box_pts(0, 0, GSIDE, GSIDE), 0.25 + 0.05 * t); bloom(img, 0.4)
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 260), sc["q"], fit_font("anton", 86, sc["q"], W - 100), WHITE, a, "mm", shadow=14)
+    for i, o in enumerate(sc["opts"]):
+        b = ease(clamp((t - 0.6 - i * 0.4) / 0.4)); y = 380 + i * 115
+        rect_a(img, (180, y, W - 180, y + 95), (10, 8, 4), 0.75 * b, 20, T["accent"], 3)
+        text_a(img, (230, y + 48), f"{i + 1}", F("anton", 60), T["accent"], b, "mm")
+        text_a(img, (W / 2 + 30, y + 48), o, F("anton", 56), WHITE, b, "mm")
+    chrome(img, tg)
+
+R.SCENE_FN.update({"gc_hook": sc_gc_hook, "gc_size": sc_gc_size, "gc_1950": sc_gc_1950, "gc_grow": sc_gc_grow, "gc_reserve": sc_gc_reserve, "gc_end": sc_gc_end})
+
+# ---------------------------------------------------------------- 035 v2: Blender (Cycles) plates + 2D overlays
+# plates are rendered by a bpy script at 15 fps into <work>/<sc["b3d"]>/<scene>/NNNN.png with anchors.json
+# (full-res pixel coords of named 3D points). Segments: sc["plates"] = [[t_from, "NNNN" | "seq:A-B", fade_s], ...]
+_PL = {}
+def _plate_img(base, name):
+    p = os.path.join(R.WORK, base, f"{name}.png")
+    if p not in _PL:
+        if len(_PL) > 24: _PL.pop(next(iter(_PL)))
+        _PL[p] = Image.open(p).convert("RGBA").resize((W, H), Image.LANCZOS)
+    return _PL[p]
+
+def _anch(base):
+    key = ("anch", base)
+    if key not in _PL: _PL[key] = json.load(open(os.path.join(R.WORK, base, "anchors.json")))
+    return _PL[key]
+
+def _seg_frame(base, seg, t):
+    t0, src = seg[0], seg[1]
+    if not src.startswith("seq:"): return _plate_img(base, src), int(src)
+    a, b = [int(x) for x in src[4:].split("-")]; fpos = a + max(0.0, t - t0) * 15
+    i = min(int(fpos), b); j = min(i + 1, b); w = fpos - i if j > i else 0.0
+    im = _plate_img(base, f"{i:04d}")
+    if w > 0.02: im = Image.blend(im, _plate_img(base, f"{j:04d}"), w)
+    return im, (i if w < 0.5 else j)
+
+def plate(img, sc, t, D):
+    """paste the right plate (with crossfades) + slow 2D push; returns (anchors dict, transform fn)"""
+    base = sc["b3d"]; segs = sc["plates"]; idx = max(i for i, s in enumerate(segs) if s[0] <= t or i == 0)
+    im, fr = _seg_frame(base, segs[idx], t)
+    fade = segs[idx][2] if len(segs[idx]) > 2 else 0.0
+    if idx > 0 and fade > 0 and t - segs[idx][0] < fade:
+        prev, _ = _seg_frame(base, segs[idx - 1], t); im = Image.blend(prev, im, ease_io((t - segs[idx][0]) / fade))
+    z0, z1 = sc.get("push", [1.0, 1.06]); z = z0 + (z1 - z0) * ease_io(clamp(t / max(D, 0.1)))
+    cx, cy = W / 2, H * sc.get("push_cy", 0.5)
+    if abs(z - 1) > 1e-3:
+        cw, ch = W / z, H / z; box_ = (cx - cw * cx / W, cy - ch * cy / H); box_ = (box_[0], box_[1], box_[0] + cw, box_[1] + ch)
+        im = im.crop(tuple(int(round(v)) for v in box_)).resize((W, H), Image.BICUBIC)
+    img.alpha_composite(im)
+    an = _anch(base).get(str(fr), {})
+    def tf(p): return ((p[0] - cx) * z + cx, (p[1] - cy) * z + cy)
+    return an, tf
+
+def _vline(img, p0, p1, a, col=WHITE, w=4, tick=18):
+    if a <= 0: return
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay); c = col + (int(235 * a),)
+    x0, y0 = p0; x1, y1 = p0[0] + (p1[0] - p0[0]) * a, p0[1] + (p1[1] - p0[1]) * a
+    d.line([(x0, y0), (x1, y1)], fill=c, width=w)
+    dx, dy = y1 - y0, -(x1 - x0); n = max(1e-3, (dx * dx + dy * dy) ** 0.5); dx, dy = dx / n * tick, dy / n * tick
+    for (x, y) in ((x0, y0), (x1, y1)): d.line([(x - dx, y - dy), (x + dx, y + dy)], fill=c, width=w)
+    img.alpha_composite(lay)
+
+def _tag(img, xy, s, size=44, col=WHITE, a=1.0, anchor="mm", bg=(8, 6, 4)):
+    if a <= 0 or not (40 < xy[0] < W - 40 and 40 < xy[1] < H - 40): return
+    f = F("anton", size); bb = ImageDraw.Draw(img).textbbox(xy, s, font=f, anchor=anchor)
+    rect_a(img, (bb[0] - 16, bb[1] - 10, bb[2] + 16, bb[3] + 10), bg, 0.72 * a, 12)
+    text_a(img, xy, s, f, col, a, anchor, shadow=4)
+
+def _vignette(img):
+    key = "vig"
+    if key not in _PL:
+        v = Image.new("L", (W, H), 0); d = ImageDraw.Draw(v)
+        for i in range(60): d.rectangle([0, 0, W, int(600 * (1 - i / 60))], fill=int(200 * (1 - i / 60) ** 1.6))
+        _PL[key] = Image.merge("RGBA", (Image.new("L", (W, H), 0),) * 3 + (v,))
+    img.alpha_composite(_PL[key])
+
+def sc_gb_hook(img, sc, t, D, tg, k):
+    plate(img, sc, t, D); _vignette(img)
+    text_a(img, (W / 2, 250), sc["top"], fit_font("anton", 96, sc["top"], W - 100), WHITE, 1.0, "mm", shadow=14)
+    text_a(img, (W / 2, 360), sc["top2"], fit_font("anton", 84, sc["top2"], W - 120), T["accent"], 1.0, "mm", shadow=12)
+    chrome(img, tg)
+
+def sc_gb_size(img, sc, t, D, tg, k):
+    an, tf = plate(img, sc, t, D); _vignette(img)
+    ga = sc.get("gate_at", 8.5); pa = sc.get("people_at", 5.0); da = sc.get("dim_at", 6.0)
+    if t < ga:
+        if "person" in an and t > pa:
+            b = ease(clamp((t - pa) / 0.4)); x, y = tf(an["person"]); _tag(img, (x, y - 60), "1.75 M", 36, WHITE, b)
+        if "cube_dim_b" in an and t > da:
+            b = ease(clamp((t - da) / 0.6)); p0, p1 = tf(an["cube_dim_b"]), tf(an["cube_dim_t"]); p0 = (p0[0] + 40, p0[1]); p1 = (p1[0] + 40, p1[1])
+            _vline(img, p0, p1, b); _tag(img, (p0[0] - 34, (p0[1] + p1[1]) / 2), sc["side"], 64, WHITE, b, "rm")
+    else:
+        b = ease(clamp((t - ga - 0.25) / 0.6))
+        if "gate_dim_b" in an:
+            p0, p1 = tf(an["gate_dim_b"]), tf(an["gate_dim_t"]); _vline(img, p0, p1, b, (255, 214, 170))
+            x, y = tf(an["gate_top"]); _tag(img, (x, y - 40), "INDIA GATE · 42 M", 40, (255, 225, 190), b)
+        if "cube_dim_b" in an:
+            p0, p1 = tf(an["cube_dim_b"]), tf(an["cube_dim_t"]); _vline(img, p0, p1, b)
+            _tag(img, (p0[0] - 30, (p0[1] + p1[1]) / 2), sc["side"], 48, T["accent"], b, "rm")
+    title_block(img, t, sc["kicker"], sc["big"], sc["sub"], y=190, t0=0.0, big_size=120)
+    chrome(img, tg)
+
+def sc_gb_pitch(img, sc, t, D, tg, k):
+    an, tf = plate(img, sc, t, D); _vignette(img)
+    a1 = ease(clamp((t - sc.get("cube_at", 0.4)) / 0.6)); a2 = ease(clamp((t - sc.get("pitch_at", 1.6)) / 0.6))
+    if "cube_a" in an:
+        p0, p1 = tf(an["cube_bl"]), tf(an["cube_br"]); p0, p1 = (p0[0], p0[1] - 70), (p1[0], p1[1] - 70)
+        _vline(img, p0, p1, a1, T["accent"]); _tag(img, ((p0[0] + p1[0]) / 2, p0[1] - 62), "CUBE · " + sc["side"], 50, T["accent"], a1)
+    if "pitch_a" in an:
+        p0, p1 = tf(an["pitch_a"]), tf(an["pitch_b"]); p0, p1 = (p0[0], p0[1] + 46), (p1[0], p1[1] + 46)
+        _vline(img, p0, p1, a2); _tag(img, ((p0[0] + p1[0]) / 2, p0[1] + 58), sc["pitch_lbl"], 46, WHITE, a2)
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 250), sc["big"], F("anton", 150), T["accent"], a, "mm", shadow=16)
+    text_a(img, (W / 2, 370), sc["lbl"], fit_font("anton", 66, sc["lbl"], W - 120), WHITE, a, "mm", shadow=10)
+    text_a(img, (W / 2, 440), sc["kicker"], F("mono", 26), (230, 225, 210), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_gb_1950(img, sc, t, D, tg, k):
+    an, tf = plate(img, sc, t, D); _vignette(img)
+    s_ = ease(clamp((t - 0.9) / 0.6))
+    if "sl" in an and s_ > 0:
+        P_ = {k_: tf(an[k_]) for k_ in ("bl", "bm", "br", "sl", "sm", "sr")}
+        lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+        d.polygon([P_["sl"], P_["sm"], P_["sr"], P_["br"], P_["bm"], P_["bl"]], fill=(70, 30, 5, int(40 * s_)))
+        d.polygon([P_["sl"], P_["sm"], P_["sr"], P_["br"], P_["bm"], P_["bl"]], outline=None)
+        gl = Image.new("RGBA", (W, H), (0, 0, 0, 0)); gd = ImageDraw.Draw(gl)
+        gd.line([P_["sl"], P_["sm"], P_["sr"]], fill=(255, 205, 120, int(255 * s_)), width=8)
+        lay.alpha_composite(gl.filter(ImageFilter.GaussianBlur(6))); ImageDraw.Draw(lay).line([P_["sl"], P_["sm"], P_["sr"]], fill=(255, 240, 200, int(255 * s_)), width=3)
+        img.alpha_composite(lay)
+        cx_ = (P_["sl"][0] + P_["sm"][0]) / 2; yb = (P_["sl"][1] + P_["bl"][1]) / 2; ys = P_["sl"][1]
+        _tag(img, (cx_, yb), "BEFORE 1950 · 1/3", 44, (240, 205, 155), s_)
+        _tag(img, (cx_, ys - (P_["sl"][1] - tf(an["after"])[1]) * 0.9), "AFTER 1950 · 2/3", 54, WHITE, s_)
+    a = ease(clamp((t - 0.2) / 0.4))
+    text_a(img, (W / 2, 290), sc["big"], F("anton", 230), T["accent"], a, "mm", shadow=16)
+    text_a(img, (W / 2, 440), sc["lbl"], F("anton", 72), WHITE, a, "mm", shadow=10)
+    chrome(img, tg)
+
+def sc_gb_grow(img, sc, t, D, tg, k):
+    an, tf = plate(img, sc, t, D); _vignette(img)
+    sa = sc.get("slab_at", 6.0)
+    if "person_top" in an:
+        x, y = tf(an["person_top"]); xf, yf = tf(an["person_feet"])
+        d = ImageDraw.Draw(img); d.line([(x, y - 8), (x + 50, y - 70)], fill=WHITE + (220,), width=3)
+        _tag(img, (x + 56, y - 76), "1.75 M PERSON", 34, WHITE, 1.0, "lm")
+    if t > sa + 1.0 and "slab_b" in an:
+        la = ease(clamp((t - sa - 1.0) / 0.4)); p0, p1 = tf(an["slab_b"]), tf(an["slab_t"])
+        _vline(img, (p0[0] - 36, p0[1] + 6), (p1[0] - 36, p1[1] - 6), la, T["accent"], 4, 14)
+        _tag(img, (p0[0] - 70, (p0[1] + p1[1]) / 2), "37 CM", 56, T["accent"], la, "rm")
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 280), sc["big"], F("anton", 200), T["accent"], a, "mm", shadow=16)
+    text_a(img, (W / 2, 420), sc["lbl"], F("anton", 66), WHITE, a, "mm", shadow=10)
+    text_a(img, (W / 2, 490), sc["sub"], fit_font("mono", 28, sc["sub"], W - 140), (230, 225, 210), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_gb_reserve(img, sc, t, D, tg, k):
+    an, tf = plate(img, sc, t, D); _vignette(img)
+    ra = sc.get("res_at", 4.0); q = ease(clamp((t - ra - 1.0) / 0.5))
+    if "res_top" in an and q > 0:
+        x, y = tf(an["res_top"]); _tag(img, (x, y - 30), sc["big"], 64, T["accent"], q)
+        x, y = tf(an["big_top"]); _tag(img, (x, y - 30), "22.6 M · ALREADY MINED", 38, WHITE, q)
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 280), sc["lbl"], fit_font("anton", 84, sc["lbl"], W - 120), WHITE, a, "mm", shadow=12)
+    text_a(img, (W / 2, 370), sc["sub"], fit_font("mono", 26, sc["sub"], W - 120), (230, 225, 210), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_gb_end(img, sc, t, D, tg, k):
+    plate(img, sc, t, D); _vignette(img)
+    a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 260), sc["q"], fit_font("anton", 86, sc["q"], W - 100), WHITE, a, "mm", shadow=14)
+    for i, o in enumerate(sc["opts"]):
+        b = ease(clamp((t - 0.6 - i * 0.4) / 0.4)); y = 380 + i * 115
+        rect_a(img, (180, y, W - 180, y + 95), (10, 8, 4), 0.75 * b, 20, T["accent"], 3)
+        text_a(img, (230, y + 48), f"{i + 1}", F("anton", 60), T["accent"], b, "mm")
+        text_a(img, (W / 2 + 30, y + 48), o, F("anton", 56), WHITE, b, "mm")
+    chrome(img, tg)
+
+R.SCENE_FN.update({"gb_hook": sc_gb_hook, "gb_size": sc_gb_size, "gb_pitch": sc_gb_pitch, "gb_1950": sc_gb_1950, "gb_grow": sc_gb_grow,
+                   "gb_reserve": sc_gb_reserve, "gb_end": sc_gb_end})
+
+
 if __name__ == "__main__":
     R.main()

@@ -1,0 +1,178 @@
+{
+ "format": "story",
+ "theme": "gold",
+ "look": "cinematic",
+ "speed": 1.08,
+ "lead": 0.0,
+ "tail": 0.3,
+ "voice_job": "035_v2",
+ "punch": true,
+ "captions": true,
+ "caption_y": 1560,
+ "siren": [],
+ "header": "UNKNOWN UNCOVERED",
+ "source": "Sources: World Gold Council · Metals Focus",
+ "ticker": "ALL THE GOLD EVER MINED",
+ "scenes": [
+  {
+   "type": "gb_hook",
+   "top": "ALL THE GOLD EVER MINED",
+   "top2": "MELTED INTO ONE CUBE?",
+   "vo": "अगर इंसान ने आज तक, जितना भी सोना निकाला है, उसे पिघलाकर, एक ही क्यूब बना दें, तो वो कितना बड़ा होगा?",
+   "b3d": "b3d/final/hook",
+   "plates": [
+    [
+     0,
+     "seq:0-39"
+    ]
+   ],
+   "push": [
+    1.0,
+    1.07
+   ]
+  },
+  {
+   "type": "gb_size",
+   "kicker": "WORLD GOLD COUNCIL · END-Q3 2026",
+   "big": "224,200 TONNES",
+   "sub": "worth about US$30 trillion",
+   "side": "22.6 M",
+   "vo": "वर्ल्ड गोल्ड काउंसिल के मुताबिक़, अब तक करीब दो लाख चौबीस हज़ार टन सोना निकाला जा चुका है। इसका क्यूब, सिर्फ़ करीब साढ़े बाईस मीटर का होगा, यानी इंडिया गेट की ऊँचाई का करीब आधा।",
+   "people_at": 5.37,
+   "dim_at": 6.42,
+   "gate_at": 8.53,
+   "b3d": "b3d/final/size",
+   "plates": [
+    [
+     0,
+     "0045"
+    ],
+    [
+     8.53,
+     "0135",
+     0.35
+    ]
+   ],
+   "push": [
+    1.0,
+    1.05
+   ]
+  },
+  {
+   "type": "gb_pitch",
+   "vo": "और इसकी हर भुजा, बाईस गज़ की क्रिकेट पिच से भी, करीब ढाई मीटर लंबी होगी।",
+   "kicker": "PITCH: 20.12 M · MCC LAWS OF CRICKET, LAW 6",
+   "pitch_lbl": "22 YARDS · 20.12 M",
+   "b3d": "b3d/final/pitch",
+   "plates": [
+    [
+     0,
+     "0030"
+    ]
+   ],
+   "push": [
+    1.0,
+    1.06
+   ],
+   "big": "22.6 M",
+   "lbl": "LONGER THAN A 22-YARD CRICKET PITCH",
+   "cube_at": 0.3,
+   "pitch_at": 1.3,
+   "side": "22.6 M"
+  },
+  {
+   "type": "gb_1950",
+   "big": "2/3",
+   "lbl": "MINED AFTER 1950",
+   "vo": "और हैरानी की बात ये है, कि इसमें से करीब दो-तिहाई सोना, उन्नीस सौ पचास के बाद ही निकाला गया है।",
+   "b3d": "b3d/final/1950",
+   "plates": [
+    [
+     0,
+     "0002"
+    ],
+    [
+     0.9,
+     "0045",
+     0.6
+    ]
+   ],
+   "push": [
+    1.0,
+    1.06
+   ]
+  },
+  {
+   "type": "gb_grow",
+   "big": "+37 CM",
+   "lbl": "A NEW LAYER EVERY YEAR",
+   "sub": "2025 mine output: record 3,672 tonnes",
+   "vo": "और ये क्यूब, हर साल बढ़ रहा है। दो हज़ार पच्चीस में, खदानों से रिकॉर्ड करीब छत्तीस सौ सत्तर टन सोना निकला, यानी हर साल, इस पर करीब सैंतीस सेंटीमीटर की नई परत।",
+   "slab_at": 6.15,
+   "b3d": "b3d/final/grow",
+   "plates": [
+    [
+     0,
+     "0045"
+    ],
+    [
+     6.15,
+     "seq:92-107"
+    ],
+    [
+     7.15,
+     "0142",
+     2.0
+    ]
+   ],
+   "push": [
+    1.0,
+    1.04
+   ]
+  },
+  {
+   "type": "gb_reserve",
+   "big": "14.2 M",
+   "lbl": "WHAT'S LEFT UNDERGROUND",
+   "sub": "economically minable reserves ~54,770 t (Metals Focus, end-2025)",
+   "vo": "और ज़मीन के नीचे, जितना सोना निकालना अभी फ़ायदेमंद है, वो सिर्फ़ करीब पचपन हज़ार टन है। उसका क्यूब, बस चौदह मीटर का।",
+   "res_at": 4.45,
+   "b3d": "b3d/final/reserve",
+   "plates": [
+    [
+     0,
+     "0030"
+    ],
+    [
+     4.45,
+     "seq:67-88"
+    ]
+   ],
+   "push": [
+    1.0,
+    1.05
+   ]
+  },
+  {
+   "type": "gb_end",
+   "q": "WHO HOLDS THE BIGGEST SHARE?",
+   "opts": [
+    "JEWELLERY",
+    "CENTRAL BANKS",
+    "BARS & COINS"
+   ],
+   "vo": "तो सोचिए, इस सोने का सबसे बड़ा हिस्सा किसके पास है? सरकारों के पास, या लोगों के गहनों में? कमेंट में बताइए, और Unknown Uncovered को सब्सक्राइब करें।",
+   "b3d": "b3d/final/end",
+   "plates": [
+    [
+     0,
+     "0045"
+    ]
+   ],
+   "push": [
+    1.0,
+    1.06
+   ]
+  }
+ ]
+}
