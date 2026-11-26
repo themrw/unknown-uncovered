@@ -30,6 +30,23 @@ def say(text):
     for a, b in SAY.items(): text = text.replace(a, b)
     return text
 
+def squeeze_pauses(a, sr, max_gap=0.22, keep=0.15, thr_db=-38.0):
+    """shorten silent gaps inside a line (Parler pauses 0.3-0.6 s at commas, which sounds chopped)."""
+    hop = int(sr * 0.01); n = len(a) // hop
+    if n < 3: return a
+    e = np.array([np.sqrt(np.mean(a[i * hop:(i + 1) * hop] ** 2)) + 1e-9 for i in range(n)])
+    sil = 20 * np.log10(e / (e.max() + 1e-9)) < thr_db; out = []; i = 0; last = 0
+    while i < n:
+        if sil[i]:
+            j = i
+            while j < n and sil[j]: j += 1
+            if (j - i) * 0.01 > max_gap and i > 0 and j < n:
+                cut0 = i * hop + int(keep / 2 * sr); cut1 = j * hop - int(keep / 2 * sr)
+                out.append(a[last:cut0]); last = cut1
+            i = j
+        else: i += 1
+    out.append(a[last:]); return np.concatenate(out)
+
 def trim(a, sr, thr=0.01, pad=0.05):
     idx = np.where(np.abs(a) > thr)[0]
     if len(idx) == 0: return a
@@ -45,7 +62,8 @@ if len(sys.argv) > 3 and sys.argv[2] == "request":
         for i, t in short: print(f"TOO SHORT scene {i:02d}: {t!r} -> write a full sentence (>= {MIN_CHARS} letters) or leave vo empty")
         sys.exit("refusing to request voice: short lines glitch in Parler (set UU_ALLOW_SHORT=1 to override)")
     req = {"description": spec.get("voice_desc", DESC), "seed": spec.get("voice_seed", 7),
-           "items": [{"name": f"{i:02d}", "text": say(sc["vo"])} for i, sc in enumerate(spec["scenes"])]}
+           "items": [dict({"name": f"{i:02d}", "text": say(sc["vo"])}, **({"description": sc["voice_desc"]} if sc.get("voice_desc") else {}))
+                     for i, sc in enumerate(spec["scenes"])]}
     p = os.path.join(REPO, "voice", "requests", f"{job}.json"); os.makedirs(os.path.dirname(p), exist_ok=True)
     json.dump(req, open(p, "w"), ensure_ascii=False, indent=1)
     spec["voice_job"] = job; json.dump(spec, open(spec_path, "w"), ensure_ascii=False, indent=1)
@@ -68,6 +86,7 @@ for i, sc in enumerate(spec["scenes"]):
         if not os.path.exists(src): sys.exit(f"missing {src}: run the voice Action first (see docstring)")
         a, sr = sf.read(src, dtype="float32"); tempo = sc.get("speed", speed)
     a = trim(a, sr)
+    if spec.get("squeeze", engine == "parler"): a = squeeze_pauses(a, sr)
     raw = os.path.join(vo, f"raw_{i:02d}.wav"); sf.write(raw, a, sr)
     out = os.path.join(vo, f"{i:02d}.wav")
     af = (f"atempo={tempo}," if abs(tempo - 1.0) > 0.005 else "") + POLISH
