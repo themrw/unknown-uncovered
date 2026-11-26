@@ -290,7 +290,7 @@ if theme in ("orbit", "ocean", "forensic", "gold"):   # cinematic space thriller
     sh = sum(np.sin(2 * np.pi * f * t + p) for f, p in ((1975.5, 0), (2093.0, 1.1), (2637.0, 2.3))) * (0.5 + 0.5 * np.sin(2 * np.pi * 0.07 * t)) ** 2
     music += lp(sh, 5000) * 0.004
     for i, sc in enumerate(spec["scenes"]):
-        ty = sc["type"].replace("gb_", "gc_"); hit = lambda at, g=0.8: (add(music, riser(1.0), ST[i] + at - 1.0, 0.22), add(music, boom(g, 55, 2.4, 3), ST[i] + at, g))
+        ty = sc["type"].replace("gb_", "gc_").replace("m2_", "md_"); hit = lambda at, g=0.8: (add(music, riser(1.0), ST[i] + at - 1.0, 0.22), add(music, boom(g, 55, 2.4, 3), ST[i] + at, g))
         if ty == "or_hook": hit(sc.get("fell_at", 4.5) + 1.5, 0.9)
         if ty == "or_count": add(music, boom(0.6, 70, 4, 2), ST[i] + 2.2, 0.6)
         if ty == "or_file": add(music, boom(0.6, 60, 7, 1.4), ST[i] + sc.get("stamp_at", 5) + 0.16, 0.8)
@@ -309,6 +309,15 @@ if theme in ("orbit", "ocean", "forensic", "gold"):   # cinematic space thriller
         if ty == "tv_quota": add(music, boom(0.6, 60, 4, 2), ST[i] + sc.get("q_at", 0.6), 0.6); hit(sc.get("y_at", 4), 0.7)
         if ty == "tv_law": hit(sc.get("doc_at", 2), 0.9)
         if ty == "ap_hook": hit(sc.get("q_at", 4), 0.8)
+        if ty == "md_hook": add(music, boom(0.8, 50, 3, 2.5), ST[i] + 0.05, 0.8); hit(sc.get("off_at", 3) + 0.4, 0.9)
+        if ty == "md_1971": hit(1.0, 0.6)
+        if ty == "md_2025": hit(sc.get("d_at", 2) + 0.2, 0.8)
+        if ty == "md_timeline":
+            for e in sc.get("events", []): add(music, boom(0.5, 60, 5, 2), ST[i] + e[0] + 0.1, 0.5)
+        if ty == "md_why": hit(sc.get("mha_at", 1) + 0.2, 0.5)
+        if ty == "mdp_why": hit(sc.get("q_at", 6) + 0.1, 0.6)
+        if ty == "mdp_siren": add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get("w_at", 1.0), 0.4); add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get("c_at", 4.0), 0.4)
+        if ty == "md_siren": add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get("w_at", 1.5), 0.4); add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get("c_at", 5), 0.4)
         if ty == "gc_hook": add(music, boom(0.8, 50, 3, 2.5), ST[i] + 0.05, 0.8); add(music, chime(2.4, 1318.5), ST[i] + 1.6, 0.04)
         if ty == "gc_size":
             for a_ in ("people_at", "dim_at"): add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get(a_, 4), 0.45)
@@ -332,7 +341,7 @@ if theme in ("orbit", "ocean", "forensic", "gold"):   # cinematic space thriller
         if ty == "bm_specs": hit(sc.get("n_at", 1.5) + 0.9, 0.7)
         if ty == "bm_map": hit(sc.get("dispute_at", 5), 0.8)
         if ty == "bm_money": hit(sc.get("t_at", 6), 0.8)
-        if ty == "bm_twist":
+        if ty in ("bm_twist", "mdp_why"):
             for l_ in sc.get("l_at", []): add(music, boom(0.6, 60, 4, 2), ST[i] + l_, 0.5)
         if ty == "ap_rank": hit(0.15, 0.9 if sc.get("cc") == "IN" else 0.6)
         if ty == "ap_top2": add(music, boom(0.6, 60, 4, 2), ST[i] + 0.2, 0.5); add(music, boom(0.7, 55, 4, 2), ST[i] + sc.get("b_at", 4), 0.6); hit(sc.get("gap_at", 7), 0.8)

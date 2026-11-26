@@ -1,0 +1,175 @@
+{
+ "format": "story",
+ "theme": "orbit",
+ "look": "cinematic",
+ "speed": 1.08,
+ "lead": 0.2,
+ "tail": 0.35,
+ "punch": true,
+ "captions": true,
+ "caption_y": 1520,
+ "siren": [],
+ "header": "UNKNOWN UNCOVERED",
+ "source": "Sources: MHA via state govts · PTI · ANI · IANS · News On AIR",
+ "ticker": "INDIA'S CIVIL DEFENCE DRILLS",
+ "voice_job": "036p_main",
+ "credits_from": [
+  "media/036_drill/credits.json"
+ ],
+ "squeeze": false,
+ "scenes": [
+  {
+   "type": "bm_hook",
+   "bg": "media/036_drill/space_1.jpg",
+   "top": "27 NOV",
+   "top2": "8 PM · ALL OF PUNJAB GOES DARK",
+   "facts": [
+    [
+     "SIRENS",
+     "2-min air raid warning"
+    ],
+    [
+     "BLACKOUT",
+     "all districts"
+    ],
+    [
+     "54 YEARS",
+     "the real story"
+    ]
+   ],
+   "vo": "सत्ताईस नवंबर, रात आठ बजे! पूरे पंजाब में सायरन बजेंगे, और बत्तियाँ बुझ जाएँगी। लेकिन असली कहानी, चौवन साल पुरानी है।",
+   "f_at": [
+    2.79,
+    3.92,
+    6.41
+   ],
+   "instant": true
+  },
+  {
+   "type": "bm_report",
+   "bg": "media/036_drill/war_1.jpg",
+   "kicker": "AS REPORTED BY NEWS MEDIA · MAY 2025",
+   "cards": [
+    [
+     "LAST DRILL THIS BIG",
+     "1971 WAR",
+     "accent"
+    ],
+    [
+     "AFTER THAT",
+     "54 YEARS: NONE",
+     "bad"
+    ],
+    [
+     "7 MAY 2025 · ONE DAY",
+     "244 DISTRICTS",
+     "accent"
+    ]
+   ],
+   "why": "Operation Abhyaas · ordered by the Ministry of Home Affairs",
+   "vo": "रिपोर्ट्स के मुताबिक़, उन्नीस सौ इकहत्तर की जंग के बाद, पूरे चौवन साल तक, देश में इतनी बड़ी मॉक ड्रिल नहीं हुई। फिर सात मई दो हज़ार पच्चीस को, एक ही दिन में, दो सौ चौवालीस ज़िलों में सायरन बज उठे!",
+   "c_at": [
+    1.36,
+    3.44,
+    7.24
+   ],
+   "why_at": 11.58
+  },
+  {
+   "type": "m2_timeline",
+   "vo": "और ये सिलसिला रुका नहीं! दो हज़ार छब्बीस में दिल्ली, पंजाब, मेघालय, बिहार, और बाईस नवंबर को, उत्तर प्रदेश के सभी पचहत्तर ज़िले।",
+   "events": [
+    [
+     3.12,
+     "delhi",
+     "DELHI",
+     "2 APR · 13 DISTRICTS",
+     120,
+     -95
+    ],
+    [
+     3.68,
+     "punjab",
+     "PUNJAB",
+     "24 APR · ALL DISTRICTS",
+     230,
+     -60
+    ],
+    [
+     4.16,
+     "meghalaya",
+     "MEGHALAYA",
+     "24 APR · ALL DISTRICTS",
+     250,
+     -120
+    ],
+    [
+     4.72,
+     "bihar",
+     "BIHAR",
+     "14 MAY · 6 DISTRICTS",
+     90,
+     70
+    ],
+    [
+     6.45,
+     "up",
+     "UTTAR PRADESH",
+     "22 NOV · ALL 75 DISTRICTS",
+     160,
+     10
+    ]
+   ]
+  },
+  {
+   "type": "mdp_why",
+   "bg": "media/036_drill/siren_4.jpg",
+   "kicker": "WHY?",
+   "l1": [
+    "AS PER",
+    "MHA DIRECTIVES"
+   ],
+   "l2": [
+    "TO TEST",
+    "SIRENS & BLACKOUT"
+   ],
+   "l3": [
+    "AND",
+    "RESCUE TEAMS"
+   ],
+   "vo": "राज्य सरकारों के मुताबिक़, ये ड्रिल्स गृह मंत्रालय के निर्देश पर होती हैं, ताकि सायरन, ब्लैकआउट और बचाव टीमों की तैयारी परखी जा सके। पर आपको क्या लगता है, ये ड्रिल्स बार-बार क्यों हो रही हैं? कमेंट में ज़रूर बताइए।",
+   "q": "WHY SO OFTEN? YOUR TAKE ↓",
+   "l_at": [
+    2.15,
+    4.85,
+    6.02
+   ],
+   "q_at": 8.23
+  },
+  {
+   "type": "mdp_siren",
+   "bg": "media/036_drill/siren_1.jpg",
+   "vo": "और याद रखिए! ऊपर-नीचे होता सायरन, मतलब ख़तरे की चेतावनी। और लगातार ऊँचा सायरन, मतलब ऑल क्लियर।",
+   "w_at": 0.86,
+   "c_at": 4.22
+  },
+  {
+   "type": "or_outro",
+   "bg": "media/036_drill/space_0.jpg",
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "54 years: none this big",
+     "WHITE"
+    ],
+    [
+     "Now: again & again",
+     "accent"
+    ]
+   ],
+   "vo": "चौवन साल में एक बार से, अब साल में कई बार! ऐसी ही छुपी कहानियों के लिए, Unknown Uncovered को सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ]
+}

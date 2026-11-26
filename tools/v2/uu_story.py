@@ -30,7 +30,7 @@ Images are repo-relative ($UU_REPO); spec["credits_from"] may be one path or a l
 """
 import json, math, os
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageChops
 import uu_render as R
 from uu_render import (W, H, T, F, WHITE, MUTED, clamp, ease, ease_io, back, prog, text_a, rect_a, paste_a, typed,
                        fit_font, chrome, big_number, GLOBE)
@@ -2646,9 +2646,9 @@ R.SCENE_FN.update({"ap_hook": sc_ap_hook, "ap_rank": sc_ap_rank, "ap_top2": sc_a
 # ---------------------------------------------------------------- reel 032: BrahMos boosted India's ranking (cinematic)
 def sc_bm_hook(img, sc, t, D, tg, k):
     cine_bg(img, sc, t, D, k, dark=0.42); A = T["accent"]
-    a = ease(clamp(t / 0.4))
+    a = 1.0 if sc.get("instant") else ease(clamp(t / 0.4))
     text_a(img, (W / 2, 330 + 20 * (1 - a)), sc.get("top", ""), F("anton", 190), A, a, "mm", shadow=16)
-    text_a(img, (W / 2, 480), sc.get("top2", ""), fit_font("anton", 76, sc.get("top2", ""), W - 120), WHITE, clamp((t - 0.3) / 0.4), "mm", shadow=10)
+    text_a(img, (W / 2, 480), sc.get("top2", ""), fit_font("anton", 76, sc.get("top2", ""), W - 120), WHITE, 1.0 if sc.get("instant") else clamp((t - 0.3) / 0.4), "mm", shadow=10)
     ats = sc.get("f_at", [2.0, 3.5, 5.0])
     for i, (big, lbl) in enumerate(sc.get("facts", [])):
         b = ease(clamp((t - ats[i]) / 0.45)); y = 760 + i * 190
@@ -3243,6 +3243,451 @@ def sc_gb_end(img, sc, t, D, tg, k):
 
 R.SCENE_FN.update({"gb_hook": sc_gb_hook, "gb_size": sc_gb_size, "gb_pitch": sc_gb_pitch, "gb_1950": sc_gb_1950, "gb_grow": sc_gb_grow,
                    "gb_reserve": sc_gb_reserve, "gb_end": sc_gb_end})
+
+
+# ---------------------------------------------------------------- reel 036: India's civil defence drills (night map, city lights, blackouts)
+# India outline = countries.geojson India-POV polygon (official boundaries). States are shown only as stylised light regions + labels.
+MD_BOX = (66.0, 99.5, 5.5, 38.0)          # lon0, lon1, lat0, lat1
+MD_Y0 = 470; MD_SX = 0.93
+def md_xy(lon, lat):
+    lon0, lon1, lat0, lat1 = MD_BOX; s = 1000.0 / ((lon1 - lon0) * MD_SX)
+    return (40 + (lon - lon0) * s * MD_SX, MD_Y0 + (lat1 - lat) * s)
+MD_CITIES = [("Delhi", 28.61, 77.21, 10), ("Mumbai", 19.08, 72.88, 10), ("Kolkata", 22.57, 88.36, 8), ("Chennai", 13.08, 80.27, 8), ("Bengaluru", 12.97, 77.59, 8),
+    ("Hyderabad", 17.39, 78.49, 8), ("Ahmedabad", 23.02, 72.57, 6), ("Pune", 18.52, 73.86, 6), ("Surat", 21.17, 72.83, 5), ("Jaipur", 26.91, 75.79, 5), ("Lucknow", 26.85, 80.95, 5),
+    ("Kanpur", 26.45, 80.33, 4), ("Nagpur", 21.15, 79.09, 4), ("Indore", 22.72, 75.86, 4), ("Bhopal", 23.26, 77.41, 3), ("Patna", 25.59, 85.14, 4), ("Vadodara", 22.31, 73.18, 3),
+    ("Ludhiana", 30.90, 75.86, 4), ("Amritsar", 31.63, 74.87, 3), ("Jalandhar", 31.33, 75.58, 2), ("Chandigarh", 30.73, 76.78, 3), ("Patiala", 30.34, 76.39, 2), ("Bathinda", 30.21, 74.95, 1.5),
+    ("Agra", 27.18, 78.01, 3), ("Varanasi", 25.32, 82.97, 3), ("Prayagraj", 25.44, 81.85, 3), ("Meerut", 28.98, 77.71, 2), ("Ghaziabad", 28.67, 77.45, 3), ("Gorakhpur", 26.76, 83.37, 2),
+    ("Bareilly", 28.37, 79.43, 2), ("Gaya", 24.79, 85.0, 1.5), ("Muzaffarpur", 26.12, 85.39, 1.5), ("Bhagalpur", 25.24, 86.97, 1.2), ("Shillong", 25.58, 91.89, 1.5), ("Tura", 25.51, 90.22, 0.8),
+    ("Guwahati", 26.14, 91.74, 2.5), ("Bhubaneswar", 20.30, 85.82, 2.5), ("Visakhapatnam", 17.69, 83.22, 3), ("Vijayawada", 16.51, 80.65, 2), ("Coimbatore", 11.02, 76.96, 3),
+    ("Kochi", 9.93, 76.27, 3), ("Thiruvananthapuram", 8.52, 76.94, 2), ("Madurai", 9.93, 78.12, 2), ("Mysuru", 12.30, 76.64, 2), ("Mangaluru", 12.91, 74.86, 1.5), ("Goa", 15.49, 73.83, 1.5),
+    ("Raipur", 21.25, 81.63, 2.5), ("Ranchi", 23.34, 85.31, 2.5), ("Jamshedpur", 22.80, 86.20, 2), ("Dehradun", 30.32, 78.03, 2), ("Srinagar", 34.08, 74.80, 2.5), ("Jammu", 32.73, 74.86, 2),
+    ("Jodhpur", 26.24, 73.02, 2), ("Udaipur", 24.59, 73.71, 1.5), ("Rajkot", 22.30, 70.80, 2.5), ("Nashik", 20.0, 73.79, 2.5), ("Aurangabad", 19.88, 75.34, 2), ("Solapur", 17.66, 75.91, 1.5),
+    ("Hubballi", 15.36, 75.12, 1.5), ("Kozhikode", 11.26, 75.78, 2), ("Tiruchirappalli", 10.79, 78.70, 1.5), ("Leh", 34.15, 77.58, 0.4), ("Imphal", 24.82, 93.94, 1), ("Agartala", 23.83, 91.29, 1),
+    ("Siliguri", 26.73, 88.40, 1.5), ("Jabalpur", 23.18, 79.99, 2), ("Gwalior", 26.22, 78.18, 2), ("Moradabad", 28.84, 78.77, 2), ("Aligarh", 27.88, 78.08, 1.5), ("Jhansi", 25.45, 78.57, 1.2)]
+# stylised drill regions (ellipses in lon/lat): centre, radii, label, label anchor
+MD_REG = {"delhi": ((77.2, 28.62), (0.55, 0.42), "DELHI"), "punjab": ((75.4, 30.85), (1.35, 1.05), "PUNJAB"), "meghalaya": ((91.3, 25.55), (1.25, 0.45), "MEGHALAYA"),
+          "bihar": ((85.7, 25.8), (2.1, 1.0), "BIHAR"), "up": ((80.4, 27.0), (3.4, 1.6), "UTTAR PRADESH")}
+def md_region(lon, lat):
+    for k_, ((cx, cy), (rx, ry), _) in MD_REG.items():
+        if ((lon - cx) / rx) ** 2 + ((lat - cy) / ry) ** 2 <= 1: return k_
+    return "rest"
+_MD = {}
+def md_layers():
+    if _MD: return _MD
+    g = json.load(open(os.path.join(R.ASSETS, "countries.geojson")))
+    ind = [f for f in g["features"] if f["properties"].get("ISO_A2") == "IN" or f["properties"].get("ADMIN") == "India"][0]["geometry"]
+    polys = ind["coordinates"] if ind["type"] == "MultiPolygon" else [ind["coordinates"]]
+    base = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(base)
+    mask = Image.new("L", (W, H), 0); dm = ImageDraw.Draw(mask)
+    for poly in polys:
+        pts = [md_xy(x, y) for x, y in poly[0]]
+        if len(pts) > 2: d.polygon(pts, fill=(16, 24, 40, 255)); dm.polygon(pts, fill=255)
+    edge = Image.new("RGBA", (W, H), (0, 0, 0, 0)); de = ImageDraw.Draw(edge)
+    for poly in polys:
+        pts = [md_xy(x, y) for x, y in poly[0]]
+        if len(pts) > 2: de.line(pts + [pts[0]], fill=(110, 160, 220, 255), width=3)
+    glow = edge.filter(ImageFilter.GaussianBlur(10)); base.alpha_composite(glow); base.alpha_composite(edge)
+    rng = np.random.default_rng(36); M = np.array(mask) > 0
+    pts = []
+    for _, la, lo, w in MD_CITIES:
+        n = int(60 + w * 80); sg = 0.07 + 0.03 * w
+        pts += [(lo + dx, la + dy, 1.0) for dx, dy in rng.normal(0, sg, (n, 2))]
+        pts += [(lo, la, 3.0)]
+    lo_ = rng.uniform(MD_BOX[0], MD_BOX[1], 9000); la_ = rng.uniform(MD_BOX[2], MD_BOX[3], 9000)
+    pts += [(a, b, 0.35) for a, b in zip(lo_, la_)]
+    lay = {k_: Image.new("L", (W, H), 0) for k_ in list(MD_REG) + ["rest"]}
+    dr = {k_: ImageDraw.Draw(v) for k_, v in lay.items()}
+    for lo, la, wt in pts:
+        x, y = md_xy(lo, la); xi, yi = int(x), int(y)
+        if not (0 <= xi < W and 0 <= yi < H) or not M[yi, xi]: continue
+        r = 1.0 if wt < 1 else (1.4 if wt < 2 else 2.6); v = int(255 * min(1.0, 0.30 + 0.35 * wt))
+        dr[md_region(lo, la)].ellipse([x - r, y - r, x + r, y + r], fill=v)
+    out = {}
+    for k_, L in lay.items():
+        glowL = L.filter(ImageFilter.GaussianBlur(4)); core = L
+        rgba = Image.new("RGBA", (W, H), (255, 186, 96, 0)); rgba.putalpha(Image.eval(glowL, lambda v: min(255, int(v * 2.2))))
+        c2 = Image.new("RGBA", (W, H), (255, 236, 190, 0)); c2.putalpha(core); rgba.alpha_composite(c2)
+        out[k_] = rgba
+    _MD.update(base=base, lights=out)
+    return _MD
+
+def md_map(img, t, D, lvl, focus=None, zoom=(1.0, 1.06), dim=0.0):
+    """lvl: dict region->light level 0..1 ('rest' too). focus: (lon,lat) for push centre."""
+    L = md_layers(); fr = Image.new("RGBA", (W, H), (4, 6, 12, 255))
+    vg = Image.new("L", (1, 256)); vg.putdata([int(60 * (1 - abs(i - 128) / 128) ** 2) for i in range(256)])
+    fr.alpha_composite(L["base"])
+    for k_, im in L["lights"].items():
+        a = clamp(lvl.get(k_, lvl.get("rest", 1.0)))
+        if a <= 0.01: continue
+        if a >= 0.99: fr.alpha_composite(im)
+        else:
+            im2 = im.copy(); im2.putalpha(Image.eval(im.getchannel("A"), lambda v, a=a: int(v * a))); fr.alpha_composite(im2)
+    if dim > 0: fr.alpha_composite(Image.new("RGBA", (W, H), (4, 6, 12, int(255 * dim))))
+    z = zoom[0] + (zoom[1] - zoom[0]) * ease_io(clamp(t / max(D, 0.1)))
+    cx, cy = md_xy(*focus) if focus else (W / 2, (MD_Y0 + 1530) / 2)
+    if abs(z - 1) > 1e-3:
+        cw, ch = W / z, H / z; x0 = clamp(cx - cw / 2, 0, W - cw); y0 = clamp(cy - ch / 2, 0, H - ch)
+        fr = fr.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BICUBIC)
+        tf = lambda p: ((p[0] - x0) * z, (p[1] - y0) * z)
+    else: tf = lambda p: p
+    img.alpha_composite(fr)
+    return tf
+
+def md_pin(img, p, label, sub, a, col=AMBER, side="r", pulse=0.0, dy=0):
+    if a <= 0: return
+    x, y = p; lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    r = 16 + 26 * pulse; d.ellipse([x - r, y - r, x + r, y + r], outline=col + (int(200 * a * (1 - pulse)),), width=4)
+    d.ellipse([x - 9, y - 9, x + 9, y + 9], fill=col + (int(255 * a),)); img.alpha_composite(lay)
+    f1 = F("anton", 40); f2 = F("mono", 22)
+    tx = x + 28 if side == "r" else x - 28; anc = "lm" if side == "r" else "rm"; ly = y + dy
+    if dy: ImageDraw.Draw(img).line([(x, y), (tx, ly)], fill=col + (int(200 * a),), width=2)
+    bb = ImageDraw.Draw(img).textbbox((tx, ly - 14), label, font=f1, anchor=anc); bb2 = ImageDraw.Draw(img).textbbox((tx, ly + 24), sub, font=f2, anchor=anc)
+    rect_a(img, (min(bb[0], bb2[0]) - 12, bb[1] - 8, max(bb[2], bb2[2]) + 12, bb2[3] + 8), (6, 8, 14), 0.8 * a, 10)
+    text_a(img, (tx, ly - 14), label, f1, WHITE, a, anc); text_a(img, (tx, ly + 24), sub, f2, col, a, anc)
+
+def _md_top(img, a, l1, l2, c1=AMBER, s1=74, s2=104):
+    text_a(img, (W / 2, 250), l1, fit_font("anton", s1, l1, W - 120), c1, a, "mm", shadow=12)
+    text_a(img, (W / 2, 360), l2, fit_font("anton", s2, l2, W - 100), WHITE, a, "mm", shadow=14)
+
+def sc_md_hook(img, sc, t, D, tg, k):
+    off = sc.get("off_at", 3.0); q = ease(clamp((t - off) / 0.8))
+    tf = md_map(img, t, D, {"punjab": 1 - 0.92 * q}, focus=(78.5, 27.0), zoom=(1.08, 1.2))
+    md_pin(img, tf(md_xy(75.4, 30.85)), "PUNJAB", "ALL DISTRICTS · 8 PM", ease(clamp((t - 0.3) / 0.4)), AMBER, "r", (tg * 0.8) % 1)
+    _md_top(img, 1.0, "TOMORROW · 27 NOV · 8 PM", "SIRENS. THEN DARKNESS.")
+    nb = ease(clamp((t - sc.get("but_at", D - 2)) / 0.4))
+    if nb > 0: _tag(img, (W / 2, 470), "BUT NOT FOR THE FIRST TIME", 54, AMBER, nb)
+    chrome(img, tg)
+
+def sc_md_1971(img, sc, t, D, tg, k):
+    md_map(img, t, D, {"rest": 0.55}, zoom=(1.0, 1.04), dim=0.35)
+    a = ease(clamp(t / 0.35)); y_ = ease(clamp((t - 0.6) / 1.4))
+    yr = int(1971 + (2025 - 1971) * y_)
+    text_a(img, (W / 2, 300), str(yr), F("anton", 210), AMBER if y_ >= 1 else WHITE, a, "mm", shadow=16)
+    text_a(img, (W / 2, 440), "FIRST NATIONWIDE DRILL SINCE 1971", fit_font("anton", 60, "FIRST NATIONWIDE DRILL SINCE 1971", W - 120), WHITE, a, "mm", shadow=10)
+    text_a(img, (W / 2, 500), "AS REPORTED · 7 MAY 2025 · \"OPERATION ABHYAAS\"", F("mono", 24), (200, 210, 225), a, "mm", shadow=4)
+    da = sc.get("d_at", D * 0.6); b = ease(clamp((t - da) / 1.2))
+    if t > da:
+        text_a(img, (W / 2, 1060), f"{int(244 * b)}", F("anton", 300), WHITE, clamp((t - da) / 0.3), "mm", shadow=18)
+        text_a(img, (W / 2, 1230), "CIVIL DEFENCE DISTRICTS", F("anton", 64), AMBER, clamp((t - da) / 0.3), "mm", shadow=10)
+    chrome(img, tg)
+
+def sc_md_timeline(img, sc, t, D, tg, k):
+    ev = sc["events"]   # [at, region, label, sub, side]
+    lvl = {}
+    for e in ev:
+        q = ease(clamp((t - e[0]) / 0.6)); lvl[e[1]] = 1 - 0.9 * q
+    tf = md_map(img, t, D, lvl, zoom=(1.0, 1.04))
+    for e in ev:
+        a = ease(clamp((t - e[0]) / 0.4))
+        (cx, cy), _, _ = MD_REG[e[1]]
+        md_pin(img, tf(md_xy(cx, cy)), e[2], e[3], a, AMBER, e[4], ((tg - e[0]) * 0.8) % 1 if t > e[0] else 0, e[5] if len(e) > 5 else 0)
+    a = ease(clamp(t / 0.35)); n = sum(1 for e in ev if t > e[0])
+    _md_top(img, a, "2026 SO FAR", (f"{n} STATES & UTs · BLACKOUT DRILLS" if n > 1 else "1 STATE/UT · BLACKOUT DRILL") if n else "AND IT DIDN'T STOP")
+    text_a(img, (W / 2, 450), "DRILLS FOUND IN NEWS REPORTS · NOT A COMPLETE LIST", F("mono", 22), (190, 200, 215), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_md_why(img, sc, t, D, tg, k):
+    md_map(img, t, D, {"rest": 0.5}, zoom=(1.04, 1.0), dim=0.45)
+    a = ease(clamp(t / 0.35))
+    text_a(img, (W / 2, 300), "WHY?", F("anton", 200), AMBER, a, "mm", shadow=16)
+    q = "“AS PER THE DIRECTIVES OF THE MINISTRY OF HOME AFFAIRS”"
+    b = ease(clamp((t - sc.get("mha_at", 1.0)) / 0.5))
+    rect_a(img, (80, 470, W - 80, 640), (8, 10, 18), 0.85 * b, 22, AMBER, 3)
+    text_a(img, (W / 2, 530), q, fit_font("anton", 46, q, W - 220), WHITE, b, "mm")
+    text_a(img, (W / 2, 595), "STATE GOVERNMENT STATEMENTS · PUNJAB, UP, BIHAR, MEGHALAYA", fit_font("mono", 22, "STATE GOVERNMENT STATEMENTS · PUNJAB, UP, BIHAR, MEGHALAYA", W - 220), (190, 200, 215), b, "mm")
+    text_a(img, (W / 2, 760), "TO TEST", F("anton", 56), (200, 210, 225), ease(clamp((t - sc.get("chips_at", [2, 3, 4])[0] + 0.3) / 0.4)), "mm")
+    for i, (lbl, at) in enumerate(zip(["AIR RAID SIRENS", "BLACKOUT", "RESCUE TEAMS"], sc.get("chips_at", [2, 3, 4]))):
+        c = ease(clamp((t - at) / 0.4)); y = 860 + i * 150
+        rect_a(img, (190, y, W - 190, y + 120), (10, 12, 20), 0.85 * c, 60, AMBER, 3)
+        text_a(img, (W / 2, y + 60), lbl, F("anton", 64), WHITE, c, "mm")
+    chrome(img, tg)
+
+def _wave(img, box, kind, t, a, col):
+    x0, y0, x1, y1 = box; d = ImageDraw.Draw(img); pts = []
+    for i in range(200):
+        u = i / 199; x = x0 + u * (x1 - x0)
+        if kind == "warn": v = 0.5 + 0.38 * math.sin(2 * math.pi * (u * 2.2 - t * 0.5))
+        else: v = 0.2 + 0.01 * math.sin(u * 40 + t * 6)
+        pts.append((x, y0 + v * (y1 - y0)))
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); dl = ImageDraw.Draw(lay); dl.line(pts, fill=col + (int(255 * a),), width=8)
+    img.alpha_composite(lay.filter(ImageFilter.GaussianBlur(6))); ImageDraw.Draw(img).line(pts, fill=(255, 255, 255, int(255 * a)), width=3)
+
+def sc_md_siren(img, sc, t, D, tg, k):
+    md_map(img, t, D, {"rest": 0.4}, zoom=(1.0, 1.0), dim=0.55)
+    a = ease(clamp(t / 0.35)); _md_top(img, a, "IF YOU HEAR A SIREN", "KNOW THE TWO SIGNALS", AMBER, 64, 92)
+    for j, (at, kind, ttl, sub, col) in enumerate([(sc.get("w_at", 1.2), "warn", "AIR RAID WARNING", "RISING & FALLING · 2 MIN", (255, 120, 80)),
+                                                    (sc.get("c_at", 5.0), "clear", "ALL CLEAR", "STEADY HIGH TONE · 2 MIN", (120, 225, 150))]):
+        b = ease(clamp((t - at) / 0.45)); y = 520 + j * 470
+        if b <= 0: continue
+        rect_a(img, (70, y, W - 70, y + 410), (8, 10, 18), 0.88 * b, 28, col, 3)
+        text_a(img, (110, y + 60), ttl, F("anton", 66), col, b, "lm"); text_a(img, (110, y + 125), sub, F("mono", 28), WHITE, b, "lm")
+        text_a(img, (W - 110, y + 60), "PITCH", F("mono", 22), (170, 180, 200), b * 0.8, "rm")
+        _wave(img, (110, y + 180, W - 110, y + 380), kind, t, b, col)
+    text_a(img, (W / 2, 1490), "AS ANNOUNCED BY PUNJAB GOVT FOR 27 NOV DRILL", F("mono", 22), (180, 190, 205), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_md_outro(img, sc, t, D, tg, k):
+    md_map(img, t, D, {"rest": 1.0}, zoom=(1.06, 1.0), dim=0.15)
+    a = ease(clamp(t / 0.35))
+    _md_top(img, a, "YOUR CITY?", "HAD A DRILL? COMMENT ↓", AMBER, 90, 84)
+    st = sc.get("card_at", max(1.2, D - 4.0)); a2 = clamp((t - st) / 0.35); p = back((t - st) / 0.5)
+    rect_a(img, (60, 1290, W - 60, 1530), (14, 10, 22), a2 * 0.95, 30, AMBER, 3)
+    big = R.LOGO.resize((140, 140), Image.LANCZOS); paste_a(img, big, (95, 1340), a2)
+    text_a(img, (265, 1350), "UNKNOWN UNCOVERED", F("unb", 40, 800), WHITE, a2)
+    rect_a(img, (265, 1420, 265 + int(330 * clamp(p, 0, 1.15)), 1496), (230, 30, 40), a2, 38)
+    text_a(img, (290, 1458), "SUBSCRIBE", F("disp", 36, "Black"), WHITE, clamp((t - st - 0.25) / 0.2), "lm")
+    rect_a(img, (615, 1420, 615 + int(330 * clamp(back((t - st - 0.3) / 0.5), 0, 1.15)), 1496), None, clamp((t - st - 0.3) / 0.3), 38, WHITE, 3)
+    text_a(img, (645, 1458), "FOLLOW", F("disp", 36, "Black"), WHITE, clamp((t - st - 0.5) / 0.2), "lm")
+    chrome(img, tg)
+
+R.SCENE_FN.update({"md_hook": sc_md_hook, "md_1971": sc_md_1971, "md_timeline": sc_md_timeline, "md_why": sc_md_why, "md_siren": sc_md_siren, "md_outro": sc_md_outro})
+
+
+# ---------------------------------------------------------------- reel 036 v2: tilted "camera" night map (perspective warp, depth blur, bloom, light beams)
+MC = 2400                                   # map canvas (square) covering MD_BOX
+def mc_xy(lon, lat):
+    lon0, lon1, lat0, lat1 = MD_BOX; s = MC / max((lon1 - lon0) * MD_SX, (lat1 - lat0))
+    ox = (MC - (lon1 - lon0) * MD_SX * s) / 2; oy = (MC - (lat1 - lat0) * s) / 2
+    return (ox + (lon - lon0) * MD_SX * s, oy + (lat1 - lat) * s)
+_M2 = {}
+def m2_layers():
+    if _M2: return _M2
+    g = json.load(open(os.path.join(R.ASSETS, "countries.geojson")))
+    ind = [f for f in g["features"] if f["properties"].get("ISO_A2") == "IN" or f["properties"].get("ADMIN") == "India"][0]["geometry"]
+    polys = ind["coordinates"] if ind["type"] == "MultiPolygon" else [ind["coordinates"]]
+    base = Image.new("RGBA", (MC, MC), (5, 8, 14, 255)); d = ImageDraw.Draw(base)
+    for gl in range(-180, 181, 2):          # faint graticule on the "table"
+        x0, _ = mc_xy(gl, 0); d.line([(x0, 0), (x0, MC)], fill=(18, 28, 44, 255), width=2)
+        _, y0 = mc_xy(0, gl); d.line([(0, y0), (MC, y0)], fill=(18, 28, 44, 255), width=2)
+    mask = Image.new("L", (MC, MC), 0); dm = ImageDraw.Draw(mask)
+    P = [[mc_xy(x, y) for x, y in poly[0]] for poly in polys]
+    for pts in P:
+        if len(pts) > 2: d.polygon([(x, y + 22) for x, y in pts], fill=(10, 16, 28, 255))      # slab side
+    for pts in P:
+        if len(pts) > 2: d.polygon(pts, fill=(18, 27, 44, 255)); dm.polygon(pts, fill=255)
+    tex = (np.random.default_rng(5).normal(0, 1, (MC // 8, MC // 8)) * 6).astype(np.int16)
+    tex = Image.fromarray(np.clip(128 + tex, 0, 255).astype(np.uint8)).resize((MC, MC), Image.BICUBIC).filter(ImageFilter.GaussianBlur(3))
+    shade = Image.new("RGBA", (MC, MC), (40, 60, 90, 0)); shade.putalpha(ImageChops.multiply(Image.eval(tex, lambda v: max(0, v - 118) * 6), mask))
+    base.alpha_composite(shade)
+    edge = Image.new("RGBA", (MC, MC), (0, 0, 0, 0)); de = ImageDraw.Draw(edge)
+    for pts in P:
+        if len(pts) > 2: de.line(pts + [pts[0]], fill=(120, 175, 235, 255), width=5)
+    base.alpha_composite(edge.filter(ImageFilter.GaussianBlur(14))); base.alpha_composite(edge)
+    rng = np.random.default_rng(36); M = np.array(mask) > 0; pts = []
+    for _, la, lo, w in MD_CITIES:
+        n = int(140 + w * 160); sg = 0.05 + 0.025 * w
+        rr = np.abs(rng.normal(0, sg, n)) ** 1.3 * 2.2; th = rng.uniform(0, 2 * np.pi, n)
+        pts += [(lo + r * np.cos(a), la + r * np.sin(a), 1.0 + w / 10 * (1 - min(1, r / (3 * sg)))) for r, a in zip(rr, th)]
+        pts += [(lo, la, 3.0)]
+    for _ in range(140):                    # highway-like strings between nearby cities
+        a, b = rng.choice(len(MD_CITIES), 2, replace=False); A, B = MD_CITIES[a], MD_CITIES[b]
+        if (A[1] - B[1]) ** 2 + (A[2] - B[2]) ** 2 > 30: continue
+        for u in rng.uniform(0, 1, 60): pts.append((A[2] + (B[2] - A[2]) * u + rng.normal(0, 0.04), A[1] + (B[1] - A[1]) * u + rng.normal(0, 0.04), 0.5))
+    lo_ = rng.uniform(MD_BOX[0], MD_BOX[1], 26000); la_ = rng.uniform(MD_BOX[2], MD_BOX[3], 26000)
+    pts += [(a, b, 0.25) for a, b in zip(lo_, la_)]
+    lay = {k_: Image.new("L", (MC, MC), 0) for k_ in list(MD_REG) + ["rest"]}; dr = {k_: ImageDraw.Draw(v) for k_, v in lay.items()}
+    for lo, la, wt in pts:
+        x, y = mc_xy(lo, la); xi, yi = int(x), int(y)
+        if not (0 <= xi < MC and 0 <= yi < MC) or not M[yi, xi]: continue
+        r = 1.3 if wt < 0.6 else (1.9 if wt < 1.5 else 3.2); v = int(255 * min(1.0, 0.25 + 0.3 * wt))
+        dr[md_region(lo, la)].ellipse([x - r, y - r, x + r, y + r], fill=v)
+    out = {}
+    for k_, L in lay.items():
+        glowL = L.filter(ImageFilter.GaussianBlur(5))
+        rgba = Image.new("RGBA", (MC, MC), (255, 170, 80, 0)); rgba.putalpha(Image.eval(glowL, lambda v: min(255, int(v * 2.0))))
+        c2 = Image.new("RGBA", (MC, MC), (255, 238, 200, 0)); c2.putalpha(L); rgba.alpha_composite(c2); out[k_] = rgba
+    _M2.update(base=base, lights=out); return _M2
+
+def _homog(src, dst):
+    A = []; bvec = []
+    for (x, y), (u, v) in zip(src, dst):
+        A.append([x, y, 1, 0, 0, 0, -u * x, -u * y]); bvec.append(u)
+        A.append([0, 0, 0, x, y, 1, -v * x, -v * y]); bvec.append(v)
+    h = np.linalg.solve(np.array(A, float), np.array(bvec, float)); return np.append(h, 1).reshape(3, 3)
+
+def m2_cam(focus, dist, tilt):
+    """pinhole camera over the flat map: looks at map point `focus` (lon,lat) from pitch phi (90 deg = top-down),
+    `dist` = canvas px spanning the screen width at the focus. Returns the canvas->screen homography."""
+    fx, fy = mc_xy(*focus); phi = math.radians(90 - 52 * tilt); d = 3000.0; f = W * d / dist
+    C = np.array([0, -d * math.cos(phi), d * math.sin(phi)]); fwd = -C / np.linalg.norm(C)
+    right = np.array([1.0, 0, 0]); up = np.cross(right, fwd); up = up / np.linalg.norm(up)
+    def pj(x, y):
+        v = np.array([x - fx, fy - y, 0.0]) - C; zc = v @ fwd
+        return (540 + f * (v @ right) / zc, 1060 - f * (v @ up) / zc)
+    src = [(fx - 600, fy - 600), (fx + 600, fy - 600), (fx + 600, fy + 600), (fx - 600, fy + 600)]
+    return _homog(src, [pj(*p_) for p_ in src])
+
+def m2_frame(img, t, D, lvl, cam0, cam1, dim=0.0, dof=1.0):
+    """render the tilted map; cam = (focus(lon,lat), dist, tilt) eased from cam0 to cam1 across the scene. returns proj(lon,lat)->screen."""
+    L = m2_layers(); k = ease_io(clamp(t / max(D, 0.1)))
+    f = (cam0[0][0] + (cam1[0][0] - cam0[0][0]) * k, cam0[0][1] + (cam1[0][1] - cam0[0][1]) * k)
+    Hm = m2_cam(f, cam0[1] + (cam1[1] - cam0[1]) * k, cam0[2] + (cam1[2] - cam0[2]) * k)
+    key = tuple(round(clamp(lvl.get(r_, lvl.get("rest", 1.0))), 2) for r_ in list(MD_REG) + ["rest"])
+    can = _M2.get(("can", key))
+    if can is None:
+        can = L["base"].copy()
+        for r_, a in zip(list(MD_REG) + ["rest"], key):
+            if a <= 0.01: continue
+            im = L["lights"][r_]
+            if a < 0.99: im = im.copy(); im.putalpha(Image.eval(im.getchannel("A"), lambda v, a=a: int(v * a)))
+            can.alpha_composite(im)
+        if len([x for x in _M2 if isinstance(x, tuple)]) > 6:
+            for x in [x for x in _M2 if isinstance(x, tuple)][:3]: _M2.pop(x)
+        _M2[("can", key)] = can
+    Hi = np.linalg.inv(Hm); Hi = Hi / Hi[2, 2]
+    fr = can.transform((W, H), Image.PERSPECTIVE, tuple(Hi.flatten()[:8]), Image.BILINEAR, fillcolor=(5, 8, 14, 255))
+    # depth of field: blur the far (upper) part
+    if dof > 0:
+        bl = fr.filter(ImageFilter.GaussianBlur(5 * dof)); m = Image.linear_gradient("L").resize((W, H)).transpose(Image.FLIP_TOP_BOTTOM)
+        m = Image.eval(m, lambda v: int(clamp((v - 110) / 120.0) * 255)); fr = Image.composite(bl, fr, m)
+    bloom = fr.resize((W // 4, H // 4)).filter(ImageFilter.GaussianBlur(10)).resize((W, H), Image.BILINEAR)
+    fr = ImageChops.add(fr.convert("RGB"), Image.eval(bloom.convert("RGB"), lambda v: int(v * 0.45))).convert("RGBA")
+    if dim > 0: fr.alpha_composite(Image.new("RGBA", (W, H), (4, 6, 12, int(255 * dim))))
+    sky = Image.new("RGBA", (W, H), (0, 0, 0, 0)); ds = ImageDraw.Draw(sky)
+    for i in range(0, 520, 4): ds.rectangle([0, i, W, i + 4], fill=(3, 5, 10, int(255 * (1 - i / 520) ** 1.4)))
+    fr.alpha_composite(sky); img.alpha_composite(fr)
+    def proj(lon, lat):
+        x, y = mc_xy(lon, lat); v = Hm @ np.array([x, y, 1.0]); return (v[0] / v[2], v[1] / v[2])
+    return proj
+
+def m2_beam(img, p, label, sub, a, col=AMBER, h=150, side=0):
+    if a <= 0: return
+    x, y = p; top = y - h * ease(a)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for i in range(6): d.line([(x, y), (x, top)], fill=col + (int(40 * a),), width=14 - 2 * i)
+    d.line([(x, y), (x, top)], fill=(255, 240, 210, int(230 * a)), width=3)
+    d.ellipse([x - 10, y - 5, x + 10, y + 5], fill=col + (int(255 * a),)); img.alpha_composite(lay.filter(ImageFilter.GaussianBlur(1)))
+    f1 = F("anton", 42); f2 = F("mono", 22); tx = x + side
+    bb = ImageDraw.Draw(img).textbbox((tx, top - 46), label, font=f1, anchor="mm"); bb2 = ImageDraw.Draw(img).textbbox((tx, top - 14), sub, font=f2, anchor="mm")
+    rect_a(img, (min(bb[0], bb2[0]) - 14, bb[1] - 8, max(bb[2], bb2[2]) + 14, bb2[3] + 10), (6, 8, 14), 0.82 * a, 10, col, 2)
+    text_a(img, (tx, top - 46), label, f1, WHITE, a, "mm"); text_a(img, (tx, top - 14), sub, f2, col, a, "mm")
+
+def _hd(img, a, l1, l2, c1=AMBER, s1=70, s2=110, y=230):
+    text_a(img, (W / 2, y), l1, fit_font("anton", s1, l1, W - 120), c1, a, "mm", shadow=12)
+    text_a(img, (W / 2, y + 112), l2, fit_font("anton", s2, l2, W - 90), WHITE, a, "mm", shadow=16)
+
+CAM_IN = ((79.5, 22.5), 1900, 0.55)
+def sc_m2_hook(img, sc, t, D, tg, k):
+    off = sc.get("off_at", 3.0); q = ease(clamp((t - off) / 1.0))
+    pr = m2_frame(img, t, D, {"punjab": 1 - 0.95 * q}, ((75.8, 29.0), 1050, 0.75), ((75.5, 30.0), 820, 0.8))
+    m2_beam(img, pr(75.4, 30.85), "PUNJAB", "ALL DISTRICTS", ease(clamp((t - 0.2) / 0.5)), AMBER, 170)
+    _hd(img, 1.0, "27 NOVEMBER 2026 · 8 PM", "SIRENS. THEN DARKNESS.")
+    nb = ease(clamp((t - sc.get("but_at", D - 2)) / 0.4))
+    if nb > 0: _tag(img, (W / 2, 520), "THE REAL STORY: 54 YEARS OLD", 56, AMBER, nb)
+    chrome(img, tg)
+
+def sc_m2_1971(img, sc, t, D, tg, k):
+    m2_frame(img, t, D, {"rest": 0.35}, ((80, 21), 2300, 0.5), ((80, 22), 2100, 0.55), dim=0.25)
+    a = ease(clamp(t / 0.3)); g = ease(clamp((t - 0.5) / max(1.0, D - 2.0)))
+    text_a(img, (W / 2, 250), "1971", F("anton", 120), (200, 210, 225), a, "mm", shadow=12)
+    text_a(img, (W / 2, 330), "↓", F("anton", 60), (200, 210, 225), a, "mm")
+    text_a(img, (W / 2, 520), f"{int(round(54 * g))}", F("anton", 330), AMBER, a, "mm", shadow=20)
+    text_a(img, (W / 2, 730), "YEARS WITHOUT A DRILL THIS BIG", fit_font("anton", 62, "YEARS WITHOUT A DRILL THIS BIG", W - 120), WHITE, a, "mm", shadow=12)
+    text_a(img, (W / 2, 800), "AS REPORTED BY NEWS MEDIA, MAY 2025", F("mono", 24), (190, 200, 215), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_m2_2025(img, sc, t, D, tg, k):
+    pr = m2_frame(img, t, D, {"rest": 1.0}, ((80, 22), 2100, 0.55), ((80, 22.5), 1900, 0.6))
+    a = ease(clamp(t / 0.3)); da = sc.get("d_at", 1.5); b = ease(clamp((t - da) / 1.4))
+    cx, cy = pr(80, 22.5)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for i in range(4):                       # one-day pulse spreading over the country (abstract, no district positions)
+        r = ((t * 260 + i * 230) % 920); al = int(120 * (1 - r / 920) * a)
+        d.ellipse([cx - r, cy - r * 0.42, cx + r, cy + r * 0.42], outline=AMBER + (al,), width=4)
+    img.alpha_composite(lay)
+    _hd(img, a, "7 MAY 2025 · ONE DAY", "NATIONWIDE DRILL", y=230)
+    if t > da:
+        text_a(img, (W / 2, 560), f"{int(244 * b)}", F("anton", 230), WHITE, clamp((t - da) / 0.3), "mm", shadow=18)
+        text_a(img, (W / 2, 710), "CIVIL DEFENCE DISTRICTS", F("anton", 62), AMBER, clamp((t - da) / 0.3), "mm", shadow=10)
+    chrome(img, tg)
+
+def sc_m2_timeline(img, sc, t, D, tg, k):
+    ev = sc["events"]; lvl = {}
+    for e in ev: lvl[e[1]] = 1 - 0.93 * ease(clamp((t - e[0]) / 0.7))
+    pr = m2_frame(img, t, D, lvl, ((83, 24.5), 1800, 0.6), ((83, 25), 1650, 0.65))
+    for e in ev:
+        a = ease(clamp((t - e[0]) / 0.45)); (cx, cy), _, _ = MD_REG[e[1]]
+        m2_beam(img, pr(cx, cy), e[2], e[3], a, AMBER, e[4] if len(e) > 4 else 150, e[5] if len(e) > 5 else 0)
+    a = ease(clamp(t / 0.3)); n = sum(1 for e in ev if t > e[0])
+    _hd(img, a, "AND IT DIDN'T STOP", f"2026: {n} STATES & UTs" if n > 1 else ("2026: 1 STATE/UT" if n else "2026"), y=230)
+    text_a(img, (W / 2, 440), "DRILLS FOUND IN NEWS REPORTS · NOT A COMPLETE LIST", F("mono", 22), (190, 200, 215), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_m2_why(img, sc, t, D, tg, k):
+    m2_frame(img, t, D, {"rest": 0.5}, ((80, 22), 2000, 0.6), ((80, 22), 2200, 0.55), dim=0.5)
+    sc2 = dict(sc); sc_md_why_body(img, sc2, t, D); chrome(img, tg)
+
+def sc_md_why_body(img, sc, t, D):
+    a = ease(clamp(t / 0.35))
+    text_a(img, (W / 2, 290), "WHY?", F("anton", 200), AMBER, a, "mm", shadow=16)
+    q = "“AS PER THE DIRECTIVES OF THE MINISTRY OF HOME AFFAIRS”"; b = ease(clamp((t - sc.get("mha_at", 1.0)) / 0.5))
+    rect_a(img, (80, 470, W - 80, 640), (8, 10, 18), 0.88 * b, 22, AMBER, 3)
+    text_a(img, (W / 2, 530), q, fit_font("anton", 46, q, W - 220), WHITE, b, "mm")
+    s2 = "STATE GOVERNMENT STATEMENTS · PUNJAB, UP, BIHAR, MEGHALAYA"
+    text_a(img, (W / 2, 595), s2, fit_font("mono", 22, s2, W - 220), (190, 200, 215), b, "mm")
+    ch = sc.get("chips_at", [2, 3, 4])
+    text_a(img, (W / 2, 760), "TO TEST", F("anton", 56), (200, 210, 225), ease(clamp((t - ch[0] + 0.3) / 0.4)), "mm")
+    for i, (lbl, at) in enumerate(zip(["AIR RAID SIRENS", "BLACKOUT", "RESCUE TEAMS"], ch)):
+        c = ease(clamp((t - at) / 0.4)); y = 860 + i * 150
+        rect_a(img, (190, y, W - 190, y + 120), (10, 12, 20), 0.88 * c, 60, AMBER, 3); text_a(img, (W / 2, y + 60), lbl, F("anton", 64), WHITE, c, "mm")
+
+def sc_m2_siren(img, sc, t, D, tg, k):
+    m2_frame(img, t, D, {"rest": 0.4}, ((80, 22), 2200, 0.55), ((80, 22), 2000, 0.6), dim=0.6)
+    a = ease(clamp(t / 0.35)); _hd(img, a, "IF YOU HEAR A SIREN", "KNOW THE TWO SIGNALS", AMBER, 64, 92)
+    for j, (at, kind, ttl, sub, col) in enumerate([(sc.get("w_at", 1.2), "warn", "AIR RAID WARNING", "RISING & FALLING · 2 MIN", (255, 120, 80)),
+                                                    (sc.get("c_at", 5.0), "clear", "ALL CLEAR", "STEADY HIGH TONE · 2 MIN", (120, 225, 150))]):
+        b = ease(clamp((t - at) / 0.45)); y = 520 + j * 470
+        if b <= 0: continue
+        rect_a(img, (70, y, W - 70, y + 410), (8, 10, 18), 0.9 * b, 28, col, 3)
+        text_a(img, (110, y + 60), ttl, F("anton", 66), col, b, "lm"); text_a(img, (110, y + 125), sub, F("mono", 28), WHITE, b, "lm")
+        _wave(img, (110, y + 180, W - 110, y + 380), kind, t, b, col)
+    text_a(img, (W / 2, 1490), "AS ANNOUNCED BY PUNJAB GOVT FOR THE 27 NOV DRILL", F("mono", 22), (180, 190, 205), a, "mm", shadow=4)
+    chrome(img, tg)
+
+def sc_m2_outro(img, sc, t, D, tg, k):
+    m2_frame(img, t, D, {"rest": 1.0}, ((80, 22), 1900, 0.6), ((80, 21.5), 2400, 0.5), dim=0.1)
+    a = ease(clamp(t / 0.3))
+    text_a(img, (W / 2, 230), "54 YEARS: NONE THIS BIG", fit_font("anton", 70, "54 YEARS: NONE THIS BIG", W - 120), (200, 210, 225), a, "mm", shadow=12)
+    text_a(img, (W / 2, 340), "NOW: AGAIN AND AGAIN", fit_font("anton", 100, "NOW: AGAIN AND AGAIN", W - 100), AMBER, a, "mm", shadow=16)
+    qa = ease(clamp((t - sc.get("q_at", 2.5)) / 0.4))
+    if qa > 0: _tag(img, (W / 2, 470), "DRILL IN YOUR CITY? COMMENT ↓", 50, WHITE, qa)
+    st = sc.get("card_at", max(1.2, D - 3.5)); a2 = clamp((t - st) / 0.35); p = back((t - st) / 0.5)
+    rect_a(img, (60, 1290, W - 60, 1530), (14, 10, 22), a2 * 0.95, 30, AMBER, 3)
+    big = R.LOGO.resize((140, 140), Image.LANCZOS); paste_a(img, big, (95, 1340), a2)
+    text_a(img, (265, 1350), "UNKNOWN UNCOVERED", F("unb", 40, 800), WHITE, a2)
+    rect_a(img, (265, 1420, 265 + int(330 * clamp(p, 0, 1.15)), 1496), (230, 30, 40), a2, 38)
+    text_a(img, (290, 1458), "SUBSCRIBE", F("disp", 36, "Black"), WHITE, clamp((t - st - 0.25) / 0.2), "lm")
+    rect_a(img, (615, 1420, 615 + int(330 * clamp(back((t - st - 0.3) / 0.5), 0, 1.15)), 1496), None, clamp((t - st - 0.3) / 0.3), 38, WHITE, 3)
+    text_a(img, (645, 1458), "FOLLOW", F("disp", 36, "Black"), WHITE, clamp((t - st - 0.5) / 0.2), "lm")
+    chrome(img, tg)
+
+R.SCENE_FN.update({"m2_hook": sc_m2_hook, "m2_1971": sc_m2_1971, "m2_2025": sc_m2_2025, "m2_timeline": sc_m2_timeline, "m2_why": sc_m2_why,
+                   "m2_siren": sc_m2_siren, "m2_outro": sc_m2_outro})
+
+
+# ---------------------------------------------------------------- reel 036 (BrahMos style): photo-led why + siren scenes
+def sc_mdp_why(img, sc, t, D, tg, k):
+    sc_bm_twist(img, sc, t, D, tg, k)
+    qa = sc.get("q_at", D - 3.0)
+    if t > qa:
+        b = ease(clamp((t - qa) / 0.45))
+        rect_a(img, (90, 1250, W - 90, 1400), (8, 10, 14), 0.82 * b, 24, T["accent"], 4)
+        text_a(img, (W / 2, 1325 + 12 * (1 - b)), sc.get("q", ""), fit_font("anton", 70, sc.get("q", ""), W - 240), WHITE, b, "mm")
+
+def sc_mdp_siren(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.62); A = T["accent"]; a = ease(clamp(t / 0.4))
+    text_a(img, (W / 2, 280), "IF YOU HEAR A SIREN", F("mono", 34), A, a, "mm", shadow=4)
+    for j, (at, kind, ttl, sub, col) in enumerate([(sc.get("w_at", 1.0), "warn", "DANGER WARNING", "RISING & FALLING · 2 MIN", (255, 110, 80)),
+                                                    (sc.get("c_at", 4.0), "clear", "ALL CLEAR", "STEADY HIGH TONE · 2 MIN", (120, 225, 150))]):
+        b = ease(clamp((t - at) / 0.45)); y = 400 + j * 450
+        if b <= 0: continue
+        rect_a(img, (90, y, W - 90, y + 400), (6, 8, 12), 0.66 * b, 18); rect_a(img, (90, y, 97, y + 400), col, b)
+        text_a(img, (140 + 30 * (1 - b), y + 70), ttl, F("anton", 84), col, b, "lm"); text_a(img, (140, y + 140), sub, F("mono", 28), WHITE, b, "lm")
+        _wave(img, (140, y + 190, W - 140, y + 370), kind, t, b, col)
+    text_a(img, (W / 2, 1300), "AS ANNOUNCED BY PUNJAB GOVT FOR 27 NOV", F("mono", 24), (210, 210, 205), a, "mm", shadow=4)
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+R.SCENE_FN.update({"mdp_why": sc_mdp_why, "mdp_siren": sc_mdp_siren})
 
 
 if __name__ == "__main__":
