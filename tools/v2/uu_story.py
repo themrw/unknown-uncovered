@@ -2673,7 +2673,7 @@ def _cards(img, t, cards, ats, y0=600, step=230):
 def sc_bm_report(img, sc, t, D, tg, k):
     cine_bg(img, sc, t, D, k, dark=0.6); a = ease(clamp(t / 0.4))
     text_a(img, (W / 2, 280), typed(sc.get("kicker", ""), prog(t, 0.1, 0.8)), F("mono", 30), T["accent"], 0.95, "mm", shadow=4)
-    fl = R.flag("IN", 120); paste_a(img, fl, (W / 2 - fl.width / 2, 340), a)
+    if sc.get("flag", "IN"): fl = R.flag(sc.get("flag", "IN"), 120); paste_a(img, fl, (W / 2 - fl.width / 2, 340), a)
     ats = sc.get("c_at", [0.4, 3.0, 6.0]); _cards(img, t, sc.get("cards", []), ats)
     wa = sc.get("why_at", ats[-1] + 1.5)
     if t > wa:
