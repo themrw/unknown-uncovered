@@ -1,0 +1,208 @@
+{
+ "format": "story",
+ "theme": "orbit",
+ "look": "cinematic",
+ "speed": 1.08,
+ "lead": 0.2,
+ "tail": 0.35,
+ "punch": true,
+ "captions": true,
+ "caption_y": 1520,
+ "siren": [],
+ "header": "UNKNOWN UNCOVERED",
+ "squeeze": false,
+ "source": "Sources: TeleGeography · ICPC · Windward · NetBlocks · Reuters/AP",
+ "ticker": "IRAN · UNDERSEA INTERNET CABLES",
+ "voice_job": "037_main",
+ "credits_from": [
+  "media/037_cables/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "bm_hook",
+   "instant": true,
+   "bg": "media/037_cables/hormuz_0.jpg",
+   "top": "INTERNET OFF?",
+   "top2": "CAN IRAN SWITCH OFF THE WORLD'S INTERNET?",
+   "facts": [
+    [
+     "NO",
+     "the short answer"
+    ],
+    [
+     "6",
+     "live cables under Hormuz"
+    ],
+    [
+     "~200",
+     "cable faults every year"
+    ]
+   ],
+   "vo": "क्या ईरान पूरी दुनिया का इंटरनेट बंद कर सकता है? सीधा जवाब है, नहीं। पर असली कहानी और भी दिलचस्प है।",
+   "f_at": [
+    4.18,
+    4.69,
+    5.85
+   ]
+  },
+  {
+   "type": "bm_report",
+   "flag": null,
+   "bg": "media/037_cables/hormuz_3.jpg",
+   "kicker": "IRAN'S IRGC · OCTOBER 2026 · A THREAT, NOT AN ACTION",
+   "cards": [
+    [
+     "WHO",
+     "IRAN'S IRGC",
+     "accent"
+    ],
+    [
+     "CONDITION",
+     "IF IRAN'S INFRASTRUCTURE IS HIT",
+     "accent"
+    ],
+    [
+     "CLAIM",
+     "\"7 MAJOR CABLES UNDER HORMUZ\"",
+     "bad"
+    ]
+   ],
+   "why": "Reported by AFP/Yahoo News, Iran International, Windward",
+   "vo": "अक्टूबर में ईरान की आईआरजीसी ने धमकी दी, कि अगर उसके ढाँचे पर हमला हुआ, तो होर्मुज़ के नीचे की सात बड़ी इंटरनेट केबल भी निशाने पर होंगी।",
+   "c_at": [
+    1.08,
+    2.49,
+    5.39
+   ],
+   "why_at": 7.06
+  },
+  {
+   "type": "bm_report",
+   "flag": null,
+   "bg": "media/037_cables/night_1.jpg",
+   "kicker": "TELEGEOGRAPHY · WINDWARD · 2026",
+   "cards": [
+    [
+     "CABLE SYSTEMS WORLDWIDE",
+     "607",
+     "accent"
+    ],
+    [
+     "LIVE CABLES UNDER HORMUZ",
+     "6",
+     "bad"
+    ],
+    [
+     "INTERCONTINENTAL DATA ON CABLES",
+     "99%+",
+     "accent"
+    ]
+   ],
+   "why": "Analysts: global internet unlikely to go down",
+   "vo": "पर दुनिया में छह सौ से ज़्यादा केबल सिस्टम हैं, और होर्मुज़ से सिर्फ़ छह चालू केबल गुज़रती हैं।",
+   "c_at": [
+    0.7,
+    3.49,
+    4.83
+   ],
+   "why_at": 5.53
+  },
+  {
+   "type": "bm_twist",
+   "bg": "media/037_cables/ship_0.jpg",
+   "kicker": "THE TWIST",
+   "l1": [
+    "EVERY YEAR",
+    "~200 CABLE FAULTS"
+   ],
+   "l2": [
+    "THAT IS",
+    "~4 EVERY WEEK"
+   ],
+   "l3": [
+    "MOSTLY",
+    "SHIP ANCHORS & FISHING"
+   ],
+   "vo": "और चौंकाने वाली बात, हर साल करीब दो सौ केबल वैसे भी टूटती हैं, यानी हर हफ़्ते लगभग चार, ज़्यादातर जहाज़ों के लंगर और मछली के जालों से।",
+   "l_at": [
+    1.2,
+    4.11,
+    5.35
+   ]
+  },
+  {
+   "type": "bm_report",
+   "flag": null,
+   "bg": "media/037_cables/gulf_2.jpg",
+   "kicker": "WHO WOULD FEEL IT MOST?",
+   "cards": [
+    [
+     "NO SUBSEA ROUTE AVOIDING HORMUZ",
+     "IRAQ · KUWAIT · BAHRAIN · QATAR",
+     "bad"
+    ],
+    [
+     "SOME HORMUZ CABLES ALSO LINK",
+     "IRAN ITSELF",
+     "accent"
+    ]
+   ],
+   "why": "Source: Windward analysis of cable routes, Oct 2026",
+   "vo": "असली असर खाड़ी देशों पर होगा। इराक़, कुवैत, बहरीन और क़तर की हर समुद्री केबल होर्मुज़ से होकर जाती है, और कुछ केबल ख़ुद ईरान को भी जोड़ती हैं।",
+   "c_at": [
+    1.77,
+    6.51
+   ],
+   "why_at": 7.68
+  },
+  {
+   "type": "bm_report",
+   "flag": "IN",
+   "bg": "media/037_cables/mumbai_0.jpg",
+   "kicker": "AND INDIA?",
+   "cards": [
+    [
+     "CABLES LANDING NEAR MUMBAI",
+     "~13 OF 17",
+     "accent"
+    ],
+    [
+     "TRAFFIC HEADING WEST*",
+     "~60%",
+     "bad"
+    ],
+    [
+     "RED SEA CUTS · SEP 2025",
+     "SLOWER, NOT SHUT",
+     "good"
+    ]
+   ],
+   "why": "*industry estimate · NetBlocks, Microsoft, Cloudflare reports",
+   "vo": "और भारत? हमारी करीब तेरह केबल मुंबई के पास उतरती हैं। सितंबर दो हज़ार पच्चीस में लाल सागर में केबल कटीं, तो भारत में इंटरनेट धीमा हुआ था, बंद नहीं।",
+   "c_at": [
+    1.16,
+    2.44,
+    3.67
+   ],
+   "why_at": 8.5
+  },
+  {
+   "type": "or_outro",
+   "bg": "media/037_cables/hormuz_1.jpg",
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "Internet: won't switch off",
+     "WHITE"
+    ],
+    [
+     "Speed: could slow",
+     "accent"
+    ]
+   ],
+   "vo": "यानी दुनिया का इंटरनेट बंद नहीं होगा, पर स्पीड पर असर पड़ सकता है। आप क्या सोचते हैं? कमेंट करें, और Unknown Uncovered को सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ]
+}
