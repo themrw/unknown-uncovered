@@ -1,0 +1,199 @@
+{
+ "format": "story",
+ "theme": "orbit",
+ "look": "cinematic",
+ "speed": 1.08,
+ "lead": 0.2,
+ "tail": 0.35,
+ "punch": true,
+ "captions": true,
+ "caption_y": 1520,
+ "siren": [],
+ "header": "UNKNOWN UNCOVERED",
+ "squeeze": false,
+ "source": "Sources: MEA · Exim Bank · IDEAS Guidelines 2022 · RBI",
+ "ticker": "INDIA'S LINES OF CREDIT",
+ "voice_job": "038_main",
+ "credits_from": [
+  "media/038_loc/credits.json"
+ ],
+ "scenes": [
+  {
+   "type": "bm_hook",
+   "instant": true,
+   "bg": "media/038_loc/metro_1.jpg",
+   "top": "$32 BN",
+   "top2": "INDIA'S LOANS TO 68 COUNTRIES",
+   "facts": [
+    [
+     "68",
+     "countries"
+    ],
+    [
+     "#1",
+     "Bangladesh"
+    ],
+    [
+     "75%",
+     "the hidden rule"
+    ]
+   ],
+   "vo": "भारत ने अड़सठ देशों को, करीब बत्तीस अरब डॉलर का कर्ज़ दिया है। पर इस कर्ज़ की एक शर्त ऐसी है, जिससे इसका बड़ा हिस्सा भारतीय कंपनियों के पास ही लौटता है।",
+   "f_at": [
+    0.42,
+    4.1,
+    5.17
+   ]
+  },
+  {
+   "type": "bm_report",
+   "flag": "IN",
+   "bg": "media/038_loc/metro_2.jpg",
+   "kicker": "MINISTRY OF EXTERNAL AFFAIRS · LINES OF CREDIT",
+   "cards": [
+    [
+     "LINES OF CREDIT",
+     "300+",
+     "accent"
+    ],
+    [
+     "COUNTRIES",
+     "68",
+     "accent"
+    ],
+    [
+     "AFRICA · 42 NATIONS",
+     "$12 BN",
+     "good"
+    ]
+   ],
+   "why": "Concessional loans via Exim Bank (IDEAS scheme)",
+   "vo": "विदेश मंत्रालय के मुताबिक़, तीन सौ से ज़्यादा लाइन्स ऑफ़ क्रेडिट दी गई हैं। और अकेले अफ़्रीका के बयालीस देशों को, करीब बारह अरब डॉलर।",
+   "c_at": [
+    1.59,
+    3.93,
+    5.03
+   ],
+   "why_at": 7.59
+  },
+  {
+   "type": "ln_map",
+   "bg": "media/038_loc/dhaka_1.jpg",
+   "kicker": "NEIGHBOURHOOD FIRST · MEA",
+   "center": [
+    19.0,
+    82.0
+   ],
+   "gr": 1150,
+   "items": [
+    [
+     "MV",
+     "MALDIVES",
+     "$1.43 BN",
+     73.5,
+     4.2,
+     "l"
+    ],
+    [
+     "NP",
+     "NEPAL",
+     "$1.65 BN",
+     85.3,
+     27.7,
+     "l"
+    ],
+    [
+     "LK",
+     "SRI LANKA",
+     "$2+ BN",
+     80.7,
+     7.9,
+     "r"
+    ],
+    [
+     "BD",
+     "BANGLADESH · #1",
+     "$7.86 BN",
+     90.4,
+     23.8,
+     "r"
+    ]
+   ],
+   "note": "BIGGEST SHARE: INDIA'S NEIGHBOURS",
+   "vo": "सबसे बड़ा हिस्सा पड़ोसियों का है। मालदीव करीब एक दशमलव चार अरब डॉलर, नेपाल एक दशमलव छह, श्रीलंका दो अरब से ज़्यादा, और नंबर वन बांग्लादेश, करीब सात दशमलव नौ अरब डॉलर!",
+   "i_at": [
+    2.27,
+    4.62,
+    5.89,
+    8.5
+   ],
+   "note_at": 10.13
+  },
+  {
+   "type": "bm_twist",
+   "bg": "media/038_loc/ship_0.jpg",
+   "kicker": "THE 75% RULE",
+   "l1": [
+    "INDIA'S RULE",
+    "IDEAS GUIDELINES 2022"
+   ],
+   "l2": [
+    "AT LEAST",
+    "75% OF CONTRACT VALUE"
+   ],
+   "l3": [
+    "MUST BE",
+    "SOURCED FROM INDIA"
+   ],
+   "vo": "अब असली शर्त। भारत के नियमों के मुताबिक़, इस कर्ज़ से होने वाले कॉन्ट्रैक्ट का कम से कम पचहत्तर प्रतिशत सामान और सेवाएँ, भारत से ही ख़रीदनी होती हैं।",
+   "l_at": [
+    0.73,
+    4.6,
+    6.99
+   ]
+  },
+  {
+   "type": "bm_report",
+   "flag": null,
+   "bg": "media/038_loc/dornier_0.jpg",
+   "kicker": "HOW IT WORKS · RBI CIRCULARS",
+   "cards": [
+    [
+     "GUYANA · $23.37 MN LOAN",
+     "2 HAL DORNIER 228 AIRCRAFT",
+     "accent"
+    ],
+    [
+     "MALDIVES · RS 4,850 CR LINE",
+     "75% FROM INDIA",
+     "good"
+    ]
+   ],
+   "why": "RBI circulars on Exim Bank lines of credit",
+   "vo": "जैसे गयाना को मिले कर्ज़ से, एचएएल के दो डॉर्नियर विमान ख़रीदे जाने थे। और मालदीव की चार हज़ार आठ सौ पचास करोड़ रुपये की लाइन पर भी, यही पचहत्तर प्रतिशत वाली शर्त है।",
+   "c_at": [
+    0.22,
+    4.73
+   ],
+   "why_at": 8.57
+  },
+  {
+   "type": "or_outro",
+   "bg": "media/038_loc/male_0.jpg",
+   "highlight": [
+    "IN"
+   ],
+   "lines": [
+    [
+     "Loans + friendship",
+     "WHITE"
+    ],
+    [
+     "+ business for India",
+     "accent"
+    ]
+   ],
+   "vo": "यानी कर्ज़ भी, दोस्ती भी, और भारतीय कंपनियों का कारोबार भी। आपको ये मॉडल कैसा लगा? कमेंट करें, और Unknown Uncovered को सब्सक्राइब और फ़ॉलो करें।"
+  }
+ ]
+}
