@@ -315,6 +315,9 @@ if theme in ("orbit", "ocean", "forensic", "gold"):   # cinematic space thriller
         if ty == "md_timeline":
             for e in sc.get("events", []): add(music, boom(0.5, 60, 5, 2), ST[i] + e[0] + 0.1, 0.5)
         if ty == "md_why": hit(sc.get("mha_at", 1) + 0.2, 0.5)
+        if ty == "ln_map":
+            for j_, a_ in enumerate(sc.get("i_at", [])): add(music, boom(0.5, 60, 5, 2), ST[i] + a_ + 0.8, 0.45 if j_ < len(sc.get("i_at", [])) - 1 else 0.0)
+            if sc.get("i_at"): hit(sc["i_at"][-1] + 0.8, 0.8)
         if ty == "mdp_why": hit(sc.get("q_at", 6) + 0.1, 0.6)
         if ty == "mdp_siren": add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get("w_at", 1.0), 0.4); add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get("c_at", 4.0), 0.4)
         if ty == "md_siren": add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get("w_at", 1.5), 0.4); add(music, boom(0.5, 70, 5, 2), ST[i] + sc.get("c_at", 5), 0.4)

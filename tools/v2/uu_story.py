@@ -3690,5 +3690,48 @@ def sc_mdp_siren(img, sc, t, D, tg, k):
 R.SCENE_FN.update({"mdp_why": sc_mdp_why, "mdp_siren": sc_mdp_siren})
 
 
+# ---------------------------------------------------------------- reel 038: India's lines of credit (neighbour arcs on the globe)
+def sc_ln_map(img, sc, t, D, tg, k):
+    cine_bg(img, sc, t, D, k, dark=0.62); A = T["accent"]
+    G = R.GLOBE; c = sc.get("center", [18.0, 84.0]); lat0, lon0 = c[0], c[1] + 3 * ease_io(clamp(t / max(D, 1)))
+    codes = ["IN"] + [b[0] for b in sc["items"]]
+    g = G.render(lat0, lon0, highlight=codes, hl_alpha=0.85, dim_others=0.0)
+    gr = sc.get("gr", 600); s_ = gr / G.R; gs = g.resize((int(g.width * s_), int(g.height * s_)), Image.LANCZOS)
+    cx, cy = W / 2, 900; a = clamp((t - 0.1) / 0.5)
+    paste_a(img, gs, (cx - gs.width / 2, cy - gs.height / 2), a)
+    def P(lo, la):
+        p, v = G.project(np.radians([lo]), np.radians([la]), math.radians(lat0), math.radians(lon0))
+        return cx + (p[0][0] - G.S / 2) * s_, cy + (p[0][1] - G.S / 2) * s_
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    ix, iy = P(78.0, 21.5); glow_dot(lay, ix, iy, 9, (255, 160, 60), a)
+    text_a(img, (W / 2, 280), sc.get("kicker", ""), F("mono", 32), A, ease(clamp(t / 0.4)), "mm", shadow=4)
+    ats = sc.get("i_at", [0.8, 1.6, 2.4, 3.2])
+    for i, it in enumerate(sc["items"]):
+        cc, nm, val, lo, la, side = it; b = clamp((t - ats[i]) / 0.8)
+        if b <= 0: continue
+        x1, y1 = P(lo, la); mx, my = (ix + x1) / 2, min(iy, y1) - 90
+        pts = [((1 - f) ** 2 * ix + 2 * (1 - f) * f * mx + f * f * x1, (1 - f) ** 2 * iy + 2 * (1 - f) * f * my + f * f * y1) for f in np.linspace(0, ease(b), 40)]
+        d.line(pts, fill=A + (230,), width=4)
+        if b >= 1:
+            glow_dot(lay, x1, y1, 8, A); top = i == len(sc["items"]) - 1
+            sd = 1 if side == "r" else -1; fl = R.flag(cc, 58)
+            tx = x1 + 22 * sd; anc = "lm" if sd > 0 else "rm"
+            bw = max(F("anton", 46 if top else 36).getlength(val), F("mono", 24).getlength(nm)) + 90
+            bx0 = tx if sd > 0 else tx - bw
+            rect_a(img, (bx0 - 8, y1 - 52, bx0 + bw + 8, y1 + 46), (6, 8, 14), 0.78, 12, A if top else None, 3 if top else 0)
+            lay.alpha_composite(fl, (int(bx0 + 4), int(y1 - 42)))
+            d.text((bx0 + 74, y1 - 18), val, font=F("anton", 46 if top else 36), fill=(A if top else (255, 255, 255)) + (255,), anchor="lm")
+            d.text((bx0 + 74, y1 + 24), nm, font=F("mono", 24), fill=(220, 220, 220, 255), anchor="lm")
+    img.alpha_composite(lay)
+    na = sc.get("note_at", D - 2.0)
+    if t > na and sc.get("note"):
+        b = ease(clamp((t - na) / 0.5))
+        rect_a(img, (110, 1330, W - 110, 1430), (8, 10, 14), 0.8 * b, 18, A, 3)
+        text_a(img, (W / 2, 1380), sc["note"], fit_font("anton", 50, sc["note"], W - 280), WHITE, b, "mm")
+    credit(img, sc.get("bg"), a); chrome(img, tg)
+
+R.SCENE_FN.update({"ln_map": sc_ln_map})
+
+
 if __name__ == "__main__":
     R.main()
